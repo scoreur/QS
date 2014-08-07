@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/QScore.jpg</file>
+        <file>sound/test.wav</file>
+    </qresource>
+</RCC>

@@ -4,9 +4,13 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include "pianokey.h"
+#include <QGraphicsItem>
+#include <vector>
+#include "qsscene.h"
+#include <QThread>
+#include <QSoundEffect>
 
-
+class musicPlay;
 
 namespace Ui {
 class QSWindow;
@@ -26,47 +30,24 @@ public slots:
 
 private:
     Ui::QSWindow *ui;
-    QGraphicsScene *wavScene, *keyScene, *scoreScene;
+    QGraphicsScene *keyScene;
+    std::vector<QGraphicsScene *> wavScene, scoreScene;
+    int currentWavId, currentScoreId;
     QString openFileName, saveFileName, tempFileName;
-    static qreal wavViewSec;//seconds in view
+    musicPlay *musicthread;
 
-    void keyBoardInit();
-    void wavFormInit();
-    void scoreInit();
 
-    qulonglong wavLoad();
 public:
-    short *wavldata, *wavrdata;//left & right channel pcm data
+
     qulonglong wavdatasize;
     //score structure undefined!
 private slots:
     void on_verticalScrollBar_valueChanged(int value);
-
-public slots:
-    void wavFormUpdate();
-    void scoreUpdate();
-};
-
-
-class WavFormChannel: public QGraphicsItem{
-public:
-    WavFormChannel(qulonglong _datasize, short *_data, qreal _intv, qreal _amp);
-    ~WavFormChannel(){
-        delete data;
-    };
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
-
-private:
-
-    qulonglong datasize;
-    qreal interval;
-    qreal amplitude;
-    QPointF *data;
-    const QRectF bound;
+    void switchWavScene(QAction*);
 
 };
+
+
+
 
 #endif // QSWINDOW_H

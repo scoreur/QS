@@ -3,6 +3,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 
+
 class ScoreItem: public QGraphicsItem
 {
 public:

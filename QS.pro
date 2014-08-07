@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui \
+         multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,10 +16,19 @@ TEMPLATE = app
 SOURCES += main.cpp\
         qswindow.cpp \
     pianokey.cpp \
-    scoreitem.cpp
+    scoreitem.cpp \
+    wavchannel.cpp \
+    qsscene.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
-    scoreitem.h
+    scoreitem.h \
+    wavchannel.h \
+    qsscene.h
 
 FORMS    += qswindow.ui
+
+RESOURCES += \
+    qs.qrc
+
+ICON = icon.icns

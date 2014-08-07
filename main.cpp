@@ -1,5 +1,6 @@
 #include "qswindow.h"
 #include <QApplication>
+#include <QSound>
 
 int main(int argc, char *argv[])
 {

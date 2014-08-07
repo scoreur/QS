@@ -42,14 +42,41 @@
         <height>204</height>
        </rect>
       </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>select zone</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>1000</number>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustToContents</enum>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
       <property name="dragMode">
-       <enum>QGraphicsView::ScrollHandDrag</enum>
+       <enum>QGraphicsView::NoDrag</enum>
       </property>
      </widget>
      <widget class="QGraphicsView" name="keyView">
@@ -60,6 +87,24 @@
         <width>936</width>
         <height>130</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>click me</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>1500</number>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -140,20 +185,29 @@
     <addaction name="actionOpen_File"/>
     <addaction name="actionSave_File"/>
     <addaction name="actionSave_File_as"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose_all"/>
    </widget>
    <widget class="QMenu" name="menuConvert">
     <property name="title">
      <string>Convert</string>
     </property>
-    <addaction name="actionShow_wave_form"/>
+    <addaction name="actionShow_specturm"/>
     <addaction name="separator"/>
     <addaction name="actionWav_to_score"/>
     <addaction name="actionScore_to_wav"/>
     <addaction name="separator"/>
     <addaction name="actionPreset"/>
    </widget>
+   <widget class="QMenu" name="menuOpened">
+    <property name="title">
+     <string>Opened</string>
+    </property>
+    <addaction name="separator"/>
+   </widget>
    <addaction name="menuQS"/>
    <addaction name="menuConvert"/>
+   <addaction name="menuOpened"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="toolTip">
@@ -208,6 +262,16 @@
   <action name="actionShow_wave_form">
    <property name="text">
     <string>show wave form</string>
+   </property>
+  </action>
+  <action name="actionShow_specturm">
+   <property name="text">
+    <string>show specturm</string>
+   </property>
+  </action>
+  <action name="actionClose_all">
+   <property name="text">
+    <string>close all.</string>
    </property>
   </action>
  </widget>
