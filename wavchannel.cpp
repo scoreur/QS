@@ -1,14 +1,14 @@
 #include "wavchannel.h"
 #include <QDebug>
-#include <QCursor>
 
-wavChannel::wavChannel(qulonglong _datasize, short *_data, qreal _intv, qreal _amp):
+
+wavChannel::wavChannel(quint32 _datasize, short *_data, qreal _intv, qreal _amp):
     datasize(_datasize), interval(_intv), amplitude(_amp),
     bound(QRectF(0,-_amp, _intv*_datasize,_amp*2)){
-    setCursor(QCursor(Qt::IBeamCursor));
+
     data = new QPointF[datasize];
     qreal temp_x = 0;
-    for(qulonglong i=0;i<datasize;++i){
+    for(quint32 i=0;i<datasize;++i){
         data[i].setX(temp_x);
         data[i].setY(-amplitude /(1<<15)*_data[i]);//正负2的15次幂
         temp_x += interval;
@@ -29,9 +29,6 @@ void wavChannel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 }
 
-QRectF wavChannel::boundingRect() const{
-    return bound;
-}
 QPainterPath wavChannel::shape() const{
     QPainterPath path;
     path.addRect(bound);

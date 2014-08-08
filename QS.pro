@@ -18,15 +18,18 @@ SOURCES += main.cpp\
     pianokey.cpp \
     scoreitem.cpp \
     wavchannel.cpp \
-    qsscene.cpp
+    qsscene.cpp \
+    qspreset.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
     scoreitem.h \
     wavchannel.h \
-    qsscene.h
+    qsscene.h \
+    qspreset.h
 
-FORMS    += qswindow.ui
+FORMS    += qswindow.ui \
+    qspreset.ui
 
 RESOURCES += \
     qs.qrc

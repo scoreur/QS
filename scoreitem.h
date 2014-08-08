@@ -3,7 +3,6 @@
 #include <QGraphicsItem>
 #include <QPainter>
 
-
 class ScoreItem: public QGraphicsItem
 {
 public:
@@ -12,7 +11,9 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QPainterPath shape() const;
-    QRectF boundingRect() const;
+    QRectF boundingRect() const{
+        return bound;
+    }
 
     static qint8 keyPitch;
     static qint8 halfnotewidth;
@@ -23,6 +24,7 @@ public:
 
 public slots:
     void noteUpdate(qint8 adjust=0);
+    static void scorePreset(int mode, int arg);
 
 private:
     uchar pitch;//0~87 for note, 88 as rest, 89 as bar
@@ -32,5 +34,7 @@ private:
     qint8 oct;//number of dots above(+) / below(-)
     QRectF bound;
 };
+
+
 
 #endif // SCOREITEM_H

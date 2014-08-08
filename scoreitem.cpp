@@ -1,16 +1,7 @@
 #include "scoreitem.h"
 #include <QDebug>
-// static member initailizing
-qint8 ScoreItem::keyPitch = -9;//C major, A as 0
-qint8 ScoreItem::halfnotewidth = 14;
-qint8 ScoreItem::halfnoteheight = 25;
-qint8 ScoreItem::notespacing = 25;
-qint8 ScoreItem::linespacing = 50;
-qint8 ScoreItem::notesize = 20;
 
-// *******
-
-
+/// @brief constructor of score notation
 ScoreItem::ScoreItem(uchar _pitch, uchar _duration):
     pitch(_pitch), duration(_duration), oct(0),
     bound(QRectF(-halfnotewidth,-halfnoteheight,
@@ -89,12 +80,36 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 }
 
-QRectF ScoreItem::boundingRect() const{
-    return bound;
-}
 QPainterPath ScoreItem::shape() const{
     QPainterPath path;
     path.addRect(bound);
     return path;
 }
 
+// static member initailizing
+qint8 ScoreItem::keyPitch = -9;//C major, A as 0
+qint8 ScoreItem::halfnotewidth = 14;
+qint8 ScoreItem::halfnoteheight = 25;
+qint8 ScoreItem::notespacing = 25;
+qint8 ScoreItem::linespacing = 50;
+qint8 ScoreItem::notesize = 20;
+
+// *******
+
+void ScoreItem::scorePreset(int mode, int arg){
+    switch(mode){
+    case 1:
+        notespacing = (qint8)arg;
+        qDebug()<<"notespacing changed!"<<notespacing;
+        break;
+    case 2:
+        linespacing = (qint8)arg;
+        qDebug()<<"linespacing changed!"<<linespacing;
+        break;
+    case 3:
+        notesize = (qint8)arg;
+        break;
+    default: break;
+    }
+
+}

@@ -3,14 +3,9 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QCursor>
-#include <QSound>
 
 
 //static member initializing
-qreal PianoKey::halfspacing = 9.0;
-qreal PianoKey::halfwidth = 6.0;
-qreal PianoKey::whiteheight = 120.0;
-qreal PianoKey::blackheight = 65.0;
 
 QRectF PianoKey::defaultKeyBound(uchar _id){//currently unused!
     qreal temp_x = 0;
@@ -47,11 +42,11 @@ QPainterPath PianoKey::defaultKeyShape(uchar _id){//y=0 set on upside of keyboar
     QPolygonF polygon;
     switch(type){
     case BLACK:
-        polygon<<QPointF(-halfwidth,0)
+/*        polygon<<QPointF(-halfwidth,0)
                <<QPointF(halfwidth,0)
                <<QPointF(halfwidth,blackheight)
                <<QPointF(-halfwidth,blackheight)
-               <<QPointF(-halfwidth, 0);
+               <<QPointF(-halfwidth, 0); */
         temp.addRoundRect(QRectF(-halfwidth,0, 2*halfwidth, blackheight), 70);
         return temp;
                break;
@@ -112,8 +107,13 @@ bool PianoKey::isWhite(uchar _id){
 }
 
 //static member initializing finished
+qreal PianoKey::halfspacing = 9.0;
+qreal PianoKey::halfwidth = 6.0;
+qreal PianoKey::whiteheight = 120.0;
+qreal PianoKey::blackheight = 65.0;
 
 
+/// @brief constructor of piano key
 PianoKey::PianoKey(uchar _id):
     id(_id),is_white(isWhite(_id)),
     path(defaultKeyShape(_id)),

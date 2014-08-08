@@ -6,25 +6,27 @@
 class wavChannel: public QGraphicsItem{
 
 public:
-    wavChannel(qulonglong _datasize, short *_data, qreal _intv, qreal _amp);
+    wavChannel(quint32 _datasize, short *_data, qreal _intv, qreal _amp);
     ~wavChannel(){
         delete []data;
     };
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    QRectF boundingRect() const;
     QPainterPath shape() const;
+    QRectF boundingRect() const{
+        return bound;
+    }
 signals:
 
 public slots:
 
 private:
 
-    qulonglong datasize;
+    quint32 datasize;
     qreal interval;
     qreal amplitude;
     QPointF *data;
-    const QRectF bound;
+    QRectF bound;
 
 };
 

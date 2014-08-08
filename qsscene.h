@@ -28,12 +28,16 @@ public:
         qDebug()<<"wavScene removed!";
     }
 
-    uint32_t load(QString fileName, uint32_t _off, uint32_t _len);
-
+    quint32 load(QString fileName, quint32 _off, quint32 _len);
+    QString Name(){
+        return name;
+    }
     static qreal secondsPerView;
+    static quint32 wavBufferSize;
 private:
     short *ldata, *rdata;
-    uint32_t offset, len;
+    quint32 offset, len;
+    QString name;
 };
 
 class ScoreScene : public QGraphicsScene
@@ -44,13 +48,16 @@ public:
     ~ScoreScene(){
         qDebug()<<"scoreScene removed!";
     }
-    uint32_t load(QString fileName);
+    quint32 load(QString fileName);
+    QString Name(){
+        return name;
+    }
 
 private:
     std::vector<uchar> note;
-    std::vector<uint8_t> dura;
-    uint32_t len;
-
+    std::vector<quint8> dura;
+    quint32 len;
+    QString name;
 };
 
 
