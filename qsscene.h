@@ -2,64 +2,86 @@
 #define QSSCENE_H
 
 #include <QGraphicsScene>
-#include <QGraphicsView>
-#include <vector>
+#include <QVector>
 #include <QString>
-#include <QDebug>
+#include <QAction>
 
+
+class QGraphicsItem;
+class QGraphicsView;
 
 class KeyScene : public QGraphicsScene
 {
 
 public:
-    KeyScene(QObject *parent, QGraphicsView *view);
-    ~KeyScene(){
-        qDebug()<<"keyScene removed!";
-    }
-
+    KeyScene(QGraphicsView *view, QObject *parent);
+    ~KeyScene();
+private:
+    QGraphicsItem *board;
 };
 
-class WavScene : public QGraphicsScene
-{
+class QSScene : public QGraphicsScene{
 
 public:
-    WavScene(QObject *parent, QGraphicsView *view, QString fileName = "");
-    ~WavScene(){
-        qDebug()<<"wavScene removed!";
-    }
-
-    quint32 load(QString fileName, quint32 _off, quint32 _len);
-    QString Name(){
+    explicit QSScene(QGraphicsView *view, QString fileName = "");
+    ~QSScene();
+    QString Name() const{
         return name;
     }
+    QAction *Opened() const{
+        return act;
+    }
+    void setName(QString fileName);
+    virtual quint32 load(QString fileName) = 0;
+    virtual quint32 store(QString fileName) = 0;
+
+private:
+    QString name;
+    QAction *act;
+};
+
+class WavScene : public QSScene
+{
+public:
+    WavScene(QGraphicsView *view, QString fileName = "");
+    ~WavScene();
+
+    quint32 load(QString fileName){
+        return load(fileName, 0, wavBufferSize);
+    }
+    quint32 store(QString fileName){return 0;}
+    quint32 load(QString fileName, quint32 _offset, quint32 _len);
     static qreal secondsPerView;
     static quint32 wavBufferSize;
 private:
     short *ldata, *rdata;
     quint32 offset, len;
-    QString name;
 };
 
-class ScoreScene : public QGraphicsScene
+class ScoreScene : public QSScene
 {
 
 public:
-    ScoreScene(QObject *parent, QGraphicsView *view, QString fileName = "");
-    ~ScoreScene(){
-        qDebug()<<"scoreScene removed!";
-    }
+    ScoreScene(QGraphicsView *view, QString fileName = "");
+    ~ScoreScene();
     quint32 load(QString fileName);
-    QString Name(){
-        return name;
-    }
+    quint32 store(QString fileName){return 0;}
 
 private:
-    std::vector<uchar> note;
-    std::vector<quint8> dura;
+    QVector<uchar> note;
+    QVector<quint8> dura;
     quint32 len;
-    QString name;
 };
 
+class StaffScene : public QSScene{
+public:
+    StaffScene(QGraphicsView *view, QString fileName);
+    ~StaffScene();
+    quint32 load(QString fileName){return 0;}
+    quint32 store(QString fileName){return 0;}
+private:
+
+};
 
 
 #endif // QSSCENE_H

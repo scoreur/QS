@@ -16,7 +16,6 @@ QSPreset::QSPreset(QWidget *parent) :
 }
 
 QSPreset::~QSPreset(){
-
     delete ui;
     qDebug()<<"preset dialog delete!";
 }

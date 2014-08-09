@@ -5,12 +5,90 @@
 #include <QCursor>
 
 
+
+
+/// @brief constructor of piano key
+PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
+    QGraphicsItem(parent),
+    id(_id),is_white(isWhite(_id)),
+    path(defaultKeyShape(_id)),
+    bound(
+         is_white?
+         QRectF(-halfspacing,0, halfspacing*2,whiteheight):
+         QRectF(-halfwidth,0, halfwidth*2,blackheight)
+         ),
+    is_pressed(false)
+{
+    setToolTip(QString("I'm No.%1 from the left!").arg(id+1));
+    //qDebug()<< id <<"success";
+}
+
+/// @brief Mouse Event
+void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton){
+        press(true);
+
+    }
+}
+
+void PianoKey::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton){
+        press(false);
+    }
+}
+
+void PianoKey::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton){
+        if(toolTip().right(5) == "left!")
+            setToolTip(QString("I'm No.%1 from the right!").arg(88-id));
+        else
+            setToolTip(QString("I'm No.%1 from the left!").arg(id+1));
+    }
+}
+
+
+void PianoKey::press(bool f){
+    if(f != is_pressed){
+        is_pressed = f;
+        scene()->update(sceneBoundingRect());//important!
+    }// to be continued to add sound
+}
+
+QColor PianoKey::color(){
+    if(is_pressed){
+        if(is_white)
+            return QColor(0xeeeeee);
+        else
+            return QColor(0x666666);
+    }
+    else if(is_white){
+        return Qt::white;
+    }
+    else
+        return Qt::black;
+}
+
+void PianoKey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    QBrush brush(color());
+    QPen pen(Qt::darkGray);
+    pen.setJoinStyle(Qt::RoundJoin);
+    painter->setBrush(brush);
+    painter->setPen(pen);
+    painter->drawPath(path);
+}
+
 //static member initializing
+qreal PianoKey::halfspacing = 9.0;
+qreal PianoKey::halfwidth = 6.0;
+qreal PianoKey::whiteheight = 120.0;
+qreal PianoKey::blackheight = 65.0;
 
 QRectF PianoKey::defaultKeyBound(uchar _id){//currently unused!
     qreal temp_x = 0;
     for(uchar i=0;i<_id;++i){
-
         if(i%12==2 || i%12 ==7) //B, E
             temp_x += PianoKey::halfspacing;
         temp_x += PianoKey::halfspacing;
@@ -47,7 +125,7 @@ QPainterPath PianoKey::defaultKeyShape(uchar _id){//y=0 set on upside of keyboar
                <<QPointF(halfwidth,blackheight)
                <<QPointF(-halfwidth,blackheight)
                <<QPointF(-halfwidth, 0); */
-        temp.addRoundRect(QRectF(-halfwidth,0, 2*halfwidth, blackheight), 70);
+        temp.addRoundRect(QRectF(-halfwidth,0, 2*halfwidth, blackheight), 70);//roundness 70
         return temp;
                break;
     case WHITE_LEFT:
@@ -104,75 +182,6 @@ bool PianoKey::isWhite(uchar _id){
     default:
         return true;
     }
-}
-
-//static member initializing finished
-qreal PianoKey::halfspacing = 9.0;
-qreal PianoKey::halfwidth = 6.0;
-qreal PianoKey::whiteheight = 120.0;
-qreal PianoKey::blackheight = 65.0;
-
-
-/// @brief constructor of piano key
-PianoKey::PianoKey(uchar _id):
-    id(_id),is_white(isWhite(_id)),
-    path(defaultKeyShape(_id)),
-    bound(
-         is_white?
-         QRectF(-halfspacing,0, halfspacing*2,whiteheight):
-         QRectF(-halfwidth,0, halfwidth*2,blackheight)
-         ),
-    is_pressed(false)
-{
-
-    //qDebug()<< id <<"success";
-}
-
-/// @brief Mouse Event
-void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
-    if(event->button() == Qt::LeftButton){
-        press(true);
-
-    }
-}
-
-void PianoKey::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
-    if(event->button() == Qt::LeftButton){
-        press(false);
-    }
-}
-
-void PianoKey::press(bool f){
-    if(f != is_pressed){
-        is_pressed = f;
-        scene()->update(scene()->sceneRect());//important!
-    }// to be continued to add sound
-}
-
-QColor PianoKey::color(){
-    if(is_pressed){
-        if(is_white)
-            return QColor(0xeeeeee);
-        else
-            return QColor(0x666666);
-    }
-    else if(is_white){
-        return Qt::white;
-    }
-    else
-        return Qt::black;
-}
-
-void PianoKey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-    QBrush brush(color());
-    QPen pen(Qt::darkGray);
-    pen.setJoinStyle(Qt::RoundJoin);
-    painter->setBrush(brush);
-    painter->setPen(pen);
-    painter->drawPath(path);
 }
 
 

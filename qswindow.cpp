@@ -8,11 +8,9 @@
 #include <QFile>
 #include <QIcon>
 #include <QDebug>
-#include <fstream>
-#include <QSoundEffect>
-
+//#include <QSoundEffect>
+/*
 class musicPlay : public QThread{
-
 public:
     musicPlay(QUrl _url): stopped(false),
     url(_url){
@@ -22,39 +20,31 @@ public:
         effect->play();
         effect->setVolume(0.5f);
     }
-    ~musicPlay(){
-
-    }
-
+    ~musicPlay(){}
     void stop(){
         stopped = true;
     }
-
 protected:
     void run();
-
 private:
     volatile bool stopped;
     QUrl url;
     QSoundEffect *effect;
-
-
 };
 void musicPlay::run(){
     if(stopped){
         effect->stop();
     }
 }
-
+*/
 
 /// @brief constructor of QS mainwindow
 QSWindow::QSWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::QSWindow),
-    currentWavId(-1),
-    currentScoreId(-1),
     openFileName(""),
-    saveFileName("")
+    saveFileName(""),
+    tempFileName("")
 {
 
     ui->setupUi(this);
@@ -67,185 +57,124 @@ QSWindow::QSWindow(QWidget *parent) :
     connect(ui->actionClose, SIGNAL(triggered()),this, SLOT(closeFile()));
     ui->actionClose->setShortcut(QKeySequence::Close);
     connect(ui->actionPreset, SIGNAL(triggered()), this, SLOT(changePreset()));
-
-
-    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchWavScene(QAction*)));
-    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchScoreScene(QAction*)));
+    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchScene(QAction*)));
     //set icon
     QIcon iconQS(":/image/QScore.jpg");
     setWindowIcon(iconQS);
-
     //initialize
-    keyScene = new KeyScene(this, ui->keyView);
-    addWav();
-    addScore();
+    keyScene = new KeyScene(ui->keyView, this);//parent not keyView
+    addScene(ui->wavView);
+    addScene(ui->scoreView);
+    addScene(ui->staffView);
     preset = new QSPreset(this);
-    //preset->setModal(true);
-    //enhancing effect
+
     ui->statusBar->showMessage("Welcome to QtScoreur!");
 
 }
 
 QSWindow::~QSWindow()
 { 
+    delete keyScene;
     delete preset;
     delete ui;
 }
 
-
-//file control module
+/// @brief file control module
 void QSWindow::openFile(){
     openFileName = QFileDialog::getOpenFileName
-            (this, "Open File: ", QDir::homePath(), "*.wav *.txt");
-
+            (this, "Open File: ", QDir::homePath(), "*.wav *.txt *.mid");
     if(openFileName.isEmpty())
         ui->statusBar->showMessage("open file unchosen!", 5000);
     else{
         ui->statusBar->showMessage(QString("open: %1").arg(openFileName));
         if(openFileName.endsWith("wav", Qt::CaseInsensitive)){
-            addWav(openFileName);
+            addScene(ui->wavView, openFileName);
             //musicthread = new musicPlay(QUrl(QString("file://") + openFileName));
             //musicthread->start();
         }
         else if(openFileName.endsWith("txt", Qt::CaseInsensitive))
         {
-            addScore(openFileName);
-
+            addScene(ui->scoreView, openFileName);
         }
-        else{
-            ui->statusBar->showMessage("can't process such a file!");
+        else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
+            addScene(ui->staffView, openFileName);
+        }else{
+            ui->statusBar->showMessage("can't process such file format!");
             openFileName = "";
         }
-
     }
-
 }
 void QSWindow::saveFile(){
-    if(ui->tabWidget->currentIndex()==1)
-        saveFileName = QFileDialog::getSaveFileName(this, "Save .wav File: ", QDir::currentPath(), "*.wav");
-    else
-        saveFileName = QFileDialog::getSaveFileName(this, "Save .txt File: ", QDir::currentPath(), "*.txt");
+    if(ui->tabWidget->currentWidget() == ui->wavTab)
+        saveFileName = QFileDialog::getSaveFileName(this, "Save .wav File: ", QDir::homePath(), "*.wav");
+    else if(ui->tabWidget->currentWidget() == ui->scoreTab)
+        saveFileName = QFileDialog::getSaveFileName(this, "Save .txt File: ", QDir::homePath(), "*.txt");
+    else if(ui->tabWidget->currentWidget() == ui->staffTab)
+        saveFileName = QFileDialog::getSaveFileName(this, "Save .mid File: ", QDir::homePath(), "*.mid");
 
     if(saveFileName.isEmpty())
-        ui->statusBar->showMessage("save file unchosen!", 5000);
-    else
-    {
-        if(QDir(saveFileName).exists()){
-            ui->statusBar->showMessage(QString("the file %1 already exists! Please change to another!").arg(saveFileName),5000);
-            saveFileName = "";
-        }
-        else{
-            ui->statusBar->showMessage(QString("open: %1; save: %2").arg(openFileName).arg(saveFileName));
-        }
-
+        ui->statusBar->showMessage("save file name unchosen!", 5000);
+    else if(QDir(saveFileName).exists()){
+        ui->statusBar->showMessage(QString("the file %1 already exists! Please change to another!").arg(saveFileName),5000);
+        saveFileName = "";
+    }
+    else{
+        ui->statusBar->showMessage(QString("save: %1").arg(saveFileName));
     }
 }
 void QSWindow::saveFileAs(){
-
+    ui->statusBar->showMessage("save as ?");
 }
 
 void QSWindow::closeFile(){
-    if(ui->tabWidget->currentIndex() == 0){
-        if(wavOpened.size()>1){
-            delete wavScene[currentWavId];
-            wavScene.remove(currentWavId);
-            ui->menuOpened->removeAction(wavOpened[currentWavId]);
-            delete wavOpened[currentWavId];
-            wavOpened.remove (currentWavId);
-            currentWavId = -1;
-            emit wavOpened[wavOpened.size()-1]->triggered();
-        }else{
-            ui->statusBar->showMessage("only one wave file left!");
-        }
-
-    }else{
-        if(scoreOpened.size()>1){
-            delete scoreScene[currentScoreId];
-            //qDebug()<<"step1"<<scoreScene.size();
-            scoreScene.remove(currentScoreId);
-            ui->menuOpened->removeAction(scoreOpened[currentScoreId]);
-            delete scoreOpened[currentScoreId];
-            //qDebug()<<"step3";
-            scoreOpened.remove (currentScoreId);
-            currentScoreId = -1;//this is important!
-            emit scoreOpened[0]->triggered();
-            //qDebug()<<"step5:"<<currentScoreId;
-        }else{
-            ui->statusBar->showMessage("only one score file left!");
-        }
-
+    QGraphicsView *view = ui->tabWidget->currentWidget()->findChild
+            <QGraphicsView *>(QString(),Qt::FindDirectChildrenOnly);
+    //current view
+    if(view->scene() == 0){
+        ui->statusBar->showMessage("no current file to delete!");
+        return;
     }
+    QSScene* qs = (QSScene*)view->scene();//current scene
+    delete qs;
+    qDebug()<<"after delete:"<<view->children().size();//index starts from 4 (3 default children)
+    if(view->findChild<QSScene*>(QString(),Qt::FindDirectChildrenOnly) != 0)//auto switch to another file if possible
+        emit ((QSScene*)view->findChild<QSScene*>(QString(),Qt::FindDirectChildrenOnly))->Opened()->triggered();
 }
 
-// ***other Slots:
+// other Slots:
 
 void QSWindow::on_verticalScrollBar_valueChanged(int value)
 {
     qDebug()<<value;
 }
 
-void QSWindow::addWav(QString fileName){
-    wavScene.push_back((new WavScene(this, ui->wavView, fileName)));
-    if(fileName == ""){
-        wavOpened.push_back(ui->menuOpened->addAction("~Untitled.wav"));
-
-    }else{
-        wavOpened.push_back(ui->menuOpened->addAction(QString("~%1")
-                                  .arg(fileName.right(16))));
-
+void QSWindow::addScene(QGraphicsView *view, QString fileName){
+    if(view->scene() != 0)
+        ((QSScene *)view->scene())->Opened()->setChecked(false);
+    if(view == ui->wavView){
+        new WavScene(view, fileName);
+    }else if(view == ui->scoreView){
+        new ScoreScene(view, fileName);
+    }else if(view == ui->staffView){
+        new StaffScene(view, fileName);
     }
-    wavOpened[wavOpened.size()-1]->setCheckable(true);
-    emit wavOpened[wavOpened.size()-1]->triggered();
-
+    QSScene* qs = (QSScene*)view->scene();
+    ui->menuOpened->addAction(qs->Opened());
+    emit qs->Opened()->triggered();
 }
 
-void QSWindow::addScore(QString fileName){
-    scoreScene.push_back((new ScoreScene(this, ui->scoreView, fileName)));
-    if(fileName == ""){
-        scoreOpened.push_back(ui->menuOpened->addAction("~Untitled.txt"));
-
-    }else{
-        scoreOpened.push_back(ui->menuOpened->addAction(QString("~%1")
-                                  .arg(fileName.right(16))));
-    }
-    scoreOpened[scoreOpened.size()-1]->setCheckable(true);
-    emit scoreOpened[scoreOpened.size()-1]->triggered();
-
-}
-
-void QSWindow::switchWavScene(QAction * act){
-    int id = wavOpened.indexOf(act);
-    if(id == -1) return; //not wave file
-    if(id != currentWavId){ //changed
-        if(currentWavId != -1)
-            wavOpened[currentWavId]->setChecked(false);
-        currentWavId = id;
-        ui->wavView->setScene(wavScene[currentWavId]);
-        qDebug()<<"set wave scene "<<currentWavId;
-    }
-    wavOpened[currentWavId]->setChecked(true);
-    if(ui->tabWidget->currentIndex() == 1)
-        ui->tabWidget->setCurrentIndex(0);
-}
-
-void QSWindow::switchScoreScene(QAction *act)
-{
-    int id = scoreOpened.indexOf(act);
-    if(id == -1) return;//not score file
-    if(id != currentScoreId){//changed
-        if(currentScoreId != -1)//no score file open
-            scoreOpened[currentScoreId]->setChecked(false);
-        currentScoreId = id;
-        ui->scoreView->setScene(scoreScene[currentScoreId]);
-        qDebug()<<"set score scene "<<currentScoreId;
-    }
-    scoreOpened[currentScoreId]->setChecked(true);
-    if(ui->tabWidget->currentIndex() == 0)
-        ui->tabWidget->setCurrentIndex(1);
+void QSWindow::switchScene(QAction * act){
+    QSScene *qs = (QSScene *)act->parent();//triggered one
+    QSScene *qs1 = (QSScene *)((QGraphicsView *)qs->parent())->scene();//current one
+    if(ui->tabWidget->currentWidget() != qs->parent()->parent())//switch tab
+        ui->tabWidget->setCurrentWidget((QWidget*)qs->parent()->parent());
+    if(qs1 != 0) (qs1)->Opened()->setChecked(false);
+    if(qs != qs1) ((QGraphicsView*)qs->parent())->setScene(qs);
+    act->setChecked(true);
+    ui->statusBar->showMessage(QString("current file: %1").arg(qs->Name()), 4000);
 }
 
 void QSWindow::changePreset(){
-
     preset->show();
-
 }
+

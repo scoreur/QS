@@ -1,15 +1,15 @@
 #ifndef PIANOKEY_H
 #define PIANOKEY_H
 #include <QGraphicsItem>
-
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
 class PianoKey: public QGraphicsItem
 {
 public:
-    PianoKey(uchar);
-    ~PianoKey(){}
+    PianoKey(uchar, QGraphicsItem *parent = 0);
+    ~PianoKey(){
+    }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QRectF boundingRect() const{
@@ -42,7 +42,7 @@ protected:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 protected:
     void press(bool f = true);
 private:
@@ -51,6 +51,7 @@ private:
     const QPainterPath path;    //key shape
     const QRectF bound;
     bool is_pressed;
+
 
 
 };

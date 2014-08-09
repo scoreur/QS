@@ -9,9 +9,9 @@
 #include "qsscene.h"
 #include "qspreset.h"
 #include <QThread>
-#include <QSoundEffect>
+//#include <QSoundEffect>
 
-class musicPlay;
+//class musicPlay;
 
 namespace Ui {
 class QSWindow;
@@ -33,23 +33,19 @@ public slots:
 private:
     Ui::QSWindow *ui;
     QGraphicsScene *keyScene;
-    QVector<QGraphicsScene *> wavScene, scoreScene;
-    int currentWavId, currentScoreId;
-    QVector<QAction *> wavOpened, scoreOpened;
-    QString openFileName, saveFileName, tempFileName;
-    musicPlay *musicthread;
     QSPreset *preset;
+    QString openFileName, saveFileName, tempFileName;
+    //musicPlay *musicthread;
+
 
 private slots:
     void on_verticalScrollBar_valueChanged(int value);
-    void addWav(QString fileName = "");
-    void addScore(QString fileName = "");
-    void switchWavScene(QAction*);
-    void switchScoreScene(QAction *);
+    void addScene(QGraphicsView *view, QString fileName = "");
+    void switchScene(QAction*);
+
     void changePreset();
 
 };
-
 
 
 
