@@ -1,9 +1,7 @@
 ﻿#include "pianokey.h"
 #include <QDebug>
-#include <QGraphicsView>
-#include <QGraphicsScene>
 #include <QCursor>
-
+#include <QGraphicsScene>
 
 
 

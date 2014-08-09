@@ -142,6 +142,10 @@ void ScoreItem::scorePreset(int mode, int arg){
 
 }
 
+
+
+
+/// @brief mouse events
 void ScoreItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
 
     setCursor(Qt::SizeVerCursor);

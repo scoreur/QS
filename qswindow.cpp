@@ -1,9 +1,12 @@
 #include "qswindow.h"
 #include "ui_qswindow.h"
-#include "pianokey.h"
-#include "scoreitem.h"
-#include "wavchannel.h"
+#include "qsview.h"
+
+#include "wavscene.h"
+#include "scorescene.h"
+#include "staffscene.h"
 #include "qspreset.h"
+
 #include <QFileDialog>
 #include <QFile>
 #include <QIcon>
@@ -62,10 +65,21 @@ QSWindow::QSWindow(QWidget *parent) :
     QIcon iconQS(":/image/QScore.jpg");
     setWindowIcon(iconQS);
     //initialize
-    keyScene = new KeyScene(ui->keyView, this);//parent not keyView
-    addScene(ui->wavView);
-    addScene(ui->scoreView);
-    addScene(ui->staffView);
+
+    keyView = new QSView(ui->wavTab, 936,130);
+    keyView->move(0,204);
+    keyScene = new KeyScene(keyView);//parent not keyView
+
+    wavView = new WavView(ui->wavTab, 936,204);
+    wavView->move(0,0);
+    scoreView = new ScoreView(ui->scoreTab, 800,300);
+    scoreView->move(0,0);
+    staffView = new StaffView(ui->staffTab, 800,300);
+    staffView->move(0,0);
+
+    addScene(wavView);
+    addScene(scoreView);
+    addScene(staffView);
     preset = new QSPreset(this);
 
     ui->statusBar->showMessage("Welcome to QtScoreur!");
@@ -74,7 +88,6 @@ QSWindow::QSWindow(QWidget *parent) :
 
 QSWindow::~QSWindow()
 { 
-    delete keyScene;
     delete preset;
     delete ui;
 }
@@ -88,16 +101,16 @@ void QSWindow::openFile(){
     else{
         ui->statusBar->showMessage(QString("open: %1").arg(openFileName));
         if(openFileName.endsWith("wav", Qt::CaseInsensitive)){
-            addScene(ui->wavView, openFileName);
+            addScene(wavView, openFileName);
             //musicthread = new musicPlay(QUrl(QString("file://") + openFileName));
             //musicthread->start();
         }
         else if(openFileName.endsWith("txt", Qt::CaseInsensitive))
         {
-            addScene(ui->scoreView, openFileName);
+            addScene(scoreView, openFileName);
         }
         else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
-            addScene(ui->staffView, openFileName);
+            addScene(staffView, openFileName);
         }else{
             ui->statusBar->showMessage("can't process such file format!");
             openFileName = "";
@@ -151,11 +164,11 @@ void QSWindow::on_verticalScrollBar_valueChanged(int value)
 void QSWindow::addScene(QGraphicsView *view, QString fileName){
     if(view->scene() != 0)
         ((QSScene *)view->scene())->Opened()->setChecked(false);
-    if(view == ui->wavView){
+    if(view == wavView){
         new WavScene(view, fileName);
-    }else if(view == ui->scoreView){
+    }else if(view == scoreView){
         new ScoreScene(view, fileName);
-    }else if(view == ui->staffView){
+    }else if(view == staffView){
         new StaffScene(view, fileName);
     }
     QSScene* qs = (QSScene*)view->scene();

@@ -1,7 +1,10 @@
 #ifndef SCOREITEM_H
 #define SCOREITEM_H
+
 #include <QGraphicsItem>
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+
 
 class ScoreItem: public QGraphicsItem
 {
@@ -43,6 +46,7 @@ private:
     QColor color;
     int mouseY;
 };
+
 
 
 

@@ -1,13 +1,13 @@
-#ifndef WAVCHANNEL_H
-#define WAVCHANNEL_H
+#ifndef WAVFRAME_H
+#define WAVFRAME_H
 #include <QPainter>
 #include <QGraphicsItem>
 
-class wavChannel: public QGraphicsItem{
+class WavFrame: public QGraphicsItem{
 
 public:
-    wavChannel(quint32 _datasize, short *_data, qreal _intv, qreal _amp);
-    ~wavChannel(){
+    WavFrame(quint32 _datasize, short *_data, qreal _intv, qreal _amp);
+    ~WavFrame(){
         delete []data;
     };
 
@@ -16,6 +16,8 @@ public:
     QRectF boundingRect() const{
         return bound;
     }
+
+    static quint16 framesize;
 signals:
 
 public slots:
@@ -31,4 +33,4 @@ private:
 };
 
 
-#endif // WAVCHANNEL_H
+#endif // WAVFRAME_H

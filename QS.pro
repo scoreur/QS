@@ -17,16 +17,24 @@ SOURCES += main.cpp\
         qswindow.cpp \
     pianokey.cpp \
     scoreitem.cpp \
-    wavchannel.cpp \
     qsscene.cpp \
-    qspreset.cpp
+    qspreset.cpp \
+    wavscene.cpp \
+    scorescene.cpp \
+    staffscene.cpp \
+    wavframe.cpp \
+    qsview.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
     scoreitem.h \
-    wavchannel.h \
     qsscene.h \
-    qspreset.h
+    qspreset.h \
+    wavscene.h \
+    scorescene.h \
+    staffscene.h \
+    wavframe.h \
+    qsview.h
 
 FORMS    += qswindow.ui \
     qspreset.ui

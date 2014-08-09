@@ -2,11 +2,10 @@
 #define QSWINDOW_H
 
 #include <QMainWindow>
-#include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsItem>
 #include <QVector>
 #include "qsscene.h"
+#include "qsview.h"
 #include "qspreset.h"
 #include <QThread>
 //#include <QSoundEffect>
@@ -33,6 +32,7 @@ public slots:
 private:
     Ui::QSWindow *ui;
     QGraphicsScene *keyScene;
+    QSView *keyView, *wavView, *scoreView, *staffView;
     QSPreset *preset;
     QString openFileName, saveFileName, tempFileName;
     //musicPlay *musicthread;
