@@ -8,9 +8,12 @@
 #include "qsview.h"
 #include "qspreset.h"
 #include <QThread>
-//#include <QSoundEffect>
+#include <QEvent>
 
-//class musicPlay;
+#include <QMediaPlayer>
+#include <QSlider>
+#include <QAbstractButton>
+
 
 namespace Ui {
 class QSWindow;
@@ -23,19 +26,39 @@ class QSWindow : public QMainWindow
 public:
     explicit QSWindow(QWidget *parent = 0);
     ~QSWindow();
+    
+    static QSize defaultWinSize;
+    static QRect keyViewRect;
+    static QRect wavViewRect;
+    static QRect scoreViewRect;
+    static QRect staffViewRect;
+    
 public slots:
     void openFile();
     void saveFile();
     void saveFileAs();
     void closeFile();
 
+    //music play
+    void musicPlay();
+    void positionChanged(qint64 position);
+    void durationChanged(qint64 duration);
+    void mediaStateChanged(QMediaPlayer::State state);
+    void setPosition(int position);
+
+protected slots:
+    void closeEvent(QCloseEvent *);
+
+
 private:
     Ui::QSWindow *ui;
-    QGraphicsScene *keyScene;
     QSView *keyView, *wavView, *scoreView, *staffView;
     QSPreset *preset;
     QString openFileName, saveFileName, tempFileName;
-    //musicPlay *musicthread;
+
+    QMediaPlayer *mediaPlayer;
+    QAbstractButton *playButton;
+    QSlider *positionSlider;
 
 
 private slots:

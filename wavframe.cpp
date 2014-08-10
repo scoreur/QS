@@ -1,20 +1,29 @@
 
 #include "wavframe.h"
 #include <QDebug>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 
-WavFrame::WavFrame(quint32 _datasize, short *_data, qreal _intv, qreal _amp):
-    datasize(_datasize), interval(_intv), amplitude(_amp),
-    bound(QRectF(0,-_amp, _intv*_datasize,_amp*1.5)){
+WavFrame::WavFrame(quint32 _len, short *_data, qreal _intv, qreal _width, qreal _amp):
+    datasize((quint32)(_width/_intv)),
+    interval(_intv), amplitude(_amp),
+    bound(QRectF(0,-_amp, _width,_amp*2.0)){
 
     data = new QPointF[datasize];
-    qreal temp_x = 0;
+    qreal d = _len/(qreal)datasize;
     for(quint32 i=0;i<datasize;++i){
-        data[i].setX(temp_x);
-        data[i].setY(-amplitude /(1<<15)*_data[i]);//正负2的15次幂
-        temp_x += interval;
+        quint32 j = (quint32)(i*d);
+        data[i] = QPointF(j*interval, -amplitude /(1<<15)*_data[j]);
+        //2 to the 15th power as maximum
     }
-    //qDebug()<<"construct channel: "<<temp_x;
+    int k = 1;
+    while(k<_len-100){
+    while(k<_len-1 && (_data[k]-_data[k-1]<=5 || _data[k+1]-_data[k]>=-5)
+          &&(_data[k]-_data[k-1]>=-5 || _data[k+1]-_data[k]<=5))++k;
+    pdata.push_back(QPointF(k*interval, -amplitude /(1<<15)*_data[k])); ++k;
+    }
+    qDebug()<<"array"<<datasize<<"vector:"<<pdata.size();
 }
 
 // static member
@@ -24,9 +33,9 @@ void WavFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option);
     Q_UNUSED(widget);
     painter->setPen(QPen(Qt::darkGreen));
-    if(datasize>0)
-        painter->drawPolyline(data, datasize);
 
+    //painter->drawPolyline((QPointF*)pdata.begin(), pdata.size());
+    painter->drawPolyline(data, datasize);
 }
 
 QPainterPath WavFrame::shape() const{

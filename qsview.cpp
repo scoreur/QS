@@ -8,7 +8,7 @@ QSView::QSView(QWidget *parent, int w, int h):
     resize(w,h);
     setEnabled(true);
     show();
-    setDragMode(RubberBandDrag);
+    setDragMode(NoDrag);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -20,7 +20,7 @@ void QSView::wheelEvent(QWheelEvent *event){
 
 WavView::WavView(QWidget *parent, int w, int h):
     QSView(parent, w, h){
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 }
 void WavView::wheelEvent(QWheelEvent *event){

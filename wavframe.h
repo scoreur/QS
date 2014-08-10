@@ -6,7 +6,7 @@
 class WavFrame: public QGraphicsItem{
 
 public:
-    WavFrame(quint32 _datasize, short *_data, qreal _intv, qreal _amp);
+    WavFrame(quint32 _datasize, short *_data, qreal _intv, qreal _width, qreal _amp);
     ~WavFrame(){
         delete []data;
     };
@@ -25,9 +25,10 @@ public slots:
 private:
 
     quint32 datasize;
-    qreal interval;
+    qreal interval;//the horizontal difference between neighbor points
     qreal amplitude;
     QPointF *data;
+    QVector<QPointF>pdata;
     QRectF bound;
 
 };

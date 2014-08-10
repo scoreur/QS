@@ -16,6 +16,8 @@ public:
     quint32 store(QString fileName){return 0;}
     quint32 load(QString fileName, quint32 _offset, quint32 _len);
     static qreal secondsPerView;
+    static qreal accuracy;
+    static quint16 sampleps;
     static quint32 wavBufferSize;
 protected:
     void drawForeground(QPainter *painter, const QRectF &rect);
