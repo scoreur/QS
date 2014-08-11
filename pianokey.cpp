@@ -2,8 +2,11 @@
 #include <QDebug>
 #include <QCursor>
 #include <QGraphicsScene>
+#include <QSound>
+#include <QDir>
 
-
+QString PianoKey::soundpath = QDir::currentPath().append("/../../../../QS/sound/keyboard/piano_%1.wav");
+        //QString("/Users/user/Documents/compile/Qt5/QS/sound/keyboard/piano_%1.wav");
 
 /// @brief constructor of piano key
 PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
@@ -25,6 +28,7 @@ PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
 void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(true);
+        QSound::play(soundpath.arg(QString::number(id,10),2,'0'));
 
     }
 }
@@ -32,6 +36,7 @@ void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
 void PianoKey::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(false);
+        //QSound::stop();no static, need an instance
     }
 }
 

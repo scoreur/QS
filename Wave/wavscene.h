@@ -1,7 +1,7 @@
 #ifndef WAVSCENE_H
 #define WAVSCENE_H
 
-#include "qsscene.h"
+#include "../qsscene.h"
 #include <QGraphicsRectItem>
 
 class WavScene : public QSScene

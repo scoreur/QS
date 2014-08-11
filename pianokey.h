@@ -3,6 +3,8 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+//#include <QString>
+
 
 class PianoKey: public QGraphicsItem
 {
@@ -20,6 +22,8 @@ public:
     }
 
     QColor color();
+
+    static QString soundpath;
 
     static qreal halfspacing;   //half interval of white keys
     static qreal halfwidth;     //half width fo black keys

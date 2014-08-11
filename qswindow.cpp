@@ -2,9 +2,9 @@
 #include "ui_qswindow.h"
 #include "qsview.h"
 
-#include "wavscene.h"
-#include "scorescene.h"
-#include "staffscene.h"
+#include "Wave/wavscene.h"
+#include "Score/scorescene.h"
+#include "Staff/staffscene.h"
 #include "qspreset.h"
 
 #include <QFileDialog>
@@ -17,29 +17,17 @@
 QSWindow::QSWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::QSWindow),
-    keyView(0),
-    wavView(0),
-    scoreView(0),
-    staffView(0),
     openFileName(""),
     saveFileName(""),
-    tempFileName("")
+    tempFileName(""),
+    mediaPlayer(new QMediaPlayer(this,QMediaPlayer::VideoSurface))
 {
 
     ui->setupUi(this);
-    //file control buttons and shortcuts
-    connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(openFile()));
-    ui->actionOpen_File->setShortcut(QKeySequence::Open);
-    connect(ui->actionSave_File, SIGNAL(triggered()), this, SLOT(saveFile()));
-    ui->actionSave_File->setShortcut(QKeySequence::Save);
-    connect(ui->actionSave_File_as, SIGNAL(triggered()), this, SLOT(saveFileAs()));
-    ui->actionSave_File_as->setShortcut(QKeySequence::SaveAs);
-    connect(ui->actionClose, SIGNAL(triggered()),this, SLOT(closeFile()));
-    ui->actionClose->setShortcut(QKeySequence::Close);
-
-
-    connect(ui->actionPreset, SIGNAL(triggered()), this, SLOT(changePreset()));
-    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchScene(QAction*)));
+    wavView = (new WavView(ui->wavTab, wavViewRect.width(),wavViewRect.height()));
+    scoreView = (new ScoreView(ui->scoreTab, scoreViewRect.width(),scoreViewRect.height()));
+    staffView = (new StaffView(ui->staffTab, staffViewRect.width(),staffViewRect.height()));
+    keyView = (new QSView(ui->wavTab, keyViewRect.width(),keyViewRect.height()));
     //set icon
     QIcon iconQS(":/image/QScore.jpg");
     setWindowIcon(iconQS);
@@ -47,20 +35,16 @@ QSWindow::QSWindow(QWidget *parent) :
 
     resize(defaultWinSize);
 
-    wavView = new WavView(ui->wavTab, wavViewRect.width(),wavViewRect.height());
+    //for rearrangement
     wavView->move(0,0);
-    scoreView = new ScoreView(ui->scoreTab, scoreViewRect.width(),scoreViewRect.height());
     scoreView->move(0,0);
-    staffView = new StaffView(ui->staffTab, staffViewRect.width(),staffViewRect.height());
     staffView->move(0,0);
-    keyView = new QSView(ui->wavTab, keyViewRect.width(),keyViewRect.height());//must be created after wavView!
     keyView->move(keyViewRect.x(),keyViewRect.y());
-    new KeyScene(keyView);
-
 
     addScene(wavView);
     addScene(scoreView);
     addScene(staffView);
+    new KeyScene(keyView);
     preset = new QSPreset(this);
 
     ui->statusBar->showMessage("Welcome to QtScoreur!");
@@ -75,14 +59,7 @@ QSWindow::QSWindow(QWidget *parent) :
     positionSlider->move(wavViewRect.bottomLeft());
     positionSlider->setRange(0, 0);
 
-
-    mediaPlayer = new QMediaPlayer(this,QMediaPlayer::VideoSurface);
-    connect(mediaPlayer, SIGNAL(positionChanged(qint64)), this,SLOT(positionChanged(qint64)));
-    connect(mediaPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
-    connect(mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),SLOT(mediaStateChanged(QMediaPlayer::State)));
-    connect(positionSlider, SIGNAL(valueChanged(int)), this, SLOT(setPosition(int)));
-    connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()));
-
+    preloadConnect();
 
 }
 //music slot:
@@ -121,6 +98,28 @@ QSWindow::~QSWindow()
 { 
     delete mediaPlayer;
     delete ui;
+}
+
+void QSWindow::preloadConnect(){
+    //file control buttons and shortcuts
+    connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(openFile()));
+    ui->actionOpen_File->setShortcut(QKeySequence::Open);
+    connect(ui->actionSave_File, SIGNAL(triggered()), this, SLOT(saveFile()));
+    ui->actionSave_File->setShortcut(QKeySequence::Save);
+    connect(ui->actionSave_File_as, SIGNAL(triggered()), this, SLOT(saveFileAs()));
+    ui->actionSave_File_as->setShortcut(QKeySequence::SaveAs);
+    connect(ui->actionClose, SIGNAL(triggered()),this, SLOT(closeFile()));
+    ui->actionClose->setShortcut(QKeySequence::Close);
+
+    connect(ui->actionPreset, SIGNAL(triggered()), this, SLOT(changePreset()));
+    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchScene(QAction*)));
+
+    //music state management
+    connect(mediaPlayer, SIGNAL(positionChanged(qint64)), this,SLOT(positionChanged(qint64)));
+    connect(mediaPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
+    connect(mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),SLOT(mediaStateChanged(QMediaPlayer::State)));
+    connect(positionSlider, SIGNAL(valueChanged(int)), this, SLOT(setPosition(int)));
+    connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()));
 }
 
 /// @brief static member

@@ -1,7 +1,7 @@
 #ifndef SCORESCENE_H
 #define SCORESCENE_H
 
-#include "qsscene.h"
+#include "../qsscene.h"
 #include <QVector>
 #include <QGraphicsRectItem>
 

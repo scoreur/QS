@@ -1,5 +1,34 @@
 <RCC>
     <qresource prefix="/">
         <file>image/QScore.jpg</file>
+        <file>image/staff/bass_clef.png</file>
+        <file>image/staff/beat_4over4.png</file>
+        <file>image/staff/flat.png</file>
+        <file>image/staff/fullnote.png</file>
+        <file>image/staff/halfnote_down.png</file>
+        <file>image/staff/halfnote_up.png</file>
+        <file>image/staff/notetail.png</file>
+        <file>image/staff/quarter_rest.png</file>
+        <file>image/staff/quater_down.png</file>
+        <file>image/staff/quater_up.png</file>
+        <file>image/staff/quaver_down.png</file>
+        <file>image/staff/quaver_rest.png</file>
+        <file>image/staff/quaver_up.png</file>
+        <file>image/staff/repeat.png</file>
+        <file>image/staff/semi_quaver_down.png</file>
+        <file>image/staff/semiquaver_up.png</file>
+        <file>image/staff/sharp.png</file>
+        <file>image/staff/sustain.png</file>
+        <file>image/staff/treble_clef.png</file>
+        <file>image/staff/two_quaver_down.png</file>
+        <file>image/staff/two_quaver_up.png</file>
+        <file>image/staff/paper1.png</file>
+        <file>image/staff/paper2.png</file>
+        <file>image/staff/paper3.png</file>
+        <file>image/staff/paper4.png</file>
+        <file>image/staff/paper5.png</file>
+        <file>image/staff/bracket.png</file>
+        <file>image/staff/double_sharp.png</file>
+        <file>image/staff/wallpaper.png</file>
     </qresource>
 </RCC>

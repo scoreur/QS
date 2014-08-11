@@ -52,13 +52,15 @@ protected slots:
 
 private:
     Ui::QSWindow *ui;
-    QSView *keyView, *wavView, *scoreView, *staffView;
+    QSView *wavView, *scoreView, *staffView,  *keyView;//keyview must be created after wavView
     QSPreset *preset;
     QString openFileName, saveFileName, tempFileName;
 
     QMediaPlayer *mediaPlayer;
     QAbstractButton *playButton;
     QSlider *positionSlider;
+
+    void preloadConnect();
 
 
 private slots:

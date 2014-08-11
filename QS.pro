@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui \
-         multimedia multimediawidgets
+         multimedia multimediawidgets \
+         network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,24 +17,24 @@ TEMPLATE = app
 SOURCES += main.cpp\
         qswindow.cpp \
     pianokey.cpp \
-    scoreitem.cpp \
+    Score/scoreitem.cpp \
+    Score/scorescene.cpp \
     qsscene.cpp \
     qspreset.cpp \
-    wavscene.cpp \
-    scorescene.cpp \
-    staffscene.cpp \
-    wavframe.cpp \
+    Wave/wavscene.cpp \
+    Wave/wavframe.cpp \
+    Staff/staffscene.cpp \
     qsview.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
-    scoreitem.h \
+    Score/scoreitem.h \
+    Score/scorescene.h \
     qsscene.h \
     qspreset.h \
-    wavscene.h \
-    scorescene.h \
-    staffscene.h \
-    wavframe.h \
+    Wave/wavscene.h \
+    Wave/wavframe.h \
+    Staff/staffscene.h \
     qsview.h
 
 FORMS    += qswindow.ui \

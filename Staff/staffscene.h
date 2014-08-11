@@ -1,7 +1,7 @@
 #ifndef STAFFSCENE_H
 #define STAFFSCENE_H
 
-#include "qsscene.h"
+#include "../qsscene.h"
 
 class StaffScene : public QSScene{
 public:
