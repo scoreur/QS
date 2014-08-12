@@ -2,33 +2,37 @@
 #include <QDebug>
 #include <QCursor>
 #include <QGraphicsScene>
-#include <QSound>
 #include <QDir>
+#include <QTimer>
+#include "qsscene.h"
 
 QString PianoKey::soundpath = QDir::currentPath().append("/../../../../QS/sound/keyboard/piano_%1.wav");
         //QString("/Users/user/Documents/compile/Qt5/QS/sound/keyboard/piano_%1.wav");
 
 /// @brief constructor of piano key
 PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
-    QGraphicsItem(parent),
+    QGraphicsObject(parent),
     id(_id),is_white(isWhite(_id)),
     path(defaultKeyShape(_id)),
-    bound(
-         is_white?
-         QRectF(-halfspacing,0, halfspacing*2,whiteheight):
-         QRectF(-halfwidth,0, halfwidth*2,blackheight)
-         ),
-    is_pressed(false)
+    bound(is_white?whiteBound : blackBound),
+    is_pressed(false),
+    keysound(new QSound(soundpath.arg(QString::number(id,10),2,'0')))
+    //keythread (new QThread(0))
 {
     setToolTip(QString("I'm No.%1 from the left!").arg(id+1));
+
     //qDebug()<< id <<"success";
+    //keysound->moveToThread(keythread);
 }
 
 /// @brief Mouse Event
 void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(true);
-        QSound::play(soundpath.arg(QString::number(id,10),2,'0'));
+        ((KeyScene*)scene())->keyInput(id);
+        //keythread->start();
+        keysound->play();
+        //QSound::play(soundpath.arg(QString::number(id,10),2,'0'));
 
     }
 }
@@ -36,7 +40,9 @@ void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
 void PianoKey::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(false);
-        //QSound::stop();no static, need an instance
+        QTimer::singleShot(latency,keysound,SLOT(stop()));//timer cannot function in multithreat
+        //keythread->quit();
+
     }
 }
 
@@ -83,23 +89,14 @@ void PianoKey::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawPath(path);
 }
 
-//static member initializing
+//keyshape parameters
 qreal PianoKey::halfspacing = 9.0;
 qreal PianoKey::halfwidth = 6.0;
 qreal PianoKey::whiteheight = 120.0;
 qreal PianoKey::blackheight = 65.0;
-
-QRectF PianoKey::defaultKeyBound(uchar _id){//currently unused!
-    qreal temp_x = 0;
-    for(uchar i=0;i<_id;++i){
-        if(i%12==2 || i%12 ==7) //B, E
-            temp_x += PianoKey::halfspacing;
-        temp_x += PianoKey::halfspacing;
-    }
-    return isWhite(_id)?
-                QRectF(temp_x,0, halfspacing*2,whiteheight):
-                QRectF(temp_x,0, halfwidth*2,blackheight);
-}
+QRectF PianoKey::blackBound = QRectF(-halfwidth,0, halfwidth*2,blackheight);
+QRectF PianoKey::whiteBound = QRectF(-halfspacing,0, halfspacing*2,whiteheight);
+quint16 PianoKey::latency = 800;
 
 QPainterPath PianoKey::defaultKeyShape(uchar _id){//y=0 set on upside of keyboard
     TYPE type = TYPE(0);
@@ -123,49 +120,51 @@ QPainterPath PianoKey::defaultKeyShape(uchar _id){//y=0 set on upside of keyboar
     QPolygonF polygon;
     switch(type){
     case BLACK:
-/*        polygon<<QPointF(-halfwidth,0)
-               <<QPointF(halfwidth,0)
+/*        polygon<<blackBound.topLeft
+               <<blackBound.topRight
                <<QPointF(halfwidth,blackheight)
                <<QPointF(-halfwidth,blackheight)
-               <<QPointF(-halfwidth, 0); */
-        temp.addRoundRect(QRectF(-halfwidth,0, 2*halfwidth, blackheight), 70);//roundness 70
+               <<QPointF(-halfwidth, 0); */// for fine looking
+        temp.addRoundRect(blackBound, 70);//roundness 70
         return temp;
                break;
     case WHITE_LEFT:
-        polygon<<QPointF(-halfspacing,0)
+        polygon<<whiteBound.topLeft()
                <<QPointF(halfspacing-halfwidth, 0)
                <<QPointF(halfspacing-halfwidth, blackheight)
                <<QPointF(halfspacing, blackheight)
-               <<QPointF(halfspacing, whiteheight)
-               <<QPointF(-halfspacing, whiteheight)
-               <<QPointF(-halfspacing, 0);
+               <<whiteBound.bottomRight()
+               <<whiteBound.bottomLeft()
+               <<whiteBound.topLeft();
                break;
     case WHITE_NORMAL:
         polygon<<QPointF(halfwidth-halfspacing, 0)
                <<QPointF(halfspacing-halfwidth, 0)
                <<QPointF(halfspacing-halfwidth, blackheight)
                <<QPointF(halfspacing, blackheight)
-               <<QPointF(halfspacing, whiteheight)
-               <<QPointF(-halfspacing, whiteheight)
+               <<whiteBound.bottomRight()
+               <<whiteBound.bottomLeft()
                <<QPointF(-halfspacing, blackheight)
                <<QPointF(halfwidth-halfspacing, blackheight)
                <<QPointF(halfwidth-halfspacing, 0);
                break;
     case WHITE_RIGHT:
         polygon<<QPointF(halfwidth-halfspacing, 0)
-               <<QPointF(halfspacing, 0)
-               <<QPointF(halfspacing, whiteheight)
-               <<QPointF(-halfspacing, whiteheight)
+               <<whiteBound.topRight()
+               <<whiteBound.bottomRight()
+               <<whiteBound.bottomLeft()
                <<QPointF(-halfspacing, blackheight)
                <<QPointF(halfwidth-halfspacing, blackheight)
                <<QPointF(halfwidth-halfspacing, 0);
                break;
     case WHITE_WHOLE:
-        polygon<<QPointF(-halfspacing,0)
-               <<QPointF(halfspacing,0)
+/*        polygon<<whiteBound.topLeft
+               <<whiteBound.topRight
                <<QPointF(halfspacing,whiteheight)
                <<QPointF(-halfspacing,whiteheight)
-               <<QPointF(-halfspacing, 0);
+               <<QPointF(-halfspacing, 0);*///for fine looking
+        temp.addRect(whiteBound);
+        return temp;
                break;
 
 

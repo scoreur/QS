@@ -153,6 +153,7 @@ void ScoreItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
     mouseY = event->scenePos().y();
     scene()->update(scene()->sceneRect());
 
+
 }
 
 void ScoreItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){

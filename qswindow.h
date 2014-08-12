@@ -9,10 +9,9 @@
 #include "qspreset.h"
 #include <QThread>
 #include <QEvent>
+#include <QTextEdit>
 
-#include <QMediaPlayer>
-#include <QSlider>
-#include <QAbstractButton>
+#include "qsplayer.h"
 
 
 namespace Ui {
@@ -28,16 +27,23 @@ public:
     ~QSWindow();
     
     static QSize defaultWinSize;
+    static QSize defaultTabSize;
     static QRect keyViewRect;
     static QRect wavViewRect;
     static QRect scoreViewRect;
     static QRect staffViewRect;
+
     
 public slots:
     void openFile();
     void saveFile();
     void saveFileAs();
     void closeFile();
+
+    void generalPreset(int mode, int arg);
+    void generalPreset(int mode, QSize size);
+    void keyInput(quint8);
+
 
     //music play
     void musicPlay();
@@ -53,13 +59,14 @@ protected slots:
 private:
     Ui::QSWindow *ui;
     QSView *wavView, *scoreView, *staffView,  *keyView;//keyview must be created after wavView
+    KeyScene *keyScene;
     QSPreset *preset;
     QString openFileName, saveFileName, tempFileName;
 
     QMediaPlayer *mediaPlayer;
     QAbstractButton *playButton;
     QSlider *positionSlider;
-
+    QSPlayer *musicthread;
     void preloadConnect();
 
 

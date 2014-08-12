@@ -21,6 +21,9 @@ class WavView : public QSView{
 public:
     WavView(QWidget *parent, int w, int h);
     ~WavView(){}
+
+signals:
+    void KeyInput(quint8);
 protected:
     void wheelEvent(QWheelEvent *event);
 };

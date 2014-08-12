@@ -1,18 +1,21 @@
 #ifndef PIANOKEY_H
 #define PIANOKEY_H
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 //#include <QString>
+//#include <QThread>
+#include <QSound>
 
-
-class PianoKey: public QGraphicsItem
+class PianoKey: public QGraphicsObject
 {
+//no need to
 public:
     PianoKey(uchar, QGraphicsItem *parent = 0);
     ~PianoKey(){
-    }
+        delete keysound;
 
+    }
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QRectF boundingRect() const{
         return bound;
@@ -29,8 +32,10 @@ public:
     static qreal halfwidth;     //half width fo black keys
     static qreal whiteheight;   //
     static qreal blackheight;   //
+    static QRectF blackBound;
+    static QRectF whiteBound;
     static QPainterPath defaultKeyShape(uchar);//
-    static QRectF defaultKeyBound(uchar);
+    static quint16 latency;
     static bool isWhite(uchar);
     bool isWhite() const{
         return is_white;
@@ -42,12 +47,14 @@ public:
         WHITE_RIGHT,
         WHITE_WHOLE
     };
+
+
+
 protected:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-protected:
     void press(bool f = true);
 private:
     const uchar id;             //key id
@@ -55,6 +62,10 @@ private:
     const QPainterPath path;    //key shape
     const QRectF bound;
     bool is_pressed;
+
+    QSound *keysound;
+    //QThread *keythread;
+
 
 
 

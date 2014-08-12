@@ -10,10 +10,12 @@ class QGraphicsView;
 
 class KeyScene : public QGraphicsScene
 {
-
 public:
-    KeyScene(QGraphicsView *view);
+    KeyScene(QGraphicsView *view, QWidget *parent);
     ~KeyScene();
+signals:
+    void keyInput(quint8);
+
 private:
     QGraphicsItem *board;
 };

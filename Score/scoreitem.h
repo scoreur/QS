@@ -26,6 +26,9 @@ public:
     static quint8 notesize;
     static QColor presetColor;
     static QBrush selectedBrush;
+
+
+
 public slots:
     void noteUpdate(qint8 adjust=0);
     static void scorePreset(int mode, int arg);

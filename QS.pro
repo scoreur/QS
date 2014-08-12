@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     Wave/wavscene.cpp \
     Wave/wavframe.cpp \
     Staff/staffscene.cpp \
-    qsview.cpp
+    qsview.cpp \
+    qsplayer.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
@@ -35,7 +36,8 @@ HEADERS  += qswindow.h \
     Wave/wavscene.h \
     Wave/wavframe.h \
     Staff/staffscene.h \
-    qsview.h
+    qsview.h \
+    qsplayer.h
 
 FORMS    += qswindow.ui \
     qspreset.ui
