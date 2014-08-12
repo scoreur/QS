@@ -13,6 +13,9 @@
 
 #include "qsplayer.h"
 
+const QString domainName = "www.scoreur.cn";
+const QString appName = "QtScoreur";
+
 
 namespace Ui {
 class QSWindow;
@@ -33,7 +36,8 @@ public:
     static QRect scoreViewRect;
     static QRect staffViewRect;
 
-    
+    friend class QSPreset;
+
 public slots:
     void openFile();
     void saveFile();
@@ -53,7 +57,7 @@ public slots:
     void setPosition(int position);
 
 protected slots:
-    void closeEvent(QCloseEvent *);
+    void closeEvent(QCloseEvent *event);
 
 
 private:
@@ -74,8 +78,11 @@ private slots:
     void on_verticalScrollBar_valueChanged(int value);
     void addScene(QGraphicsView *view, QString fileName = "");
     void switchScene(QAction*);
+    void displayKeyBoard();
 
     void changePreset();
+    void readSettings();
+    void writeSettings();
 
 };
 

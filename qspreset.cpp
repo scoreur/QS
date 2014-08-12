@@ -4,6 +4,7 @@
 #include "qswindow.h"
 #include <QString>
 #include <QDebug>
+#include <QSettings>
 
 QSPreset::QSPreset(QWidget *parent) :
     QDialog(parent),
@@ -21,7 +22,7 @@ QSPreset::~QSPreset(){
     qDebug()<<"preset dialog delete!";
 }
 void QSPreset::widgetConsturct(){
-
+    QSettings settings(domainName, appName);
 
     ui->listWidget->addItem("general");
     ui->listWidget->addItem("wave");
@@ -31,10 +32,12 @@ void QSPreset::widgetConsturct(){
             ui->stackedWidget, SLOT(setCurrentIndex(int)));
 
     //general
-    ui->editWinWidth->setText(QString::number(QSWindow::defaultWinSize.width()));
-    ui->editWinHeight->setText(QString::number(QSWindow::defaultWinSize.height()));
-    ui->editTabWidth->setText(QString::number(QSWindow::defaultTabSize.width()));
-    ui->editTabHeight->setText(QString::number(QSWindow::defaultTabSize.height()));
+    settings.beginGroup("general");
+    ui->editWinWidth->setText(QString::number(settings.value("winSize", QSWindow::defaultWinSize).toSize().width()));
+    ui->editWinHeight->setText(QString::number(settings.value("winSize", QSWindow::defaultWinSize).toSize().height()));
+    ui->editTabWidth->setText(QString::number(settings.value("tabSize", QSWindow::defaultTabSize).toSize().width()));
+    ui->editTabHeight->setText(QString::number(settings.value("tabSize", QSWindow::defaultTabSize).toSize().height()));
+    settings.endGroup();
 
 
     //wave
@@ -60,6 +63,8 @@ void QSPreset::accept(){
                                            ui->editWinHeight->text().toInt()));
         ((QSWindow *)parent())->generalPreset(2,QSize(ui->editTabWidth->text().toInt(),
                                                       ui->editTabHeight->text().toInt()));
+
+        ((QSWindow *)parent())->writeSettings();
 
         break;
 

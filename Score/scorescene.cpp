@@ -32,24 +32,27 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
     }
     qreal temp_x = 10, temp_y = ScoreItem::halfnoteheight + 10;
     int totaldura = 0;
-    ScoreItem *score;
+    ScoreLine *scoreLine = new ScoreLine(this, 0, 0);
+    scoreLine->setPos(0,temp_y);
+    int j = 0;
+    scoreLine->text = QString::number(++j);
+
     for(quint32 i=0;i<len;++i){//typesetting
 
-        score = new ScoreItem(note[i], dura[i]);
         temp_x += (ScoreItem::notespacing * dura[i]/12.0);//add x before add score
-        score->setPos(temp_x, temp_y);
-        addItem(score);
+        (new ScoreItem(note[i], dura[i],scoreLine))->setPos(temp_x, 0);
+
         totaldura += dura[i];
         if((totaldura) % 48==0){
             temp_x += ScoreItem::notespacing * 0.75;
-            score = new ScoreItem(89);//bar
-            score->setPos(temp_x, temp_y);
-            addItem(score);
-
+            (new ScoreItem(89,12,scoreLine))->setPos(temp_x, 0);//bar
         }
 
         if((totaldura) % 192 == 0){//4 bars per line
             temp_y += ScoreItem::linespacing;
+            scoreLine = new ScoreLine(this, 0, 0);
+            scoreLine->setPos(0, temp_y);
+            scoreLine->text = QString::number(++j);
             temp_x = 10;
         }
     }
@@ -94,7 +97,38 @@ quint8 ScoreScene::margin_top = 10;
 quint8 ScoreScene::margin_bottom = 10;
 
 ScoreLine::ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent):
-    QGraphicsRectItem(parent), type((TYPE)_type)
+    QGraphicsRectItem(parent), type((TYPE)_type), text(""), isPressed(false)
 {
     scene->addItem(this);
+    setRect(0,-ScoreItem::halfnoteheight, scene->width(),ScoreItem::linespacing);
+}
+void ScoreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+    QFont font("Times [Adobe]", 9 , QFont::Bold);
+    QPen pen(QColor(0,0,220,100));
+    painter->setFont(font);
+    painter->setPen(pen);
+    painter->drawText(5,-8, 10,10, Qt::AlignLeft, text);
+    if(isPressed)
+        painter->drawRect(boundingRect());
+}
+
+void ScoreLine::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton)
+        isPressed = true;
+        //qDebug()<<event->scenePos();
+    scene()->update(sceneBoundingRect());
+}
+
+void ScoreLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton)
+        isPressed = false;
+    scene()->update(sceneBoundingRect());
+}
+
+void ScoreLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+
+    setY(event->scenePos().y());
+    scene()->update(sceneBoundingRect());
 }

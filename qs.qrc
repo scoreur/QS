@@ -30,5 +30,6 @@
         <file>image/staff/bracket.png</file>
         <file>image/staff/double_sharp.png</file>
         <file>image/staff/wallpaper.png</file>
+        <file>image/lm.jpg</file>
     </qresource>
 </RCC>

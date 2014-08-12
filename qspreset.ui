@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
+    <width>667</width>
     <height>315</height>
    </rect>
   </property>
@@ -431,10 +431,10 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>280</y>
-     <width>301</width>
-     <height>32</height>
+     <x>490</x>
+     <y>260</y>
+     <width>151</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
@@ -447,10 +447,10 @@
   <widget class="QStackedWidget" name="stackedWidget">
    <property name="geometry">
     <rect>
-     <x>160</x>
+     <x>140</x>
      <y>10</y>
-     <width>521</width>
-     <height>271</height>
+     <width>501</width>
+     <height>241</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -723,8 +723,8 @@
     <widget class="QSpinBox" name="spinBox">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>80</y>
+       <x>90</x>
+       <y>20</y>
        <width>91</width>
        <height>24</height>
       </rect>
@@ -743,7 +743,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>80</y>
+       <y>20</y>
        <width>62</width>
        <height>16</height>
       </rect>
@@ -755,8 +755,8 @@
     <widget class="QComboBox" name="wallPaperSelect">
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>20</y>
+       <x>90</x>
+       <y>60</y>
        <width>121</width>
        <height>26</height>
       </rect>
@@ -798,8 +798,8 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>30</y>
+       <x>10</x>
+       <y>60</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -811,10 +811,10 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>380</x>
-       <y>60</y>
-       <width>91</width>
-       <height>81</height>
+       <x>20</x>
+       <y>90</y>
+       <width>51</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -838,10 +838,10 @@
   <widget class="QListWidget" name="listWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
-     <width>111</width>
-     <height>281</height>
+     <width>131</width>
+     <height>241</height>
     </rect>
    </property>
   </widget>

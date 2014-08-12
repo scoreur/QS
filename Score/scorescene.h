@@ -4,6 +4,7 @@
 #include "../qsscene.h"
 #include <QVector>
 #include <QGraphicsRectItem>
+#include <QGraphicsSceneMouseEvent>
 
 class ScoreLine;
 
@@ -55,8 +56,16 @@ public:
     };
     TYPE type;
 
-private:
+
     QString text;//
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+private:
+    bool isPressed;
 };
 
 

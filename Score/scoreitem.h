@@ -1,15 +1,17 @@
 #ifndef SCOREITEM_H
 #define SCOREITEM_H
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
 
-class ScoreItem: public QGraphicsItem
+
+class ScoreItem: public QGraphicsObject
 {
+    Q_OBJECT
 public:
-    ScoreItem(uchar _pitch, uchar _duration = 12);
+    ScoreItem(uchar _pitch, uchar _duration = 12, QGraphicsItem *parent = 0);
     ~ScoreItem(){}
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -26,6 +28,8 @@ public:
     static quint8 notesize;
     static QColor presetColor;
     static QBrush selectedBrush;
+
+
 
 
 

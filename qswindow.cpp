@@ -1,17 +1,18 @@
 #include "qswindow.h"
 #include "ui_qswindow.h"
 #include "qsview.h"
-
 #include "Wave/wavscene.h"
 #include "Score/scorescene.h"
 #include "Staff/staffscene.h"
-#include "qspreset.h"
 
 #include <QFileDialog>
 #include <QFile>
 #include <QIcon>
 #include <QPushButton>
+#include <QSettings>
 #include <QDebug>
+
+
 
 ////////////////////////////////////////////////
 /// @brief constructor of QS mainwindow
@@ -29,20 +30,18 @@ QSWindow::QSWindow(QWidget *parent) :
     mediaPlayer(0),
     musicthread(0)
 {
-    qDebug()<<"currentpath: "<<QDir::currentPath();
-
+    //qDebug()<<QSettings(domainName, appName).scope();
+    //QSettings(domainName, appName).clear();//remove this line in release version
     ui->setupUi(this);
     wavView = (new WavView(ui->wavTab, wavViewRect.width(),wavViewRect.height()));
     scoreView = (new ScoreView(ui->scoreTab, scoreViewRect.width(),scoreViewRect.height()));
     staffView = (new StaffView(ui->staffTab, staffViewRect.width(),staffViewRect.height()));
-    keyView = (new QSView(ui->tabWidget, keyViewRect.width(),keyViewRect.height()));
+    keyView = (new QSView(ui->centralWidget, keyViewRect.width(),keyViewRect.height()));
     //set icon
     QIcon iconQS(":/image/QScore.jpg");
     setWindowIcon(iconQS);
     //initialize
-
-    resize(defaultWinSize);
-    ui->tabWidget->resize(defaultTabSize);
+    readSettings();
 
     //for rearrangement
     wavView->move(0,0);
@@ -56,7 +55,7 @@ QSWindow::QSWindow(QWidget *parent) :
     keyScene = new KeyScene(keyView, this);
     preset = new QSPreset(this);
 
-    ui->statusBar->showMessage("Welcome to QtScoreur!");
+    ui->statusBar->showMessage(QString("Welcome to QtScoreur! ")+QDir::currentPath());
 
     //music play
     playButton = new QPushButton(ui->wavTab);
@@ -134,17 +133,18 @@ void QSWindow::mediaStateChanged(QMediaPlayer::State state){
 
 void QSWindow::preloadConnect(){
     //file control buttons and shortcuts
-    connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(ui->actionOpen_File, SIGNAL(triggered()), SLOT(openFile()));
     ui->actionOpen_File->setShortcut(QKeySequence::Open);
-    connect(ui->actionSave_File, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(ui->actionSave_File, SIGNAL(triggered()), SLOT(saveFile()));
     ui->actionSave_File->setShortcut(QKeySequence::Save);
-    connect(ui->actionSave_File_as, SIGNAL(triggered()), this, SLOT(saveFileAs()));
+    connect(ui->actionSave_File_as, SIGNAL(triggered()), SLOT(saveFileAs()));
     ui->actionSave_File_as->setShortcut(QKeySequence::SaveAs);
-    connect(ui->actionClose, SIGNAL(triggered()),this, SLOT(closeFile()));
+    connect(ui->actionClose, SIGNAL(triggered()), SLOT(closeFile()));
     ui->actionClose->setShortcut(QKeySequence::Close);
 
-    connect(ui->actionPreset, SIGNAL(triggered()), this, SLOT(changePreset()));
-    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), this, SLOT(switchScene(QAction*)));
+    connect(ui->actionPreset, SIGNAL(triggered()), SLOT(changePreset()));
+    connect(ui->actionDisplay_Keyboard, SIGNAL(triggered()), SLOT(displayKeyBoard()));
+    connect(ui->menuOpened, SIGNAL(triggered(QAction*)), SLOT(switchScene(QAction*)));
 
 
    //music state management
@@ -161,7 +161,7 @@ void QSWindow::preloadConnect(){
 //////////////////////////////////////////////////////////////////////////////
 /// @brief static member                                                  ////
 QSize QSWindow::defaultWinSize = QSize(960,500);
-QSize QSWindow::defaultTabSize = QSize(940,480);                          ////
+QSize QSWindow::defaultTabSize = QSize(940,400);                          ////
 QRect QSWindow::keyViewRect = QRect(0,300, 936,130);                      ////
 QRect QSWindow::wavViewRect = QRect(0,0, 936,204);                        ////
 QRect QSWindow::scoreViewRect = QRect(0,0, 750,300);                      ////
@@ -316,23 +316,54 @@ void QSWindow::switchScene(QAction * act){
         mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
 }
 
+void QSWindow::displayKeyBoard(){
+    if(keyView->isVisible()){
+        keyView->hide();
+        ui->actionDisplay_Keyboard->setText("Show Keyboard");
+    }else{
+        keyView->show();
+        ui->actionDisplay_Keyboard->setText("Hide Keyboard");
+    }
+}
+
 void QSWindow::keyInput(quint8 id){
     ui->scoreInput->append(QString::number(id)+" 12");
 }
 
-void QSWindow::closeEvent(QCloseEvent *){
-    bool checked = true;//to check file state
+void QSWindow::closeEvent(QCloseEvent *event){
+    bool checked = false;//to check file state
+    if(ui->scoreInput->toPlainText().isEmpty())
+        checked = true;
     if( checked == true){
         //mediaPlayer->setMedia(QUrl());//discard media to prevent error
         musicthread->quit();
-        qDebug()<<"discard media and quit";
-        QApplication::quit();
+        qDebug()<<"discard media";
+        //writeSettings();
+        //qDebug()<<"store the size info";
+        event->accept();
     }else{
-        ui->statusBar->showMessage("you haven't saved the file(s)!");
+        ui->statusBar->showMessage("you haven't saved the file(s)! Please empty the textbox!");
+        ui->tabWidget->setCurrentWidget(ui->scoreTab);
+        event->ignore();
     }
 }
 
 void QSWindow::changePreset(){
     preset->show();
+
+}
+void QSWindow::readSettings(){
+    QSettings settings(domainName, appName);
+    settings.beginGroup("general");
+    resize(settings.value("winSize", defaultWinSize).toSize());
+    ui->tabWidget->resize(settings.value("tabSize", defaultTabSize).toSize());
+    settings.endGroup();
+}
+void QSWindow::writeSettings(){
+    QSettings settings(domainName, appName);
+    settings.beginGroup("general");
+    settings.setValue("winSize", size());
+    settings.setValue("tabSize", ui->tabWidget->size());
+    settings.endGroup();
 }
 

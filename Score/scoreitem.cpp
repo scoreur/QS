@@ -1,12 +1,15 @@
 #include "scoreitem.h"
-
+#include <QGraphicsItem>
 #include <QDebug>
 #include <QCursor>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 
+
+
 /// @brief constructor of score notation
-ScoreItem::ScoreItem(uchar _pitch, uchar _duration):
+ScoreItem::ScoreItem(uchar _pitch, uchar _duration, QGraphicsItem *parent):
+    QGraphicsObject(parent),
     pitch(_pitch), duration(_duration), oct(0),
     bound(QRectF(-halfnotewidth *_duration/12.0,-halfnoteheight,
           halfnotewidth*2 *_duration/12.0,halfnoteheight*2)),
@@ -18,8 +21,15 @@ ScoreItem::ScoreItem(uchar _pitch, uchar _duration):
 }
 
 void ScoreItem::noteUpdate(qint8 adjust){
-
-    pitch += adjust;
+    if(adjust != 0){
+        if(pitch > 88) return;
+        if(pitch + adjust >88)
+            pitch = 88;
+        else if( pitch + adjust < 0)
+            pitch = 0;
+        else
+            pitch += adjust;
+    }
     switch((pitch - keyPitch)%12){
     case 0: note = '1'; semi = 0;
         break;
@@ -47,8 +57,10 @@ void ScoreItem::noteUpdate(qint8 adjust){
         break;
     default: break;
     }
-    if(pitch == 88)
+    if(pitch == 88){
         note = '0';
+        semi = 0;
+    }
     else
         oct = ((pitch-keyPitch)/12-4);
     //qDebug()<<int((pitch-keyPitch)%12);
@@ -77,6 +89,20 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->setBrush(brush);
             painter->drawEllipse(halfnotewidth/2.0-2,notesize/2.0-6,1,1);
         }
+
+        if(semi == 1){// #
+
+            font.setPointSizeF(notesize/2);
+            painter->setFont(font);
+            painter->drawText(-bound.width()/2,-bound.height()/2+8, 10,10, Qt::AlignLeft, QString('#'));
+        }
+        else if(semi == -1){// b
+            font.setPointSizeF(notesize/2);
+            painter->setFont(font);
+            painter->drawText(-bound.width()/2,-bound.height()/2+8, 10,10, Qt::AlignLeft, QString('b'));
+        }
+        else
+            ;
 
         if(oct != 0 && pitch != 88){//not rest
             qint8 direc = oct>0? 1:-1;
@@ -151,7 +177,7 @@ void ScoreItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
     setCursor(Qt::SizeVerCursor);
     color = Qt::red;
     mouseY = event->scenePos().y();
-    scene()->update(scene()->sceneRect());
+    scene()->update(sceneBoundingRect());
 
 
 }
@@ -161,7 +187,7 @@ void ScoreItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     setCursor(Qt::ArrowCursor);
     color = presetColor;
     mouseY = 0;
-    scene()->update(scene()->sceneRect());
+    scene()->update(sceneBoundingRect());
 }
 
 void ScoreItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
@@ -171,11 +197,11 @@ void ScoreItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     else if(tmp<-1)
         noteUpdate(1-(-tmp)/1);
     mouseY = event->scenePos().y();
-    scene()->update(scene()->sceneRect());
+    scene()->update(sceneBoundingRect());
     //qDebug()<<event->scenePos();
 }
 void ScoreItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     noteUpdate(88-pitch);
-    scene()->update(scene()->sceneRect());
+    scene()->update(sceneBoundingRect());
     qDebug()<<"double clicked!";
 }
