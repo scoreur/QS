@@ -12,9 +12,7 @@ class QSPlayer : public QThread
     Q_OBJECT
 public:
     explicit QSPlayer(QString fileName,QWidget *parent = 0);
-    ~QSPlayer(){
-        player->setMedia(QUrl());//discard the media
-    }
+    ~QSPlayer();
     QMediaPlayer *player;
 
     void run();

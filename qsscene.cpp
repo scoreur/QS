@@ -20,15 +20,24 @@ KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
     for(uchar i=0;i<88;++i){
 
         (new PianoKey(i,board))->setPos(temp_x, temp_y);
-
+        spectrum[i] = QPointF(temp_x, 0);
         if(i%12==2 || i%12 ==7) //B, E
             temp_x += PianoKey::halfspacing;
         temp_x += PianoKey::halfspacing;
     }
 
 }
+void KeyScene::drawForeground(QPainter *painter, const QRectF &rect){
+    QPen pen(Qt::red);
+    painter->setPen(pen);
+    painter->drawPolyline(spectrum, 88);
+
+
+}
+
 KeyScene::~KeyScene(){
     delete board;
+
     qDebug()<<"keyScene removed!";
 }
 void KeyScene::keyInput(quint8 id){
@@ -45,6 +54,7 @@ QSScene::QSScene(QGraphicsView *view, QString fileName):
         view->setScene(this);
         view->setRenderHint(QPainter::Antialiasing);
         act->setCheckable(true);
+
 }
 QSScene::~QSScene(){
     delete act;

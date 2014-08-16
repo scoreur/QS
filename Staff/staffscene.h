@@ -8,8 +8,8 @@ class StaffScene : public QSScene{
 public:
     StaffScene(QGraphicsView *view, QString fileName);
     ~StaffScene();
-    quint32 load(QString fileName){return 0;}
-    quint32 store(QString fileName){return 0;}
+    quint32 load(QString fileName);
+    quint32 store(QString fileName);
 private:
 
 };

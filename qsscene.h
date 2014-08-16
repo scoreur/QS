@@ -13,9 +13,11 @@ class KeyScene : public QGraphicsScene
 public:
     KeyScene(QGraphicsView *view, QWidget *parent);
     ~KeyScene();
+    QPointF spectrum[88];
 signals:
     void keyInput(quint8);
-
+protected:
+    void drawForeground(QPainter *painter, const QRectF &rect);
 private:
     QGraphicsItem *board;
 };
@@ -34,6 +36,8 @@ public:
     void setName(QString fileName);
     virtual quint32 load(QString fileName) = 0;
     virtual quint32 store(QString fileName) = 0;
+
+
 
 
 

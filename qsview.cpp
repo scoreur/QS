@@ -21,6 +21,7 @@ void QSView::wheelEvent(QWheelEvent *event){
 WavView::WavView(QWidget *parent, int w, int h):
     QSView(parent, w, h){
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setCacheMode(QGraphicsView::CacheNone);
 
 }
 void WavView::wheelEvent(QWheelEvent *event){
@@ -34,6 +35,7 @@ ScoreView::ScoreView(QWidget *parent, int w, int h):
 
 }
 void ScoreView::wheelEvent(QWheelEvent *event){
+    qDebug()<<event->pos()<<" showing";
     verticalScrollBar()->show();
 }
 
@@ -43,5 +45,6 @@ StaffView::StaffView(QWidget *parent, int w, int h):
 
 }
 void StaffView::wheelEvent(QWheelEvent *event){
+    qDebug()<<event->pos()<<" showing";
     verticalScrollBar()->show();
 }

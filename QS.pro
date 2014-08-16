@@ -6,13 +6,14 @@
 
 QT       += core gui \
          multimedia multimediawidgets \
-         network
+         network\
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QS
 TEMPLATE = app
-
+CONFIG += c++11
 
 SOURCES += main.cpp\
         qswindow.cpp \

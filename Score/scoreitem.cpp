@@ -173,21 +173,24 @@ void ScoreItem::scorePreset(int mode, int arg){
 
 /// @brief mouse events
 void ScoreItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton){
+        setCursor(Qt::SizeVerCursor);
+        color = Qt::red;
+        mouseY = event->scenePos().y();
+        scene()->update(sceneBoundingRect());
 
-    setCursor(Qt::SizeVerCursor);
-    color = Qt::red;
-    mouseY = event->scenePos().y();
-    scene()->update(sceneBoundingRect());
-
+    }
 
 }
 
 void ScoreItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+    if(event->button() == Qt::LeftButton){
+        setCursor(Qt::ArrowCursor);
+        color = presetColor;
+        mouseY = 0;
+        scene()->update(sceneBoundingRect());
+    }
 
-    setCursor(Qt::ArrowCursor);
-    color = presetColor;
-    mouseY = 0;
-    scene()->update(sceneBoundingRect());
 }
 
 void ScoreItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){

@@ -29,13 +29,6 @@ public:
     explicit QSWindow(QWidget *parent = 0);
     ~QSWindow();
     
-    static QSize defaultWinSize;
-    static QSize defaultTabSize;
-    static QRect keyViewRect;
-    static QRect wavViewRect;
-    static QRect scoreViewRect;
-    static QRect staffViewRect;
-
     friend class QSPreset;
 
 public slots:
@@ -54,7 +47,7 @@ public slots:
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
     void mediaStateChanged(QMediaPlayer::State state);
-    void setPosition(int position);
+    void setPosition();
 
 protected slots:
     void closeEvent(QCloseEvent *event);
@@ -64,13 +57,14 @@ private:
     Ui::QSWindow *ui;
     QSView *wavView, *scoreView, *staffView,  *keyView;//keyview must be created after wavView
     KeyScene *keyScene;
-    QSPreset *preset;
+
     QString openFileName, saveFileName, tempFileName;
 
     QMediaPlayer *mediaPlayer;
     QAbstractButton *playButton;
     QSlider *positionSlider;
     QSPlayer *musicthread;
+    QSPreset *preset;
     void preloadConnect();
 
 
@@ -81,8 +75,6 @@ private slots:
     void displayKeyBoard();
 
     void changePreset();
-    void readSettings();
-    void writeSettings();
 
 };
 

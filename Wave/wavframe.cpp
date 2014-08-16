@@ -32,7 +32,7 @@ quint16 WavFrame::framesize = 200;
 void WavFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    painter->setPen(QPen(Qt::darkGreen));
+    painter->setPen(QPen(QColor(0,200,0,200)));
 
     //painter->drawPolyline((QPointF*)pdata.begin(), pdata.size());
     painter->drawPolyline(data, datasize);

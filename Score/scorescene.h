@@ -15,7 +15,7 @@ public:
     ScoreScene(QGraphicsView *view, QString fileName = "");
     ~ScoreScene();
     quint32 load(QString fileName);
-    quint32 store(QString fileName){return 0;}
+    quint32 store(QString fileName);
 
     static quint16 pagewidth;
     static quint16 pageheight;
@@ -25,7 +25,7 @@ public:
     static quint8 margin_bottom;
 
 protected:
-    void drawBackground(QPainter *painter, QRectF *rect);
+    void drawBackground(QPainter *painter, const QRectF *rect);
 
 
 private:

@@ -80,8 +80,11 @@ quint32 ScoreScene::load(QString fileName){
     }
 
 }
+quint32 ScoreScene::store(QString fileName){
+    return fileName.size();
+}
 
-void ScoreScene::drawBackground(QPainter *painter, QRectF *rect){
+void ScoreScene::drawBackground(QPainter *painter, const QRectF *rect){
     QPen pen(Qt::red);
     painter->setPen(pen);
     painter->drawLine(0,0, 400,400);

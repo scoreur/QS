@@ -16,6 +16,12 @@ StaffScene::StaffScene(QGraphicsView *view, QString fileName)
 StaffScene::~StaffScene(){
     qDebug()<<"staffScene removed!";
 }
+quint32 StaffScene::load(QString fileName){
+    return fileName.size();
+}
+quint32 StaffScene::store(QString fileName){
+    return fileName.size();
+}
 
 StaffMeasure::StaffMeasure(QGraphicsScene *scene, QGraphicsItem *parent):
     QGraphicsRectItem(parent)

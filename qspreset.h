@@ -14,6 +14,15 @@ public:
     explicit QSPreset(QWidget *parent = 0);
     ~QSPreset();
 
+    static QSize winSize;
+    static QSize tabSize;
+    static QRect keyViewRect;
+    static QRect wavViewRect;
+    static QRect scoreViewRect;
+    static QRect staffViewRect;
+
+    void readSettings();
+    void writeSettings();
 
 public slots:
     void accept();

@@ -28,32 +28,21 @@ QSWindow::QSWindow(QWidget *parent) :
     saveFileName(""),
     tempFileName(""),
     mediaPlayer(0),
-    musicthread(0)
+    musicthread(0),
+    preset(new QSPreset(this))
 {
     //qDebug()<<QSettings(domainName, appName).scope();
     //QSettings(domainName, appName).clear();//remove this line in release version
     ui->setupUi(this);
-    wavView = (new WavView(ui->wavTab, wavViewRect.width(),wavViewRect.height()));
-    scoreView = (new ScoreView(ui->scoreTab, scoreViewRect.width(),scoreViewRect.height()));
-    staffView = (new StaffView(ui->staffTab, staffViewRect.width(),staffViewRect.height()));
-    keyView = (new QSView(ui->centralWidget, keyViewRect.width(),keyViewRect.height()));
+    preset->readSettings();//also construct all views
+
     //set icon
     QIcon iconQS(":/image/QScore.jpg");
     setWindowIcon(iconQS);
     //initialize
-    readSettings();
 
-    //for rearrangement
-    wavView->move(0,0);
-    scoreView->move(0,0);
-    staffView->move(0,0);
-    keyView->move(keyViewRect.x(),keyViewRect.y());
 
-    addScene(wavView);
-    addScene(scoreView);
-    addScene(staffView);
-    keyScene = new KeyScene(keyView, this);
-    preset = new QSPreset(this);
+
 
     ui->statusBar->showMessage(QString("Welcome to QtScoreur! ")+QDir::currentPath());
 
@@ -62,20 +51,23 @@ QSWindow::QSWindow(QWidget *parent) :
     playButton->setEnabled(false);
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     playButton->setText("play");
-    playButton->move(0, wavViewRect.height()+25);
+    playButton->move(0, wavView->height()+25);
     positionSlider = new QSlider(Qt::Horizontal,ui->wavTab);
-    positionSlider->resize(wavViewRect.width(),20);
-    positionSlider->move(wavViewRect.bottomLeft());
+    positionSlider->resize(wavView->width(),20);
+    positionSlider->move(wavView->rect().bottomLeft());
     positionSlider->setRange(0, 0);
 
     musicthread = new QSPlayer(openFileName);                                                                                                               ////
     mediaPlayer = musicthread->player;
     musicthread->start();
+
     preloadConnect();//holding all connections needed
+    addScene(wavView);
+    addScene(scoreView);
+    addScene(staffView);
+    keyScene = new KeyScene(keyView, this);
 
 
-
-     //qDebug()<<keyView->parent()->parent()->parent()->parent()->parent()->objectName();
 }
 QSWindow::~QSWindow()
 {
@@ -110,16 +102,18 @@ void QSWindow::musicPlay(){
 void QSWindow::durationChanged(qint64 duration){
     //qDebug()<<"duration changed"<<duration;
     positionSlider->setRange(0, duration);
-    positionSlider->setSingleStep(duration/400.0);
+    positionSlider->setSingleStep(duration/800.0);
 }
 void QSWindow::positionChanged(qint64 position){
     //qDebug()<<"positionChanged"<<position;
     positionSlider->setValue(position);
-}
-void QSWindow::setPosition(int position){
-    mediaPlayer->setPosition(position);
     QScrollBar * bar = wavView->horizontalScrollBar();
     bar->setValue(position/(qreal)positionSlider->maximum()*bar->maximum());//
+
+
+}
+void QSWindow::setPosition(){
+    mediaPlayer->setPosition(positionSlider->value());
 
 }
 void QSWindow::mediaStateChanged(QMediaPlayer::State state){
@@ -154,25 +148,16 @@ void QSWindow::preloadConnect(){
             this, SLOT(durationChanged(qint64)),Qt::QueuedConnection);
     connect(mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this,
             SLOT(mediaStateChanged(QMediaPlayer::State)),Qt::QueuedConnection);
-    connect(positionSlider, SIGNAL(valueChanged(int)), this, SLOT(setPosition(int)),Qt::QueuedConnection);
+    connect(positionSlider, SIGNAL(sliderReleased()), this, SLOT(setPosition()),Qt::QueuedConnection);
     connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()),Qt::QueuedConnection);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// @brief static member                                                  ////
-QSize QSWindow::defaultWinSize = QSize(960,500);
-QSize QSWindow::defaultTabSize = QSize(940,400);                          ////
-QRect QSWindow::keyViewRect = QRect(0,300, 936,130);                      ////
-QRect QSWindow::wavViewRect = QRect(0,0, 936,204);                        ////
-QRect QSWindow::scoreViewRect = QRect(0,0, 750,300);                      ////
-QRect QSWindow::staffViewRect = QRect(0,0, 800,300);                      ////
-///                                                                       ////
-//////////////////////////////////////////////////////////////////////////////
+
 /// @brief general preset
 void QSWindow::generalPreset(int mode, int arg){
 
     switch(mode){
-
+        qDebug()<<arg;
     case 1:
 
 
@@ -311,6 +296,8 @@ void QSWindow::switchScene(QAction * act){
     if(qs1 != 0) (qs1)->Opened()->setChecked(false);
     if(qs != qs1) ((QGraphicsView*)qs->parent())->setScene(qs);
     act->setChecked(true);
+    qs->views()[0]->setToolTip(QDir(qs->Name()).dirName());
+
     ui->statusBar->showMessage(QString("current file: %1").arg(qs->Name()), 4000);
     if(qs->parent() == ui->wavTab && QDir(qs->Name()).exists())
         mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
@@ -327,7 +314,8 @@ void QSWindow::displayKeyBoard(){
 }
 
 void QSWindow::keyInput(quint8 id){
-    ui->scoreInput->append(QString::number(id)+" 12");
+    if(ui->tabWidget->currentWidget()==ui->scoreTab)
+        ui->scoreInput->insertPlainText(QString::number(id)+" 12; ");
 }
 
 void QSWindow::closeEvent(QCloseEvent *event){
@@ -335,10 +323,10 @@ void QSWindow::closeEvent(QCloseEvent *event){
     if(ui->scoreInput->toPlainText().isEmpty())
         checked = true;
     if( checked == true){
-        //mediaPlayer->setMedia(QUrl());//discard media to prevent error
+
         musicthread->quit();
-        qDebug()<<"discard media";
-        //writeSettings();
+        delete musicthread;
+        //preset->writeSettings();
         //qDebug()<<"store the size info";
         event->accept();
     }else{
@@ -351,19 +339,5 @@ void QSWindow::closeEvent(QCloseEvent *event){
 void QSWindow::changePreset(){
     preset->show();
 
-}
-void QSWindow::readSettings(){
-    QSettings settings(domainName, appName);
-    settings.beginGroup("general");
-    resize(settings.value("winSize", defaultWinSize).toSize());
-    ui->tabWidget->resize(settings.value("tabSize", defaultTabSize).toSize());
-    settings.endGroup();
-}
-void QSWindow::writeSettings(){
-    QSettings settings(domainName, appName);
-    settings.beginGroup("general");
-    settings.setValue("winSize", size());
-    settings.setValue("tabSize", ui->tabWidget->size());
-    settings.endGroup();
 }
 
