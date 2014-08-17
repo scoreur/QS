@@ -7,6 +7,7 @@
 #include <QDebug>
 #include "scoreitem.h"
 #include "scorescene.h"
+#include "qspreset.h"
 #include <QPainter>
 
 
@@ -15,7 +16,7 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
     : QSScene(view, fileName)
 {
     setItemIndexMethod(BspTreeIndex);
-
+    setBackgroundBrush(QBrush(QPixmap(QString(":/image/staff/paper3.png"), "PNG").scaled(100,100)));
     if(fileName != ""){
         len = load(fileName);
     }else{
@@ -30,30 +31,31 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
             dura.push_back(6);
         }
     }
-    qreal temp_x = 10, temp_y = ScoreItem::halfnoteheight + 10;
+    qreal temp_y = ScoreItem::halfnoteheight + 10;
     int totaldura = 0;
-    ScoreLine *scoreLine = new ScoreLine(this, 0, 0);
-    scoreLine->setPos(0,temp_y);
-    int j = 0;
-    scoreLine->text = QString::number(++j);
+    ScoreLine *scoreLine = 0;
+    QVector<quint16> *scoreX = 0;
+    int start_i = 0;
 
     for(quint32 i=0;i<len;++i){//typesetting
-
-        temp_x += (ScoreItem::notespacing * dura[i]/12.0);//add x before add score
-        (new ScoreItem(note[i], dura[i],scoreLine))->setPos(temp_x, 0);
-
         totaldura += dura[i];
-        if((totaldura) % 48==0){
-            temp_x += ScoreItem::notespacing * 0.75;
-            (new ScoreItem(89,12,scoreLine))->setPos(temp_x, 0);//bar
-        }
+        if(totaldura == 12*16 || i == len -1){//4 bars per line
 
-        if((totaldura) % 192 == 0){//4 bars per line
-            temp_y += ScoreItem::linespacing;
             scoreLine = new ScoreLine(this, 0, 0);
-            scoreLine->setPos(0, temp_y);
-            scoreLine->text = QString::number(++j);
-            temp_x = 10;
+            scoreLine->setPos(20, temp_y);
+            lines.push_back(scoreLine);
+            scoreLine->text = QString::number(lines.size());
+            scoreLine->decorator = new BarDecorator((quint8*)dura.begin()+start_i, i-start_i+1, 12);
+
+            scoreX = &((BarDecorator*)scoreLine->decorator)->scoreX;
+
+            for(i = 0; i<scoreX->size(); ++i){
+                (new ScoreItem(note[start_i+i], dura[start_i+i],scoreLine))->setPos((*scoreX)[i]*ScoreItem::halfnotewidth/4.0, 0);
+            }
+            start_i += scoreX->size();
+            i = start_i - 1;
+            temp_y += ScoreItem::linespacing;
+            totaldura = 0;
         }
     }
 }
@@ -88,34 +90,174 @@ void ScoreScene::drawBackground(QPainter *painter, const QRectF *rect){
     QPen pen(Qt::red);
     painter->setPen(pen);
     painter->drawLine(0,0, 400,400);
-    qDebug()<<rect;
+    painter->setBrush(backgroundBrush());
+    painter->drawRect(*rect);
 }
 
-/// @brief static members
-quint16 ScoreScene::pagewidth = 800;
-quint16 ScoreScene::pageheight = 600;
-quint8 ScoreScene::margin_left = 10;
-quint8 ScoreScene::margin_right = 10;
-quint8 ScoreScene::margin_top = 10;
-quint8 ScoreScene::margin_bottom = 10;
+void ScoreScene::append(qint16 num, uchar *notes, quint8 *duras){
+    for(int i = 0; i<num; ++i){
+        note.push_back(notes[i]);
+        dura.push_back(duras[i]);
+    }
+    if(num < 0){
+        for(int i = 0; i < -num; ++i){
+            note.pop_back();
+            dura.pop_back();
+        }
+    }else{
+    //adjust to score line
 
+    }
+}
+void ScoreScene::lineUpdate(){
+    for(int i = 0; i< lines.size(); ++i)
+        if(lines[i]->type == ScoreLine::SCORE)
+            ((BarDecorator*)lines[i]->decorator)->updatePath();
+}
+
+qreal BarDecorator::unitX = (qreal)ScoreItem::halfnotewidth/2.0;
+/// @brief constructor of BarDecorator
+BarDecorator::BarDecorator(quint8 *dura, quint32 num, quint8 _ticks, Decorator *_next):
+    Decorator(_next), ticks(_ticks), duraPtr(0), path(0)
+{
+    //construct lowerLine1&2 (upArc) and scoreX;
+    quint8 tick = ticks/4;//divide one beat into four (semi-quaver)
+    quint16 temp_x = 0;
+    for(int i=0; i<num; ++i){
+        //currently assuming no note accross beats&bars
+        if(duraPtr % ticks + dura[i]<= ticks){//not exceed one beat
+            if(dura[i]/tick == 1) scoreX << 2 * temp_x;//semi-quaver;
+            switch((duraPtr % ticks)/tick){
+            case 0://new start
+                if(dura[i] < ticks){//not full beat
+                    lowerLine1 << temp_x << 4;//full first line
+                }
+                switch(dura[i]/tick){
+                case 1://semi-quaver
+                    lowerLine2 << temp_x << 1; break;
+                case 2:
+                    scoreX << 2 * temp_x + 1; break;
+                case 3://dot needed
+                    lowerLine2 << temp_x + 3 << 1;
+                    scoreX << 2 * temp_x + 1;
+                    dotX << 2 * (temp_x + 1); break;
+                case 4:
+                    scoreX << 2 * temp_x + 3; break;
+                }
+                break;
+            case 1://
+                switch(dura[i]/tick){
+                case 1://semi-quaver
+                    lowerLine2.back() += 1;
+                    break;
+                case 2:
+                    scoreX << 2 * temp_x + 1; break;
+                case 3:
+                    scoreX << 2 * temp_x + 1;
+                    dotX << 2 * (temp_x + 1); break;
+                }
+                break;
+            case 2:
+                switch(dura[i]/tick){
+                case 1://semi-quaver
+                    lowerLine2 << temp_x << 2; break;
+                    break;
+                case 2:
+                    scoreX << 2 * temp_x + 1; break;
+                }
+                break;
+            case 3: break;
+        }
+        }
+        duraPtr += dura[i];
+        temp_x += dura[i]/tick;
+        if(duraPtr%ticks == 0){
+            temp_x += 1;//reserve for interval between beat
+            if((duraPtr/ticks) % 4 == 0)
+                temp_x += 1;//reserve for bar
+        }
+
+    }
+    updatePath();
+}
+void BarDecorator::paint(QPainter *painter){
+    if(path != 0) painter->drawPath(*path);
+    if(next != 0) next->paint(painter);
+}
+void BarDecorator::updatePath(){
+    delete path; path = new QPainterPath;
+    if(!lowerLine1.empty()){
+        QVector<quint16>::iterator iter;
+        qreal  temp_y = ScoreItem::notesize*0.5-2;
+        for(iter = lowerLine1.begin(); iter != lowerLine1.end();iter += 2){
+            path->moveTo(QPointF((*iter - 0.5) * unitX, temp_y));
+            path->lineTo(QPointF((*(iter+1)+*iter-0.5) * unitX,temp_y));
+        }
+        if(!lowerLine2.empty()){
+            temp_y += 2;
+            for(iter = lowerLine2.begin(); iter != lowerLine2.end(); iter += 2){
+                path->moveTo(QPointF((*iter-0.5) * unitX,temp_y));
+                path->lineTo(QPointF((*(iter+1)+*iter-0.5) * unitX,temp_y));
+            }
+        }
+    }
+    if(!upArc.empty()){
+
+        qreal archeight = 4;
+        qreal  temp_y = - ScoreItem::halfnoteheight - 1;
+        for(QVector<quint16>::iterator iter = upArc.begin(); iter != upArc.end(); iter += 2)
+            path->arcTo(*iter * unitX, temp_y, *(iter+1) * unitX, archeight, 180 * 16, -180 *16);
+
+    }
+    for(int i=0; i< duraPtr/ticks/4; ++i){
+        path->moveTo((21*i+19.5)*unitX, -ScoreItem::halfnoteheight*0.75);
+        path->lineTo((21*i+19.5)*unitX, ScoreItem::halfnoteheight*0.75);
+    }
+}
+
+/// @brief constructor of ScoreLine
 ScoreLine::ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent):
-    QGraphicsRectItem(parent), type((TYPE)_type), text(""), isPressed(false)
+    QGraphicsRectItem(parent), type((TYPE)_type), text(""), isPressed(false), decorator(0)
 {
     scene->addItem(this);
-    setRect(0,-ScoreItem::halfnoteheight, scene->width(),ScoreItem::linespacing);
+    setRect(-20,-ScoreItem::halfnoteheight,
+            QSPreset::scorePaddingRect.width(), ScoreItem::linespacing);
+    switch(type){
+    case SCORE:
+        //decorator = new BarDecorator();
+        break;
+    case TITLE:
+         ;
+        break;
+    case AUTHOR:
+        ;
+        break;
+    case LYRIC://include the chord notation
+        ;
+        break;
+    case FOOTTER:
+        ;
+        break;
+    default: break;
+    }
 }
 void ScoreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option)
     Q_UNUSED(widget)
+    if(decorator != 0){
+        decorator->paint(painter);
+    }
     QFont font("Times [Adobe]", 9 , QFont::Bold);
-    QPen pen(QColor(0,0,220,100));
+    QPen pen(QColor(0,0,220,50));
     painter->setFont(font);
     painter->setPen(pen);
-    painter->drawText(5,-8, 10,10, Qt::AlignLeft, text);
+    painter->drawText(-15,-8, 10,10, Qt::AlignLeft, text);
+
+
     if(isPressed)
         painter->drawRect(boundingRect());
 }
+
 
 void ScoreLine::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton)

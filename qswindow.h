@@ -39,7 +39,7 @@ public slots:
 
     void generalPreset(int mode, int arg);
     void generalPreset(int mode, QSize size);
-    void keyInput(quint8);
+    void keyInput(quint8, quint8 dura);
 
 
     //music play

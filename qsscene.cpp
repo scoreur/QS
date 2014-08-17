@@ -9,11 +9,13 @@
 KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
     : QGraphicsScene(view->geometry(), parent),
       board(new QGraphicsRectItem(0,0, 104*PianoKey::halfspacing,PianoKey::whiteheight))
+
 {
     view->setScene(this);
     //setItemIndexMethod(NoIndex);//default
     view->setRenderHint(QPainter::Antialiasing);
     view->setUpdatesEnabled(true);
+    keyTime.start();
 
     qreal temp_x = PianoKey::halfspacing, temp_y = view->y()+2;
     addItem(board);
@@ -41,7 +43,8 @@ KeyScene::~KeyScene(){
     qDebug()<<"keyScene removed!";
 }
 void KeyScene::keyInput(quint8 id){
-    ((QSWindow*)parent())->keyInput(id);
+
+    ((QSWindow*)parent())->keyInput(id, (quint8)(keyTime.elapsed()/PianoKey::keyTimeAccuracy));
 }
 
 
@@ -63,6 +66,7 @@ void QSScene::setName(QString fileName){
     name = fileName;
     act->setText(QString("QS~%1").arg(fileName.right(16)));
 }
+
 
 
 

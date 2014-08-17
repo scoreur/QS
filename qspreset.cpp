@@ -3,6 +3,7 @@
 #include "qswindow.h"
 #include "ui_qswindow.h"
 #include "Score/scoreitem.h"
+#include "Score/scorescene.h"
 
 #include <QString>
 #include <QDebug>
@@ -64,6 +65,7 @@ void QSPreset::widgetConsturct(){
 
 void QSPreset::accept(){
     QSWindow * win = (QSWindow*)parent();
+    ScoreScene * scoreScene = (ScoreScene*)win->scoreView->scene();
     switch(ui->stackedWidget->currentIndex()){
     case 0://ui->generalPreset:
         win->resize(QSize(ui->editWinWidth->text().toInt(),
@@ -79,10 +81,12 @@ void QSPreset::accept(){
         break;
 
     case 2://ui->scorePreset:
-        ScoreItem::scorePreset(1, ui->editNoteSpacing->text().toInt(0,10));
-        ScoreItem::scorePreset(2, ui->editLineSpacing->text().toInt(0,10));
-        ScoreItem::scorePreset(3, ui->editNoteSize->text().toInt(0,10));
 
+        ScoreItem::notespacing = ui->editNoteSpacing->text().toInt(0,10);
+        ScoreItem::linespacing =  ui->editLineSpacing->text().toInt(0,10);
+        ScoreItem::notesize = ui->editNoteSize->text().toInt(0,10);
+        scoreScene->lineUpdate();
+        scoreScene->update(scoreScene->sceneRect());
         break;
     case 3://ui->staffPreset:
         break;
@@ -94,19 +98,31 @@ void QSPreset::accept(){
 
 }
 
+
 void QSPreset::reject(){
     qDebug()<<"preset unchanged!";
     hide();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// @brief static member                                                  ////
+/// @brief static member
+//general                                                ////
 QSize QSPreset::winSize = QSize(960,500);
 QSize QSPreset::tabSize = QSize(940,400);                                 ////
 QRect QSPreset::keyViewRect = QRect(0,300, 936,130);                      ////
 QRect QSPreset::wavViewRect = QRect(0,0, 936,204);                        ////
-QRect QSPreset::scoreViewRect = QRect(0,0, 750,300);                      ////
+QRect QSPreset::scoreViewRect = QRect(0,0, 770,300);                      ////
 QRect QSPreset::staffViewRect = QRect(0,0, 800,300);
+
+//wave
+
+//score
+QSize QSPreset::scorePageSize = QSize(800,600);
+QRect QSPreset::scorePaddingRect = QRect(10,10,
+                                         QSPreset::scorePageSize.width()-20,
+                                         QSPreset::scorePageSize.height()-20);
+
+//staff
 
 ///                                                                       ////
 //////////////////////////////////////////////////////////////////////////////

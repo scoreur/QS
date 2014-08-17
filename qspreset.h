@@ -14,12 +14,21 @@ public:
     explicit QSPreset(QWidget *parent = 0);
     ~QSPreset();
 
+    //general(in QSWindow)
     static QSize winSize;
     static QSize tabSize;
     static QRect keyViewRect;
     static QRect wavViewRect;
     static QRect scoreViewRect;
     static QRect staffViewRect;
+    //wave
+
+    //score
+    static QSize scorePageSize;
+    static QRect scorePaddingRect;
+
+    //staff
+
 
     void readSettings();
     void writeSettings();

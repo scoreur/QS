@@ -29,7 +29,7 @@ PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
 void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(true);
-        ((KeyScene*)scene())->keyInput(id);
+        ((KeyScene*)scene())->keyTime.restart();
         //keythread->start();
         keysound->play();
         //QSound::play(soundpath.arg(QString::number(id,10),2,'0'));
@@ -40,6 +40,7 @@ void PianoKey::mousePressEvent(QGraphicsSceneMouseEvent *event){
 void PianoKey::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton){
         press(false);
+        ((KeyScene*)scene())->keyInput(id);
         QTimer::singleShot(latency,keysound,SLOT(stop()));//timer cannot function in multithreat
         //keythread->quit();
 
@@ -96,7 +97,8 @@ qreal PianoKey::whiteheight = 120.0;
 qreal PianoKey::blackheight = 65.0;
 QRectF PianoKey::blackBound = QRectF(-halfwidth,0, halfwidth*2,blackheight);
 QRectF PianoKey::whiteBound = QRectF(-halfspacing,0, halfspacing*2,whiteheight);
-quint16 PianoKey::latency = 800;
+quint16 PianoKey::latency = 300;
+quint16 PianoKey::keyTimeAccuracy = 80;
 
 QPainterPath PianoKey::defaultKeyShape(uchar _id){//y=0 set on upside of keyboard
     TYPE type = TYPE(0);

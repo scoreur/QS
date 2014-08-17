@@ -35,7 +35,7 @@ ScoreView::ScoreView(QWidget *parent, int w, int h):
 
 }
 void ScoreView::wheelEvent(QWheelEvent *event){
-    qDebug()<<event->pos()<<" showing";
+    //qDebug()<<event->pos()<<" showing";
     verticalScrollBar()->show();
 }
 

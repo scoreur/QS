@@ -313,9 +313,10 @@ void QSWindow::displayKeyBoard(){
     }
 }
 
-void QSWindow::keyInput(quint8 id){
+void QSWindow::keyInput(quint8 id, quint8 dura = 12){
+    if(dura == 0) id = 88;
     if(ui->tabWidget->currentWidget()==ui->scoreTab)
-        ui->scoreInput->insertPlainText(QString::number(id)+" 12; ");
+        ui->scoreInput->insertPlainText(QString::number(id)+":"+QString::number(dura)+"; ");
 }
 
 void QSWindow::closeEvent(QCloseEvent *event){

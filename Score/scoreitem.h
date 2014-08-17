@@ -28,14 +28,11 @@ public:
     static quint8 notesize;
     static QColor presetColor;
     static QBrush selectedBrush;
-
-
-
-
+    static int temppitch;//for temporary storing
 
 public slots:
     void noteUpdate(qint8 adjust=0);
-    static void scorePreset(int mode, int arg);
+
 protected slots:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -52,6 +49,7 @@ private:
     QRectF bound;
     QColor color;
     int mouseY;
+
 };
 
 

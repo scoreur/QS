@@ -7,6 +7,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 class ScoreLine;
+class Decorator;
 
 class ScoreScene : public QSScene
 {
@@ -14,16 +15,13 @@ class ScoreScene : public QSScene
 public:
     ScoreScene(QGraphicsView *view, QString fileName = "");
     ~ScoreScene();
+    //load score.txt
     quint32 load(QString fileName);
+    //save score.txt
     quint32 store(QString fileName);
-
-    static quint16 pagewidth;
-    static quint16 pageheight;
-    static quint8 margin_left;
-    static quint8 margin_right;
-    static quint8 margin_top;
-    static quint8 margin_bottom;
-
+    //append new notes; when num<0, remove abs(num) notes from the back
+    void append(qint16 num, uchar * notes = 0, quint8 * duras = 0);
+    void lineUpdate();
 protected:
     void drawBackground(QPainter *painter, const QRectF *rect);
 
@@ -41,11 +39,6 @@ public:
     ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent = 0);
     ~ScoreLine(){}
 
-    static quint8 padding_left;
-    static quint8 padding_right;
-    static quint8 padding_top;
-    static quint8 padding_bottom;
-
     enum TYPE{
         SCORE = 0,
         TITLE,
@@ -58,7 +51,7 @@ public:
 
 
     QString text;//
-
+    Decorator *decorator;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -66,7 +59,46 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 private:
     bool isPressed;
+
 };
 
+class Decorator{
+
+public:
+    virtual void paint(QPainter *painter) = 0;
+protected:
+    Decorator(Decorator *_next = 0) : next(_next){}
+    ~Decorator(){
+        delete next;
+    }
+    void setNext(Decorator *_next){next = _next;}
+
+    Decorator *next;
+};
+
+class BarDecorator : public Decorator{
+public:
+    BarDecorator(quint8 *dura, quint32 num,
+                 quint8 _ticks = 12, Decorator *_next = 0);
+    ~BarDecorator(){delete path;}
+    void paint(QPainter *painter);
+    static qreal unitX;
+    QVector<quint16>scoreX;//scoreItem pos multiplied by 2
+    QVector<quint16>dotX;//attached dot pos multiplied by 2
+public slots:
+    void updatePath();
+
+private:
+
+    quint8 ticks;//how many ticks in one beat
+    quint8 duraPtr;//current duration pointer
+    QPainterPath *path;//store the painting cmd
+    QVector<quint16>lowerLine1;
+    QVector<quint16>lowerLine2;
+    QVector<quint16>upArc;
+
+
+
+};
 
 #endif // SCORESCENE_H

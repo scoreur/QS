@@ -36,6 +36,7 @@ public:
     static QRectF whiteBound;
     static QPainterPath defaultKeyShape(uchar);//
     static quint16 latency;
+    static quint16 keyTimeAccuracy;
     static bool isWhite(uchar);
     bool isWhite() const{
         return is_white;

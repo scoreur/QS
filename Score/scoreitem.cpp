@@ -79,16 +79,6 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         QFont font("Times [Adobe]", notesize , QFont::Bold);
         painter->setFont(font);
         painter->drawText(bound, Qt::AlignCenter, QString(note));
-        if(duration == 6)//half
-            painter->drawLine(-halfnotewidth/2.0,notesize/2.0, halfnotewidth/2.0,notesize/2.0);
-        else if(duration == 3){//quarter
-            painter->drawLine(-halfnotewidth/2.0,notesize/2.0+2, halfnotewidth/2.0,notesize/2.0+2);
-            painter->drawLine(-halfnotewidth/2.0,notesize/2.0, halfnotewidth/2.0,notesize/2.0);
-        }else if(duration == 9){//three quarters
-            painter->drawLine(-halfnotewidth/2.0,notesize/2.0, halfnotewidth/2.0,notesize/2.0);
-            painter->setBrush(brush);
-            painter->drawEllipse(halfnotewidth/2.0-2,notesize/2.0-6,1,1);
-        }
 
         if(semi == 1){// #
 
@@ -147,28 +137,8 @@ quint8 ScoreItem::linespacing = 50;
 quint8 ScoreItem::notesize = 20;
 QColor ScoreItem::presetColor = Qt::black;
 QBrush ScoreItem::selectedBrush(QColor(0,60,220,20));
+int ScoreItem::temppitch = 89;
 // *******
-
-void ScoreItem::scorePreset(int mode, int arg){
-    switch(mode){
-    case 1:
-        if(notespacing != (quint8)arg)
-            qDebug()<<"notespacing changed!"<< int(notespacing = (quint8)arg);
-        break;
-    case 2:
-        if(linespacing != (quint8)arg)
-            qDebug()<<"linespacing changed!"<< int(linespacing = (quint8)arg);
-        break;
-    case 3:
-        if(notesize != (quint8)arg)
-            qDebug()<<"notesize changed!"<< int(notesize = (quint8)arg);
-        break;
-    default: break;
-    }
-
-}
-
-
 
 
 /// @brief mouse events
@@ -177,6 +147,7 @@ void ScoreItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
         setCursor(Qt::SizeVerCursor);
         color = Qt::red;
         mouseY = event->scenePos().y();
+        temppitch = pitch;
         scene()->update(sceneBoundingRect());
 
     }
@@ -188,6 +159,7 @@ void ScoreItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
         setCursor(Qt::ArrowCursor);
         color = presetColor;
         mouseY = 0;
+        temppitch = 89;
         scene()->update(sceneBoundingRect());
     }
 
@@ -195,11 +167,11 @@ void ScoreItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
 
 void ScoreItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     int tmp = (int)(mouseY-event->scenePos().y());
-    if(tmp>1)
-        noteUpdate(tmp/1-1);
-    else if(tmp<-1)
-        noteUpdate(1-(-tmp)/1);
-    mouseY = event->scenePos().y();
+    if(tmp>5)
+        noteUpdate(temppitch-pitch+tmp/5-1);
+    else if(tmp<-5)
+        noteUpdate(temppitch-pitch+1-(-tmp)/5);
+
     scene()->update(sceneBoundingRect());
     //qDebug()<<event->scenePos();
 }

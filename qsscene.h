@@ -4,9 +4,11 @@
 #include <QGraphicsScene>
 #include <QString>
 #include <QAction>
+#include <QTime>
 
 class QGraphicsItem;
 class QGraphicsView;
+
 
 class KeyScene : public QGraphicsScene
 {
@@ -14,12 +16,14 @@ public:
     KeyScene(QGraphicsView *view, QWidget *parent);
     ~KeyScene();
     QPointF spectrum[88];
+    friend class PianoKey;
 signals:
     void keyInput(quint8);
 protected:
     void drawForeground(QPainter *painter, const QRectF &rect);
 private:
     QGraphicsItem *board;
+    QTime keyTime;
 };
 
 class QSScene : public QGraphicsScene{
