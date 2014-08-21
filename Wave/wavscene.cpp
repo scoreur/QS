@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "wavframe.h"
 #include "wavscene.h"
+#include "../Core/spectrum.h"
 #include <QGraphicsSceneWheelEvent>
 #include <cmath>
 #include <thread>
@@ -14,7 +15,7 @@ qreal WavScene::secondsPerView = 5;
 qreal WavScene::accuracy = 0.05;
 quint16 WavScene::sampleps = 44100;
 quint32 WavScene::wavBufferSize = 1<<22;
-
+QColor WavScene::backgroundColor = QColor(51, 204, 102, 240);
 /// @brief constructor of WavScene
 
 WavScene::WavScene(QGraphicsView *view, QString fileName)
@@ -25,9 +26,10 @@ WavScene::WavScene(QGraphicsView *view, QString fileName)
     setItemIndexMethod(NoIndex);
     //view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     //view->setCacheMode(QGraphicsView::CacheBackground);
-
-    std::thread th((WavScene::load0), (WavScene*)this, fileName, offset, wavBufferSize);
-    th.detach();
+    if(!fileName.isEmpty()){
+        std::thread th((WavScene::load0), (WavScene*)this, fileName, offset, wavBufferSize);
+        th.detach();
+    }
 
 
     if(fileName.isEmpty())
@@ -103,7 +105,7 @@ void WavScene::drawForeground(QPainter *painter, const QRectF &rect){
 
 }
 void WavScene::drawBackground(QPainter *painter, const QRectF &rect){
-    painter->setBrush(QBrush(QColor(0, 30, 200, 200)));
+    painter->setBrush(QBrush(backgroundColor));
     painter->setPen(Qt::NoPen);
     painter->drawRect(rect);
 
