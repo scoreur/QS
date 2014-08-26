@@ -121,7 +121,8 @@ QSize QSPreset::scorePageSize = QSize(800,600);
 QRect QSPreset::scorePaddingRect = QRect(10,10,
                                          QSPreset::scorePageSize.width()-20,
                                          QSPreset::scorePageSize.height()-20);
-
+QColor QSPreset::wavForegroundColor = QColor(20, 175, 50, 220);
+QColor QSPreset::wavBackgroundColor = QColor(15, 15, 15, 220);
 //staff
 
 ///                                                                       ////

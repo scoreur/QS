@@ -1,9 +1,10 @@
 
+#include "../qspreset.h"
 #include "wavframe.h"
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include "Core/spectrum.h"
+#include "../Core/spectrum.h"
 
 double ampExpand(double in){
     int sgn = in>0? 1: -1;
@@ -45,7 +46,7 @@ quint16 WavFrame::framesize = 200;
 void WavFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QPen pen(QColor(0,240,0,255));
+    QPen pen(QSPreset::wavForegroundColor);
     pen.setWidth(1);
     painter->setPen(pen);
 

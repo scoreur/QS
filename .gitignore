@@ -1,9 +1,12 @@
-
+*.o
 
 *.user
+*.autosave
+*.stash
 
 *.wav
-
 *.mp3
-
 *.mid
+
+MIDI/*.cpp
+MIDI/*.pro

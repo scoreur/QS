@@ -6,6 +6,7 @@
 #include <QVector>
 #include "qsscene.h"
 #include "qsview.h"
+#include "html5applicationviewer.h"
 #include "qspreset.h"
 #include <QThread>
 #include <QEvent>
@@ -56,6 +57,7 @@ protected slots:
 private:
     Ui::QSWindow *ui;
     QSView *wavView, *scoreView, *staffView,  *keyView;//keyview must be created after wavView
+    Html5ApplicationViewer *webView;
     KeyScene *keyScene;
 
     QString openFileName, saveFileName, tempFileName;

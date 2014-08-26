@@ -22,6 +22,8 @@ public:
     static QRect scoreViewRect;
     static QRect staffViewRect;
     //wave
+    static QColor wavForegroundColor;
+    static QColor wavBackgroundColor;
 
     //score
     static QSize scorePageSize;

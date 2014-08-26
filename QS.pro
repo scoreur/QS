@@ -9,7 +9,7 @@ QT       += core gui \
          network\
 
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 TARGET = QS
 TEMPLATE = app
@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     qsview.cpp \
     qsplayer.cpp \
     Staff/staffitem.cpp \
-    Core/spectrum.cpp
+    Core/spectrum.cpp \
+    midiparser.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
@@ -42,7 +43,14 @@ HEADERS  += qswindow.h \
     qsview.h \
     qsplayer.h \
     Staff/staffitem.h \
-    Core/spectrum.h
+    Core/spectrum.h \
+    midiparser.h
+
+DEFINES += TOUCH_OPTIMIZED_NAVIGATION
+# Please do not modify the following two lines. Required for deployment.
+include(html5applicationviewer/html5applicationviewer.pri)
+qtcAddDeployment()
+
 
 FORMS    += qswindow.ui \
     qspreset.ui
@@ -51,3 +59,18 @@ RESOURCES += \
     qs.qrc
 
 ICON = icon.icns
+
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/MIDI/release/ -lMIDI
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/MIDI/debug/ -lMIDI
+else:unix: LIBS += -L$$PWD/MIDI/ -lMIDI
+
+INCLUDEPATH += $$PWD/MIDI
+DEPENDPATH += $$PWD/MIDI
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/release/libMIDI.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/debug/libMIDI.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/release/MIDI.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/debug/MIDI.lib
+else:unix: PRE_TARGETDEPS += $$PWD/MIDI/libMIDI.a

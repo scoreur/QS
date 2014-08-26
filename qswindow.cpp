@@ -4,7 +4,7 @@
 #include "Wave/wavscene.h"
 #include "Score/scorescene.h"
 #include "Staff/staffscene.h"
-
+#include "midiparser.h"
 #include <QFileDialog>
 #include <QFile>
 #include <QIcon>
@@ -66,6 +66,14 @@ QSWindow::QSWindow(QWidget *parent) :
     addScene(scoreView);
     addScene(staffView);
     keyScene = new KeyScene(keyView, this);
+
+    //add webView
+    webView = new Html5ApplicationViewer(ui->webTab);
+    webView->setOrientation(Html5ApplicationViewer::ScreenOrientationAuto);
+    webView->resize(900, 400);
+    webView->showExpanded();
+    webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
+
 
 
 }
@@ -215,6 +223,7 @@ void QSWindow::openFile(){                                                      
         }
         else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
             addScene(staffView, openFileName);
+            MidiParser::test(openFileName.toStdString());
         }else{
             ui->statusBar->showMessage("can't process such file format!");
             openFileName = "";
