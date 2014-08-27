@@ -8,5 +8,6 @@
 *.mp3
 *.mid
 
-MIDI/*.cpp
+
 MIDI/*.pro
+MIDI/Makefile
