@@ -15,6 +15,7 @@ QSView::QSView(QWidget *parent, int w, int h):
 }
 
 void QSView::wheelEvent(QWheelEvent *event){
+    Q_UNUSED(event)
 
 }
 
@@ -25,6 +26,7 @@ WavView::WavView(QWidget *parent, int w, int h):
 
 }
 void WavView::wheelEvent(QWheelEvent *event){
+    Q_UNUSED(event)
     horizontalScrollBar()->show();
 }
 
@@ -35,7 +37,7 @@ ScoreView::ScoreView(QWidget *parent, int w, int h):
 
 }
 void ScoreView::wheelEvent(QWheelEvent *event){
-    //qDebug()<<event->pos()<<" showing";
+    Q_UNUSED(event)
     verticalScrollBar()->show();
 }
 
@@ -45,6 +47,6 @@ StaffView::StaffView(QWidget *parent, int w, int h):
 
 }
 void StaffView::wheelEvent(QWheelEvent *event){
-    qDebug()<<event->pos()<<" showing";
+    Q_UNUSED(event)
     verticalScrollBar()->show();
 }

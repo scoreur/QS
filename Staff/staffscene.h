@@ -2,7 +2,16 @@
 #define STAFFSCENE_H
 
 #include "../qsscene.h"
+#include "staffitem.h"
 #include <QGraphicsRectItem>
+#include <QPainter>
+#include <QVector>
+
+// forward declarations
+class StaffImages;
+class StaffLine;
+
+
 
 class StaffScene : public QSScene{
 public:
@@ -10,19 +19,45 @@ public:
     ~StaffScene();
     quint32 load(QString fileName);
     quint32 store(QString fileName);
+    QVector<StaffLine*> lines;
 private:
+
 
 };
 
 class StaffMeasure : QGraphicsRectItem{
 
 public:
-    StaffMeasure(QGraphicsScene *scene, QGraphicsItem *parent);
+    StaffMeasure(QGraphicsItem *parent);
     ~StaffMeasure(){}
 
 private:
 
 };
 
+
+
+class StaffLine : public QGraphicsRectItem{
+public:
+    StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent = 0);
+    ~StaffLine(){}
+
+    enum TYPE{
+        STAFF = 0,
+        TITLE,
+        AUTHOR,
+        COMMENT,
+        LYRIC,
+        FOOTTER
+    }type;
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+
+
+};
 
 #endif // STAFFSCENE_H

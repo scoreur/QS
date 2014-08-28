@@ -36,7 +36,7 @@ void QSPlayer::run(){
     qDebug()<<format.isValid();
     audioOut = new QAudioOutput(format, parent());
 
-    audioOut->start(file);
+    //audioOut->start(file);
     qDebug()<<exec();
 }
 

@@ -30,6 +30,7 @@ KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
 
 }
 void KeyScene::drawForeground(QPainter *painter, const QRectF &rect){
+    Q_UNUSED(rect)
     QPen pen(Qt::red);
     painter->setPen(pen);
     painter->drawPolyline(spectrum, 88);

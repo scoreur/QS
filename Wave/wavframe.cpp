@@ -31,7 +31,7 @@ WavFrame::WavFrame(quint32 _len, short *_data, qreal _intv, qreal _width, qreal 
         //2 to the 15th power as maximum
     }
     qDebug()<<"array "<<datasize;
-    int k = 1;
+    quint32 k = 1;
     while(k<_len-100){
     while(k<_len-1 && (_data[k]-_data[k-1]<=5 || _data[k+1]-_data[k]>=-5)
           &&(_data[k]-_data[k-1]>=-5 || _data[k+1]-_data[k]<=5))++k;

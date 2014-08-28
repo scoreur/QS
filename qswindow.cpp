@@ -29,7 +29,7 @@ QSWindow::QSWindow(QWidget *parent) :
     tempFileName(""),
     mediaPlayer(0),
     musicthread(0),
-    preset(new QSPreset(this))
+    preset(QSPreset::getInstance(this))
 {
     //qDebug()<<QSettings(domainName, appName).scope();
     //QSettings(domainName, appName).clear();//remove this line in release version
@@ -72,7 +72,7 @@ QSWindow::QSWindow(QWidget *parent) :
     webView->setOrientation(Html5ApplicationViewer::ScreenOrientationAuto);
     webView->resize(900, 400);
     webView->showExpanded();
-    webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
+    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
 

@@ -52,6 +52,7 @@ public:
 
     QString text;//
     Decorator *decorator;
+    static quint8 nTicksPerBeat, nBeatsPerMeasure, nMeasuresPerLine;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -68,7 +69,7 @@ public:
     virtual void paint(QPainter *painter) = 0;
 protected:
     Decorator(Decorator *_next = 0) : next(_next){}
-    ~Decorator(){
+    virtual ~Decorator(){
         delete next;
     }
     void setNext(Decorator *_next){next = _next;}

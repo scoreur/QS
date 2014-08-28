@@ -25,7 +25,7 @@ QSPreset::~QSPreset(){
     qDebug()<<"preset dialog delete!";
 }
 
-
+QSPreset * QSPreset::instance = 0;
 
 
 void QSPreset::widgetConsturct(){
@@ -118,12 +118,21 @@ QRect QSPreset::staffViewRect = QRect(0,0, 800,300);
 
 //score
 QSize QSPreset::scorePageSize = QSize(800,600);
-QRect QSPreset::scorePaddingRect = QRect(10,10,
-                                         QSPreset::scorePageSize.width()-20,
-                                         QSPreset::scorePageSize.height()-20);
+QRect QSPreset::scorePaddingRect = QRect(20,20,
+                                         QSPreset::scorePageSize.width()-40,
+                                         QSPreset::scorePageSize.height()-40);
 QColor QSPreset::wavForegroundColor = QColor(20, 175, 50, 220);
 QColor QSPreset::wavBackgroundColor = QColor(15, 15, 15, 220);
 //staff
+QSize QSPreset::staffPageSize = QSize(800, 600);
+QRectF QSPreset::staffPaddingRect = QRect(10, 10,
+                                                QSPreset::staffPageSize.width()-20,
+                                                QSPreset::staffPageSize.height()-20);
+QSize QSPreset::staffLineSize = QSize(780, 50);
+qreal QSPreset::staffLineInterval = 9;
+qreal QSPreset::staffLineSpacing = 50;
+
+
 
 ///                                                                       ////
 //////////////////////////////////////////////////////////////////////////////
@@ -153,5 +162,18 @@ void QSPreset::writeSettings(){
     settings.setValue("winSize", win->size());
     settings.setValue("tabSize", win->ui->tabWidget->size());
     settings.endGroup();
+}
+
+
+
+StaffImages::StaffImages(){
+    int tmp = 70;
+    images[tr_clef] = QPixmap(QString(":/image/staff/treble_clef.png"), "PNG").scaled(70, 70);
+    images[ba_clef] = QPixmap(QString(":/image/staff/bass_clef"), "PNG").scaled(45, 45);
+    images[qut_rest] = QPixmap(QString(":/image/staff/quarter_rest"), "PNG").scaled(tmp, tmp);
+    images[quv_rest] = QPixmap(QString(":/image/staff/quaver_rest"), "PNG").scaled(tmp, tmp);
+    images[sharp] = QPixmap(QString(":/image/staff/sharp.png"), "PNG").scaled(25, 25);
+    images[flat] = QPixmap(QString(":/image/staff/flat.png"), "PNG").scaled(25, 25);
+    images[nature] = QPixmap(QString(":/image/staff/sharp.png"), "PNG").scaled(tmp, tmp);// TODO: replace by nature.png
 }
 

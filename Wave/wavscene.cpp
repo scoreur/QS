@@ -116,6 +116,7 @@ void WavScene::drawBackground(QPainter *painter, const QRectF &rect){
 
 }
 void WavScene::wheelEvent(QGraphicsSceneWheelEvent *event){
+    Q_UNUSED(event)
     //qDebug()<<event->delta();
 
 }

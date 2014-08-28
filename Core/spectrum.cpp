@@ -45,7 +45,7 @@ cmplx * Spectrum::DFT(cmplx data[], quint32 num, bool mode){
     cmplx w0 = mode? exp2iPI(1/(double)num): exp2iPI(-1/(double)num);
     cmplx w = cmplx(1.0, 0.0);
     cmplx *out = new cmplx[num];
-    for(int j=0;j<(num>>1);++j){//calculate half
+    for(quint32 j=0;j<(num>>1);++j){//calculate half
         out[j] = 0.0;
         for(int k = num-1; k >= 0; --k){//Horner rule
             out[j] = w*out[j]+data[k];
@@ -86,7 +86,7 @@ double * Spectrum::DCT(double data[], quint32 num, bool mode){//DCT-II, usual DC
         else out[i] *= 0.5;
     }
 
-
+    return out;
 
 }
 

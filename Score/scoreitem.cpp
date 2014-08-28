@@ -176,6 +176,7 @@ void ScoreItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     //qDebug()<<event->scenePos();
 }
 void ScoreItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
+    Q_UNUSED(event)// TODO: replace this macro by USING event
     noteUpdate(88-pitch);
     scene()->update(sceneBoundingRect());
     qDebug()<<"double clicked!";

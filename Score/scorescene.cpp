@@ -24,7 +24,7 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
         setName("Untitled.txt");
     }
 
-    if(len == 0){
+    if(len == 0){// sample score stored inside
         len = 88;
         for(quint32 i=0;i<len;++i){
             note.push_back(i);
@@ -36,16 +36,18 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
     ScoreLine *scoreLine = 0;
     QVector<quint16> *scoreX = 0;
     int start_i = 0;
-
+    quint16 lineTicks = ScoreLine::nTicksPerBeat * ScoreLine::nBeatsPerMeasure * ScoreLine::nMeasuresPerLine;
     for(quint32 i=0;i<len;++i){//typesetting
         totaldura += dura[i];
-        if(totaldura == 12*16 || i == len -1){//4 bars per line
+        if(totaldura == lineTicks || i == len -1){//fill one line or reach the end
 
             scoreLine = new ScoreLine(this, 0, 0);
             scoreLine->setPos(20, temp_y);
             lines.push_back(scoreLine);
             scoreLine->text = QString::number(lines.size());
-            scoreLine->decorator = new BarDecorator((quint8*)dura.begin()+start_i, i-start_i+1, 12);
+            scoreLine->decorator = new BarDecorator((quint8*)dura.begin()+start_i
+                                                    , i-start_i+1
+                                                    , ScoreLine::nTicksPerBeat);
 
             scoreX = &((BarDecorator*)scoreLine->decorator)->scoreX;
 
@@ -62,6 +64,10 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
 ScoreScene::~ScoreScene(){
     qDebug()<<"scoreScene removed!";
 }
+
+quint8 ScoreLine::nTicksPerBeat = 12;		// number of ticks per beat
+quint8 ScoreLine::nBeatsPerMeasure = 4;	// number of beats per measure
+quint8 ScoreLine::nMeasuresPerLine = 4;	// number of measures per line
 
 quint32 ScoreScene::load(QString fileName){
     std::fstream scorein;
@@ -217,7 +223,7 @@ void BarDecorator::updatePath(){
 
 /// @brief constructor of ScoreLine
 ScoreLine::ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent):
-    QGraphicsRectItem(parent), type((TYPE)_type), text(""), isPressed(false), decorator(0)
+    QGraphicsRectItem(parent), type((TYPE)_type), text(""), decorator(0), isPressed(false)
 {
     scene->addItem(this);
     setRect(-20,-ScoreItem::halfnoteheight,

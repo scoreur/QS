@@ -3,16 +3,46 @@
 
 #include <QDialog>
 
+class StaffImages{// holding images for painting staves
+public:
+    StaffImages();// loading&scaling images for qrc
+    // TODO: use sigleton pattern
+    ~StaffImages(){
+
+    }
+    enum TYPE{
+        tr_clef = 0,
+        ba_clef,
+        qut_rest,
+        quv_rest,
+        sharp,
+        flat,
+        nature
+    };
+    QPixmap images[20];//TODO: add more
+    QPixmap &operator[](quint32 i){
+        return images[i];
+    }
+
+};
+
+
 namespace Ui{
 class QSPreset;
 }
+
 
 class QSPreset : public QDialog
 {
     Q_OBJECT
 public:
-    explicit QSPreset(QWidget *parent = 0);
+
     ~QSPreset();
+    static QSPreset* getInstance(QWidget *parent = 0){
+        if(instance == 0)
+            instance = new QSPreset(parent);
+        return instance;
+    }
 
     //general(in QSWindow)
     static QSize winSize;
@@ -30,7 +60,12 @@ public:
     static QRect scorePaddingRect;
 
     //staff
-
+    static QSize staffPageSize;
+    static QRectF staffPaddingRect;
+    static QSize staffLineSize;
+    static qreal staffLineInterval;
+    static qreal staffLineSpacing;
+    StaffImages imgs;
 
     void readSettings();
     void writeSettings();
@@ -40,13 +75,15 @@ public slots:
     void reject();
 
 private:
+    explicit QSPreset(QWidget *parent = 0);
     Ui::QSPreset *ui;
+    static QSPreset *instance;
     void widgetConsturct();
     //void switchStack(QWidget *widget);
 
 private slots:
 
-
 };
+
 
 #endif // QSPRESET_H
