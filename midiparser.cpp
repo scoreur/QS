@@ -36,7 +36,7 @@ void MidiParser::test(std::string fileName){
 
     for(int i=0;i<mid.numTracks();i++)
     {
-        map<int, pair<int, int> >g;
+        map<int, int>g;
         QJsonArray wyj;
         MIDI::Track* track=mid.track(i);
         tmp << "Track #" << i+1 <<'\n';
