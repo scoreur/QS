@@ -1,5 +1,5 @@
 #include "midiparser.h"
-#include "MIDI.h"
+#include "MIDIFile.hpp"
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonValue>
@@ -12,12 +12,12 @@ MidiParser::MidiParser()
 }
 
 void MidiParser::test(std::string fileName){
-    MIDI::File mid(fileName.c_str());
-    mid.open();
+   // MIDI::File mid(fileName.c_str());
+    //mid.open();
 
     fstream tmp;
     tmp.open(fileName.append(".txt"), std::ios::out);
-
+/*
     MIDI::Header* header=mid.header();
 
 //    tmp << "Header" <<'\n';
@@ -63,6 +63,6 @@ void MidiParser::test(std::string fileName){
         }
         cxq.append(wyj);
     }
-
+*/
     tmp.close();
 }

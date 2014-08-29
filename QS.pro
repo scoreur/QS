@@ -45,7 +45,8 @@ HEADERS  += qswindow.h \
     Staff/staffitem.h \
     Core/spectrum.h \
     midiparser.h \
-    decorator.h
+    decorator.h \
+    MIDIFile.hpp
 
 INCLUDEPATH += $$PWD
 
@@ -65,15 +66,5 @@ ICON = icon.icns
 
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/MIDI/release/ -lMIDI
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/MIDI/debug/ -lMIDI
-else:unix: LIBS += -L$$PWD/MIDI/ -lMIDI
-
 INCLUDEPATH += $$PWD/MIDI
-DEPENDPATH += $$PWD/MIDI
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/release/libMIDI.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/debug/libMIDI.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/release/MIDI.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/MIDI/debug/MIDI.lib
-else:unix: PRE_TARGETDEPS += $$PWD/MIDI/libMIDI.a

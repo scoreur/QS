@@ -79,12 +79,16 @@ struct MidiEvent{
     quint8 param1, param2;
     MidiEvent(quint32 delta, char *&in):
     deltaTime(delta){
-        if(0x80 & *(quint8*)in)
+        quint8 tmp = *(quint8*)in;
+        if(0x80 & tmp)
             type = *(in++);
         else
             type = 0;
         param1 = *(quint8*)(in++);
-        param2 = *(quint8*)(in++);
+        if(tmp>>4 == 0xC || tmp>>4 == 0xD)
+            param2 = 0;
+        else
+            param2 = *(quint8*)(in++);
     }
     ~MidiEvent(){}
     };
