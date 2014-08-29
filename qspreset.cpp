@@ -4,7 +4,7 @@
 #include "ui_qswindow.h"
 #include "Score/scoreitem.h"
 #include "Score/scorescene.h"
-
+#include <QDir>
 #include <QString>
 #include <QDebug>
 #include <QSettings>
@@ -190,21 +190,21 @@ void StaffImages::updatePictures(){
     QPainter painter; QPen pen(QSPreset::noteColor[0]); QBrush brush(QSPreset::noteColor[0]);
     qreal shx = 0, shy = -0.35; qreal intv = QSPreset::staffLineInterval;
 
-
-
-    painter.begin(pic+0);//half_note_head
+    QPicture picture;
+    painter.begin(&picture);//hollow_note_head
     painter.setPen(pen);
     painter.shear(shx,shy);
-    painter.drawEllipse(-intv/2,-intv/2, intv*1.3,intv*0.9);
+    painter.drawEllipse(QPointF(0,0), intv*0.65,intv*0.45);
     painter.end();
-    //pic[0].save("note_single.pic");//test
-    painter.begin(pic+1);//qut_note_head; TODO: allow multi-color
+    picture.save("black_hollow_note.pic");//test
+    painter.begin(&picture);//solid_note_head; TODO: allow multi-color
     painter.setPen(pen);
     painter.setBrush(brush);
     painter.shear(shx,shy);
-    painter.drawEllipse(-intv/2,-intv/2, intv*1.3,intv*0.9);
+    painter.drawEllipse(QPointF(0,0), intv *0.65, intv*0.45);
     painter.end();
+    picture.save("black_solid_note.pic");
 
-    //painter.begin(pic+2);
+
 }
 

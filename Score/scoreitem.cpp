@@ -1,4 +1,5 @@
 #include "scoreitem.h"
+#include "qspreset.h"
 #include <QGraphicsItem>
 #include <QDebug>
 #include <QCursor>
@@ -20,6 +21,7 @@ ScoreItem::ScoreItem(uchar _pitch, uchar _duration, QGraphicsItem *parent):
     noteUpdate();
 }
 
+
 void ScoreItem::noteUpdate(qint8 adjust){
     if(adjust != 0){
         if(pitch > 88) return;
@@ -30,40 +32,16 @@ void ScoreItem::noteUpdate(qint8 adjust){
         else
             pitch += adjust;
     }
-    switch((pitch - keyPitch)%12){
-    case 0: note = '1'; semi = 0;
-        break;
-    case 1: note = '1'; semi = 1;
-        break;
-    case 2: note = '2'; semi = 0;
-        break;
-    case 3: note = '3'; semi = -1;
-        break;
-    case 4: note = '3'; semi = 0;
-        break;
-    case 5: note = '4'; semi = 0;
-        break;
-    case 6: note = '4'; semi = 1;
-        break;
-    case 7: note = '5'; semi = 0;
-        break;
-    case 8: note = '5'; semi = 1;
-        break;
-    case 9: note = '6'; semi = 0;
-        break;
-    case 10: note = '7'; semi = -1;
-        break;
-    case 11: note = '7'; semi = 0;
-        break;
-    default: break;
-    }
+
+    note = PitchToNote[(pitch-keyPitch)%12];
+    semi = PitchToSemi[(pitch-keyPitch)%12];
+
     if(pitch == 88){
         note = '0';
         semi = 0;
     }
     else
-        oct = ((pitch-keyPitch)/12-4);
-    //qDebug()<<int((pitch-keyPitch)%12);
+        oct = ((pitch-keyPitch)/12-4);    
 }
 
 
@@ -74,24 +52,22 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     QPen pen(color);
     QBrush brush(color);
+    QFont font("Times [Adobe]", notesize , QFont::Bold);
     painter->setPen(pen);
     if(pitch<89){       
-        QFont font("Times [Adobe]", notesize , QFont::Bold);
+
         painter->setFont(font);
         painter->drawText(bound, Qt::AlignCenter, QString(note));
 
         if(semi == 1){// #
-
-            font.setPointSizeF(notesize/2);
-            painter->setFont(font);
-            painter->drawText(-bound.width()/2,-bound.height()/2+8, 10,10, Qt::AlignLeft, QString('#'));
+            painter->drawPixmap(-bound.width()/2-6,-bound.height()/2+5, 20,12,
+                                QSPreset::getInstance()->imgs[StaffImages::sharp]);
         }
         else if(semi == -1){// b
-            font.setPointSizeF(notesize/2);
-            painter->setFont(font);
-            painter->drawText(-bound.width()/2,-bound.height()/2+8, 10,10, Qt::AlignLeft, QString('b'));
+            painter->drawPixmap(-bound.width()/2-6,-bound.height()/2+5, 20,12,
+                                            QSPreset::getInstance()->imgs[StaffImages::flat]);
         }
-        else
+        else//nature sign
             ;
 
         if(oct != 0 && pitch != 88){//not rest
@@ -106,19 +82,7 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->setPen(Qt::NoPen);
             painter->drawRect(bound);
         }
-    }else switch(pitch){
-    case 89:
-        painter->drawLine(0,-notesize *0.75, 0,notesize*0.75);
-        break;
-    case 90:
-        painter->drawLine(-2,-notesize *0.75, -2,notesize*0.75);
-        painter->drawLine(2,-notesize *0.75, 2,notesize*0.75);
-    case 91://undefined
-        break;
-
-    default: break;
     }
-
 
 }
 
@@ -135,8 +99,10 @@ quint8 ScoreItem::halfnoteheight = 25;
 quint8 ScoreItem::notespacing = 35;
 quint8 ScoreItem::linespacing = 50;
 quint8 ScoreItem::notesize = 20;
-QColor ScoreItem::presetColor = Qt::black;
-QBrush ScoreItem::selectedBrush(QColor(0,60,220,20));
+QColor ScoreItem::presetColor = Qt::black;//default color for notes
+QBrush ScoreItem::selectedBrush(QColor(0,60,220,20));//the color of note's rect when selected
+qint8 ScoreItem::PitchToNote[12] = {49,49,50,51,51,52,52,53,53,54,55,55};//map pitch to note text
+qint8 ScoreItem::PitchToSemi[12] = {0,1,0,-1,0,0,1,0,1,0,-1,0};
 int ScoreItem::temppitch = 89;
 // *******
 

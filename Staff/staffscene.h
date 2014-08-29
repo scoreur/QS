@@ -1,8 +1,9 @@
 #ifndef STAFFSCENE_H
 #define STAFFSCENE_H
 
-#include "../qsscene.h"
-#include "../qspreset.h"
+#include "qsscene.h"
+#include "qspreset.h"
+#include "decorator.h"
 #include "staffitem.h"
 #include <QGraphicsRectItem>
 #include <QPainter>
@@ -44,6 +45,7 @@ public:
     ~StaffLine(){}
 
     LineType type;
+
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

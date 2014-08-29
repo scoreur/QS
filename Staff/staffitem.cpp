@@ -1,6 +1,7 @@
 #include "staffitem.h"
-#include "../qspreset.h"
-#include "../qsscene.h"
+#include "qspreset.h"
+#include "qsscene.h"
+#include <QDir>
 ////////////////////
 /// \brief Constructor of StaffItem
 /// \param parent
@@ -8,7 +9,7 @@
 ///
 StaffItem::StaffItem(QGraphicsItem *parent, quint8 _dura) :
     QGraphicsObject(parent), dura(_dura), colorIndex(0),
-    markShowed(false), bound(-5,-5,10,10)
+    markShowed(false), bound(-10,-10,20,20)
 {
 
 }
@@ -16,12 +17,20 @@ StaffItem::StaffItem(QGraphicsItem *parent, quint8 _dura) :
 void StaffItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option)
     Q_UNUSED(widget)
-    if(dura == 24)
-        painter->drawPicture(0,0,QSPreset::getInstance()->imgs(StaffImages::half_note_head));
-    else if(dura == 12)
-        painter->drawPicture(0,0,QSPreset::getInstance()->imgs(StaffImages::qut_note_head));
-    else if(dura == 6)
-        ;
+    QPicture picture;
+    if(dura >= 24){
+
+        picture.load("black_solid_note.pic");
+        painter->drawPicture(0,0,picture);
+
+    }
+    else{
+
+        picture.load("black_hollow_note.pic");
+        painter->drawPicture(0,0, picture);
+    }
+
+
 }
 
 void StaffItem::showMark(bool f){
@@ -51,7 +60,7 @@ void StaffItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
 
 void StaffItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
 
-    setPos(event->scenePos());
+
     scene()->update(sceneBoundingRect());
 }
 
@@ -93,25 +102,26 @@ QPainterPath KeySignature::shape() const{
 void KeySignature::constructPlaces(){
     if(! places.empty())
         places.clear();
+    qreal startX = 20;
     if(clef == 0){
         if(id > 0){//sharp key
             for(qint8 i=0; i<id; ++i){
-                places << QPointF(i*7+20,(i*3)%5 * QSPreset::staffLineInterval/2-3);
+                places << QPointF(i*7+startX,(i*3)%5 * QSPreset::staffLineInterval/2-3);
             }
         }
         else if(id < 0)//flat key
             for(quint8 i=0; i<-id; ++i){
-                places<< QPointF(i*7+20,(2 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
+                places<< QPointF(i*7+startX,(2 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
             }
     }else if(clef == 1){
         if(id > 0){//sharp key
             for(qint8 i=0; i<id; ++i){
-                places << QPointF(i*7+20,(2 + (i*3)%5) * QSPreset::staffLineInterval/2-3);
+                places << QPointF(i*7+startX,(2 + (i*3)%5) * QSPreset::staffLineInterval/2-3);
             }
         }
         else if(id < 0)//flat key
             for(quint8 i=0; i<-id; ++i){
-                places<< QPointF(i*7+20,(4 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
+                places<< QPointF(i*7+startX,(4 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
             }
 
     }else{

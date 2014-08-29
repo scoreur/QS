@@ -1,5 +1,5 @@
 #include "staffscene.h"
-#include "../qspreset.h"
+#include "qspreset.h"
 #include <QDebug>
 #include <QPicture>
 

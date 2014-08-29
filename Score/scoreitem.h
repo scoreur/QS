@@ -28,6 +28,7 @@ public:
     static quint8 notesize;
     static QColor presetColor;
     static QBrush selectedBrush;
+    static qint8 PitchToNote[12], PitchToSemi[12];
     static int temppitch;//for temporary storing
 
 public slots:

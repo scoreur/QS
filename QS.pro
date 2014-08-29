@@ -44,7 +44,10 @@ HEADERS  += qswindow.h \
     qsplayer.h \
     Staff/staffitem.h \
     Core/spectrum.h \
-    midiparser.h
+    midiparser.h \
+    decorator.h
+
+INCLUDEPATH += $$PWD
 
 DEFINES += TOUCH_OPTIMIZED_NAVIGATION
 # Please do not modify the following two lines. Required for deployment.

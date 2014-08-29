@@ -20,18 +20,11 @@ public:
         flat,
         nature,
 
-        half_note_head = 100,
-        qut_note_head
     };
     QPixmap images[20];//TODO: add more
     QPixmap &operator[](quint32 i){
             return images[i%20];
     }
-    QPicture &operator()(quint32 i){
-        return pic[i%10];
-    }
-    QPicture pic[10];
-
     void updateImages();
     void updatePictures();
 
