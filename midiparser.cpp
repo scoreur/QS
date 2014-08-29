@@ -47,23 +47,22 @@ void MidiParser::test(std::string fileName){
             tim += event->deltaTime();
             if ((int)event->command() == 8 || (int)event->command() == 9) {
                 if ((int)event->command() == 8) {
-                    qDebug() << (int)event->param1() << endl;
                     if (g.count((int)event->param1())) {
                         QJsonArray wkn;
-                        wkn.append(g[(int)event->param1()]);
+                        //wkn.append(g[(int)event->param1()]);
                         wkn.append(tim);
                         wkn.append((int)event->param1());
                         wyj.append(wkn);
                         g.erase((int)event->param1());
                     }
                 } else {
-                    g[(int)event->param1()] = tim;
+                    //g[(int)event->param1()] = tim;
                 }
             }
             tmp << (int)tim << ' ' << (int)event->type() << ' ' << (int)event->command() << ' ' << (int)event->param1() << ' ' << (int)event->param2() << endl;
         }
         cxq.append(wyj);
     }
-    qDebug() << cxq << endl;
+
     tmp.close();
 }

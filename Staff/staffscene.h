@@ -2,6 +2,7 @@
 #define STAFFSCENE_H
 
 #include "../qsscene.h"
+#include "../qspreset.h"
 #include "staffitem.h"
 #include <QGraphicsRectItem>
 #include <QPainter>
@@ -42,14 +43,7 @@ public:
     StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent = 0);
     ~StaffLine(){}
 
-    enum TYPE{
-        STAFF = 0,
-        TITLE,
-        AUTHOR,
-        COMMENT,
-        LYRIC,
-        FOOTTER
-    }type;
+    LineType type;
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

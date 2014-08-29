@@ -3,6 +3,8 @@
 
 #include <QGraphicsObject>
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+
 
 
 
@@ -10,9 +12,12 @@ class StaffItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit StaffItem(QGraphicsItem *parent = 0);
+    explicit StaffItem(QGraphicsItem *parent = 0, quint8 _dura = 12);
     ~StaffItem(){}
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    QPainterPath shape() const;
+    QRectF boundingRect() const;
+
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -30,7 +35,10 @@ private:
     quint8 pitch;
     quint8 dura;
     qint8 mark;
+    quint8 colorIndex;
     bool markShowed;
+    QRectF bound;
+
 
 };
 

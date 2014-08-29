@@ -117,7 +117,7 @@ void ScoreScene::append(qint16 num, uchar *notes, quint8 *duras){
 }
 void ScoreScene::lineUpdate(){
     for(int i = 0; i< lines.size(); ++i)
-        if(lines[i]->type == ScoreLine::SCORE)
+        if(lines[i]->type == LineType::NOTES)
             ((BarDecorator*)lines[i]->decorator)->updatePath();
 }
 
@@ -223,13 +223,13 @@ void BarDecorator::updatePath(){
 
 /// @brief constructor of ScoreLine
 ScoreLine::ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent):
-    QGraphicsRectItem(parent), type((TYPE)_type), text(""), decorator(0), isPressed(false)
+    QGraphicsRectItem(parent), type((LineType)_type), text(""), decorator(0), isPressed(false)
 {
     scene->addItem(this);
     setRect(-20,-ScoreItem::halfnoteheight,
             QSPreset::scorePaddingRect.width(), ScoreItem::linespacing);
     switch(type){
-    case SCORE:
+    case NOTES:
         //decorator = new BarDecorator();
         break;
     case TITLE:

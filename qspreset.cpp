@@ -131,7 +131,7 @@ QRectF QSPreset::staffPaddingRect = QRect(10, 10,
 QSize QSPreset::staffLineSize = QSize(780, 50);
 qreal QSPreset::staffLineInterval = 9;
 qreal QSPreset::staffLineSpacing = 50;
-
+QColor QSPreset::noteColor[2] = {QColor(15,15,15,250), Qt::blue};
 
 
 ///                                                                       ////
@@ -167,6 +167,14 @@ void QSPreset::writeSettings(){
 
 
 StaffImages::StaffImages(){
+
+    updateImages();
+
+    updatePictures();
+}
+
+//loading static images
+void StaffImages::updateImages(){
     int tmp = 70;
     images[tr_clef] = QPixmap(QString(":/image/staff/treble_clef.png"), "PNG").scaled(70, 70);
     images[ba_clef] = QPixmap(QString(":/image/staff/bass_clef"), "PNG").scaled(45, 45);
@@ -175,5 +183,28 @@ StaffImages::StaffImages(){
     images[sharp] = QPixmap(QString(":/image/staff/sharp.png"), "PNG").scaled(25, 25);
     images[flat] = QPixmap(QString(":/image/staff/flat.png"), "PNG").scaled(25, 25);
     images[nature] = QPixmap(QString(":/image/staff/sharp.png"), "PNG").scaled(tmp, tmp);// TODO: replace by nature.png
+
+}
+//loading dynamic pictures
+void StaffImages::updatePictures(){
+    QPainter painter; QPen pen(QSPreset::noteColor[0]); QBrush brush(QSPreset::noteColor[0]);
+    qreal shx = 0, shy = -0.35; qreal intv = QSPreset::staffLineInterval;
+
+
+
+    painter.begin(pic+0);//half_note_head
+    painter.setPen(pen);
+    painter.shear(shx,shy);
+    painter.drawEllipse(-intv/2,-intv/2, intv*1.3,intv*0.9);
+    painter.end();
+    //pic[0].save("note_single.pic");//test
+    painter.begin(pic+1);//qut_note_head; TODO: allow multi-color
+    painter.setPen(pen);
+    painter.setBrush(brush);
+    painter.shear(shx,shy);
+    painter.drawEllipse(-intv/2,-intv/2, intv*1.3,intv*0.9);
+    painter.end();
+
+    //painter.begin(pic+2);
 }
 

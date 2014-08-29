@@ -2,6 +2,7 @@
 #define QSPRESET_H
 
 #include <QDialog>
+#include <QPicture>
 
 class StaffImages{// holding images for painting staves
 public:
@@ -17,15 +18,33 @@ public:
         quv_rest,
         sharp,
         flat,
-        nature
+        nature,
+
+        half_note_head = 100,
+        qut_note_head
     };
     QPixmap images[20];//TODO: add more
     QPixmap &operator[](quint32 i){
-        return images[i];
+            return images[i%20];
     }
+    QPicture &operator()(quint32 i){
+        return pic[i%10];
+    }
+    QPicture pic[10];
+
+    void updateImages();
+    void updatePictures();
 
 };
 
+enum LineType{
+    NOTES = 0,
+    TITLE,
+    AUTHOR,
+    COMMENT,
+    LYRIC,
+    FOOTTER
+};
 
 namespace Ui{
 class QSPreset;
@@ -65,7 +84,9 @@ public:
     static QSize staffLineSize;
     static qreal staffLineInterval;
     static qreal staffLineSpacing;
+    static QColor noteColor[2];
     StaffImages imgs;
+
 
     void readSettings();
     void writeSettings();

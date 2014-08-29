@@ -1,6 +1,7 @@
 #include "staffscene.h"
 #include "../qspreset.h"
 #include <QDebug>
+#include <QPicture>
 
 /// @brief constructor of StaffScene
 StaffScene::StaffScene(QGraphicsView *view, QString fileName)
@@ -10,10 +11,13 @@ StaffScene::StaffScene(QGraphicsView *view, QString fileName)
         setName("Untitled.mid");
     setBackgroundBrush(QBrush(QPixmap(QString(":/image/staff/paper2.png"), "PNG").scaled(100,100)));
 
-    StaffLine * staffLine = new StaffLine(this, StaffLine::STAFF);
+    StaffLine * staffLine = new StaffLine(this, LineType::NOTES);
     staffLine->setPos(20,20);
     lines.push_back(staffLine);
     new KeySignature(staffLine, 1, -5);
+    qreal startX = 100, startY = 10, intv = QSPreset::staffLineInterval;
+    for(quint16 i=0;i<10;++i)
+        (new StaffItem(staffLine, 24-(i*12)%24))->setPos(startX+intv*2*i, startY + i*intv/2.0);
     //quint8 test_notes[8] = {39,41,43,44,46,48,50,51};
 
 
@@ -44,7 +48,7 @@ StaffMeasure::StaffMeasure(QGraphicsItem *parent):
 /// holding all notes in one track or display title/lyrics/etc.
 ///////////////////////////////////////////////////////////////
 StaffLine::StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent) :
-    QGraphicsRectItem(parent), type((TYPE)_type){
+    QGraphicsRectItem(parent), type((LineType)_type){
     scene->addItem(this);
     setRect(-20,-20, QSPreset::staffLineSize.width(), QSPreset::staffLineSize.height());
 
@@ -54,6 +58,8 @@ StaffLine::StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent
 void StaffLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option)
     Q_UNUSED(widget)
+    QPicture pic;
+    pic.load("");
 
     QPen pen(Qt::black);
     painter->setPen(pen);

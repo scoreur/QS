@@ -2,6 +2,7 @@
 #define SCORESCENE_H
 
 #include "../qsscene.h"
+#include "../qspreset.h"
 #include <QVector>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -39,15 +40,7 @@ public:
     ScoreLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent = 0);
     ~ScoreLine(){}
 
-    enum TYPE{
-        SCORE = 0,
-        TITLE,
-        AUTHOR,
-        COMMENT, //include the chord notation;
-        LYRIC,
-        FOOTTER,
-    };
-    TYPE type;
+    LineType type;
 
 
     QString text;//
