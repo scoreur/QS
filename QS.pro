@@ -66,5 +66,4 @@ ICON = icon.icns
 
 
 
-INCLUDEPATH += $$PWD/MIDI
 
