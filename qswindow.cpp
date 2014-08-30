@@ -125,10 +125,14 @@ void QSWindow::setPosition(){
 
 }
 void QSWindow::mediaStateChanged(QMediaPlayer::State state){
-    if(state == QMediaPlayer::StoppedState)
+    if(state == QMediaPlayer::StoppedState){
+        ((WavScene*)wavView->scene())->isMoving = false;
         qDebug()<<"stopped";
-    else
+    }
+    else{
         qDebug()<<"start!";
+        ((WavScene*)wavView->scene())->isMoving = true;
+    }
 }
 /// end of music slot
 /////////////////////////////////////////////////////////////
@@ -144,8 +148,10 @@ void QSWindow::preloadConnect(){
     connect(ui->actionClose, SIGNAL(triggered()), SLOT(closeFile()));
     ui->actionClose->setShortcut(QKeySequence::Close);
 
+
     connect(ui->actionPreset, SIGNAL(triggered()), SLOT(changePreset()));
     connect(ui->actionDisplay_Keyboard, SIGNAL(triggered()), SLOT(displayKeyBoard()));
+    ui->actionDisplay_Keyboard->setShortcut(QKeySequence("ctrl+K"));
     connect(ui->menuOpened, SIGNAL(triggered(QAction*)), SLOT(switchScene(QAction*)));
 
 

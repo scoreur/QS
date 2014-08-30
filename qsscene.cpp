@@ -67,7 +67,9 @@ void KeyScene::keyPressEvent(QKeyEvent *event){
         return;
     }
     if(event->key()==0x3b){//semi-colon
+        //qDebug()<<"keyhold: "<<keyhold;
         if(PianoKey::scope<=63  && keyhold==0){
+
             PianoKey::scope+=12;
             // TODO: add ui effect
         }
@@ -112,7 +114,7 @@ void KeyScene::keyReleaseEvent(QKeyEvent *event){
     if(i>=13)
         return;
     ((PianoKey*)board->childItems()[PianoKey::scope+i])->keyRelease();
-    --keyhold;
+    if(keyhold>0) --keyhold;
 
 
 }
