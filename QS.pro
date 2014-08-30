@@ -13,7 +13,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 TARGET = QS
 TEMPLATE = app
-CONFIG += c++11
+CONFIG += c++11 \
+        ordered
 
 SOURCES += main.cpp\
         qswindow.cpp \
@@ -46,7 +47,8 @@ HEADERS  += qswindow.h \
     Core/spectrum.h \
     midiparser.h \
     decorator.h \
-    MIDIFile.hpp
+    MIDIFile.hpp \
+    Wave/lame.h
 
 INCLUDEPATH += $$PWD
 
@@ -64,6 +66,12 @@ RESOURCES += \
 
 ICON = icon.icns
 
+win32: LIBS += -L$$PWD/Wave/lame/win/ -lmp3lame
+else:unix: LIBS += -L$$PWD/Wave/lame/mac/ -lmp3lame
 
+INCLUDEPATH += $$PWD/Wave
+DEPENDPATH += $$PWD/Wave
 
-
+win32-g++:PRE_TARGETDEPS += $$PWD/Wave/lame/win/libmp3lame.a
+else:win32:!win32-g++: PRE_TARGETDEPS += $$PWD/Wave/lame/win/mp3lame.lib
+else:unix: PRE_TARGETDEPS += $$PWD/Wave/lame/mac/libmp3lame.a

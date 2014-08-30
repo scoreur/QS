@@ -1,15 +1,17 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include <QGraphicsSceneWheelEvent>
 #include <QFile>
+#include <fstream>
 //#include <QUrl>
+#include <cmath>
+#include <thread>
 #include <QDebug>
 #include "wavframe.h"
 #include "wavscene.h"
 #include "Core/spectrum.h"
 #include "qspreset.h"
-#include <QGraphicsSceneWheelEvent>
-#include <cmath>
-#include <thread>
+#include "lame.h"
 
 
 qreal WavScene::secondsPerView = 2.5;
@@ -17,6 +19,55 @@ qreal WavScene::accuracy = 0.05;
 quint16 WavScene::sampleps = 44100;
 quint32 WavScene::wavBufferSize = 1<<22;
 // @brief constructor of WavScene
+
+void display(mp3data_struct *md){//display header info
+    qDebug()<<"nchannels:" << md->stereo;
+    qDebug()<<"samplerate:" << md->samplerate;
+    qDebug()<<"bitrate:" << md->bitrate;
+    qDebug()<<"framesize:" << md->framesize;
+}
+const int buffersize = 4000;
+int test_lame(char* in, char* out){
+       std::ifstream fd(in);
+       if(!fd){
+           qDebug()<<"open file %s error!"<<in;
+           return 1;
+       }
+       std::ofstream fw(out);
+
+       qDebug()<<in<<"->"<<out;
+       mp3data_struct md;
+       hip_t mfile = hip_decode_init();
+
+       unsigned char mbuffer[buffersize];
+       short pcm_l[40000]; short pcm_r[40000];
+       fd.read((char*)mbuffer, buffersize);
+
+       int nout = hip_decode_headers( mfile, mbuffer, buffersize, pcm_l, pcm_r, &md);
+       display(&md);
+       int i=0;
+       for(i=0; i<nout; ++i){
+           fw.write((char*)(pcm_l+i),2);
+           fw.write((char*)(pcm_r+i), 2);
+       }
+
+       int totallen = nout;
+       while( fd.read((char*)mbuffer, buffersize)){
+           nout = hip_decode(mfile, mbuffer, buffersize, pcm_l, pcm_r);
+           qDebug()<<"out:"<<nout;
+           if(nout == -1) { qDebug()<<"ERROR!"; hip_decode_exit(mfile); return 3;}
+           totallen += nout;
+           for(i=0; i<nout; ++i){
+               fw.write((char*)(pcm_l+i),2);
+               fw.write((char*)(pcm_r+i), 2);
+           }
+       }
+       qDebug()<<"Exit: /total lenth sec:"<<hip_decode_exit(mfile)<<totallen/44100.0;
+       fd.close();
+       fw.close();
+       return 0;
+
+}
 
 WavScene::WavScene(QGraphicsView *view, QString fileName)
     : QSScene(view, fileName), isMoving(false),
@@ -34,6 +85,8 @@ WavScene::WavScene(QGraphicsView *view, QString fileName)
         setName("Untitled.wav");
 
     //WavFile::test();
+    //qDebug()<<test_lame("/Users/user/Music/test.mp3","/Users/user/Music/test.pcm");
+
 
 }
 WavScene::~WavScene(){
