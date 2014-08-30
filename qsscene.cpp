@@ -2,8 +2,11 @@
 #include "pianokey.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include <QKeyEvent>
+#include <QFocusEvent>
 #include <QDebug>
 #include "qswindow.h"
+
 
 /// @brief constructor of the keyboard
 KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
@@ -17,6 +20,7 @@ KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
     view->setUpdatesEnabled(true);
     keyTime.start();
 
+
     qreal temp_x = PianoKey::halfspacing, temp_y = view->y()+2;
     addItem(board);
     for(uchar i=0;i<88;++i){
@@ -27,6 +31,7 @@ KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
             temp_x += PianoKey::halfspacing;
         temp_x += PianoKey::halfspacing;
     }
+
 
 }
 void KeyScene::drawForeground(QPainter *painter, const QRectF &rect){
@@ -46,6 +51,70 @@ KeyScene::~KeyScene(){
 void KeyScene::keyInput(quint8 id){
 
     ((QSWindow*)parent())->keyInput(id, (quint8)(keyTime.elapsed()/PianoKey::keyTimeAccuracy));
+}
+
+quint8 KeyScene::PianoKeyCode[13] = {'A','W','S','E','D','F','U','J','I','K','O','L','P'};
+qint8 KeyScene::keyhold = 0;
+void KeyScene::keyPressEvent(QKeyEvent *event){
+    if(event->key()=='Q'){
+        if(PianoKey::scope>=12 && keyhold==0){
+            PianoKey::scope-=12;
+
+            // TODO: add ui effect
+
+        }
+
+        return;
+    }
+    if(event->key()==0x3b){//semi-colon
+        if(PianoKey::scope<=63  && keyhold==0){
+            PianoKey::scope+=12;
+            // TODO: add ui effect
+        }
+
+        return;
+    }
+    if(event->key()=='G'){
+        if(PianoKey::scope<=74 && keyhold==0){
+            ++PianoKey::scope;
+
+            // TODO: add ui effect
+
+        }
+
+        return;
+    }
+    if(event->key()=='H'){
+        if(PianoKey::scope>=1 && keyhold==0){
+            --PianoKey::scope;
+
+            // TODO: add ui effect
+
+        }
+
+        return;
+    }
+    quint16 i=0;
+    while(i<13 && PianoKeyCode[i]!=event->key()) ++i;
+    if(i>=13)
+        return;
+    else{
+        i+=PianoKey::scope;
+        if(((PianoKey*)board->childItems()[i])->is_pressed)
+            return;
+        ((PianoKey*)board->childItems()[i])->keyPress();
+        ++keyhold;
+    }
+}
+void KeyScene::keyReleaseEvent(QKeyEvent *event){
+    quint16 i=0;
+    while(i<13 && PianoKeyCode[i]!=event->key()) ++i;
+    if(i>=13)
+        return;
+    ((PianoKey*)board->childItems()[PianoKey::scope+i])->keyRelease();
+    --keyhold;
+
+
 }
 
 

@@ -34,7 +34,7 @@ QSWindow::QSWindow(QWidget *parent) :
     //qDebug()<<QSettings(domainName, appName).scope();
     //QSettings(domainName, appName).clear();//remove this line in release version
     ui->setupUi(this);
-    preset->readSettings();//also construct all views
+    preset->readSettings();//ALSO construct ALL Views!!
 
     //set icon
     QIcon iconQS(":/image/QScore.jpg");
@@ -161,7 +161,7 @@ void QSWindow::preloadConnect(){
 }
 
 
-/// @brief general preset
+
 void QSWindow::generalPreset(int mode, int arg){
 
     switch(mode){
@@ -189,11 +189,6 @@ void QSWindow::generalPreset(int mode, QSize size){
     case 2:
         ui->tabWidget->resize(size);
         break;
-    case 3:
-
-
-    case 4:
-
     default:
         break;
     }
@@ -326,6 +321,15 @@ void QSWindow::keyInput(quint8 id, quint8 dura = 12){
     if(dura == 0) id = 88;
     if(ui->tabWidget->currentWidget()==ui->scoreTab)
         ui->scoreInput->insertPlainText(QString::number(id)+":"+QString::number(dura)+"; ");
+}
+void QSWindow::keyPressEvent(QKeyEvent *event){
+    if(keyView->isVisible())
+        keyScene->keyPressEvent(event);
+
+}
+void QSWindow::keyReleaseEvent(QKeyEvent *event){
+    if(keyView->isVisible())
+        keyScene->keyReleaseEvent(event);
 }
 
 void QSWindow::closeEvent(QCloseEvent *event){

@@ -60,9 +60,9 @@ void Spectrum::DFT(Spectrum *spectrum, qint16 *data, quint32 num, quint16 sample
     cmplx w, w0;
     double sampledata = 0;
     for(int j=0;j<88;++j){
-        spectrum->spect[j] = w = w0 = exp2iPI(PianoFreq[j]/44100.0);
+        spectrum->spect[j] = w = w0 = exp2iPI(FreqPiano[j]/44100.0);
         //spectrum->spect[3*j+1] = 0.0; this->spect[3*j+2] = 0.0;
-        double delta_i = delta_i=8*M_PI/PianoFreq[j]/samplesize;//4 periods
+        double delta_i = 8*M_PI/FreqPiano[j]/samplesize;//4 periods
         if(num < delta_i * samplesize) return;
         for(int k=0;k<samplesize;++k){//default, for single tone
             double abs_i = delta_i*k;

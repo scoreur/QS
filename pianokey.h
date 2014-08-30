@@ -3,6 +3,7 @@
 #include <QGraphicsObject>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QKeyEvent>
 //#include <QString>
 //#include <QThread>
 #include <QSound>
@@ -26,6 +27,7 @@ public:
 
     QColor color();
 
+    friend class KeyScene;
     static QString soundpath;
 
     static qreal halfspacing;   //half interval of white keys
@@ -38,6 +40,7 @@ public:
     static quint16 latency;
     static quint16 keyTimeAccuracy;
     static bool isWhite(uchar);
+    static quint8 scope;
     bool isWhite() const{
         return is_white;
     }
@@ -48,7 +51,9 @@ public:
         WHITE_RIGHT,
         WHITE_WHOLE
     };
-
+public slots:
+    void keyPress();
+    void keyRelease();
 
 
 protected:
@@ -56,6 +61,8 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    //void keyPressEvent(QKeyEvent *event);
+    //void keyReleaseEvent(QKeyEvent *event);
     void press(bool f = true);
 private:
     const uchar id;             //key id

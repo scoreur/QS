@@ -56,6 +56,40 @@ void PianoKey::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     }
 }
 
+/*
+void PianoKey::keyPressEvent(QKeyEvent *event){
+    qDebug()<<event->key();
+    if(id>=scope && id<=scope+12 && event->key()==PianoKeyCode[id-scope]){
+        press(true);
+        ((KeyScene*)scene())->keyTime.restart();
+        //keythread->start();
+        keysound->play();
+    }
+
+}
+
+void PianoKey::keyReleaseEvent(QKeyEvent *event){
+    if(id>=scope && id<=scope+12 && event->key()==PianoKeyCode[id-scope]){
+        press(false);
+        ((KeyScene*)scene())->keyInput(id);
+        QTimer::singleShot(latency,keysound,SLOT(stop()));//timer cannot function in multithreat
+        //keythread->quit();
+
+    }
+}
+*/
+void PianoKey::keyPress(){
+    press(true);
+    ((KeyScene*)scene())->keyTime.restart();
+    keysound->play();
+}
+void PianoKey::keyRelease(){
+    press(false);
+    ((KeyScene*)scene())->keyInput(id);
+
+}
+
+quint8 PianoKey::scope = 39;
 
 void PianoKey::press(bool f){
     if(f != is_pressed){

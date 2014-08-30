@@ -17,13 +17,18 @@ public:
     ~KeyScene();
     QPointF spectrum[88];
     friend class PianoKey;
+    friend class QSWindow;
+    static quint8 PianoKeyCode[13];
 signals:
     void keyInput(quint8);
 protected:
     void drawForeground(QPainter *painter, const QRectF &rect);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 private:
     QGraphicsItem *board;
     QTime keyTime;
+    static qint8 keyhold;
 };
 
 class QSScene : public QGraphicsScene{

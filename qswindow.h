@@ -52,6 +52,8 @@ public slots:
 
 protected slots:
     void closeEvent(QCloseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 
 private:

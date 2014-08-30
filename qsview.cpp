@@ -12,6 +12,7 @@ QSView::QSView(QWidget *parent, int w, int h):
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+
 }
 
 void QSView::wheelEvent(QWheelEvent *event){

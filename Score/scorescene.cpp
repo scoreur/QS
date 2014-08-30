@@ -32,7 +32,7 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
         }
     }
     qreal temp_y = ScoreItem::halfnoteheight + 10;
-    int totaldura = 0;
+    quint32 totaldura = 0;
     ScoreLine *scoreLine = 0;
     BarDecorator *bar = 0;
     QVector<quint16> *scoreX = 0;
@@ -40,7 +40,10 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
     quint16 lineTicks = ScoreLine::nTicksPerBeat * ScoreLine::nBeatsPerMeasure * ScoreLine::nMeasuresPerLine;
     for(quint32 i=0;i<len;++i){//typesetting
         totaldura += dura[i];
-        if(totaldura == lineTicks || i == len -1){//fill one line or reach the end
+        //qDebug()<<totaldura;
+
+        if(totaldura == lineTicks || i == len-1){//fill one line or reach the end
+
 
             scoreLine = new ScoreLine(this, 0, 0);
             bar = (BarDecorator*)scoreLine->decorator;
@@ -50,6 +53,8 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
 
             bar->construct((quint8*)dura.begin()+start_i, i-start_i+1);
             scoreX = &bar->scoreX;
+            qDebug()<<"start: "<<start_i;
+
 
             for(i = 0; i<scoreX->size(); ++i){
                 (new ScoreItem(note[start_i+i], dura[start_i+i],scoreLine))->setPos((*scoreX)[i]*ScoreItem::halfnotewidth/4.0, 0);
@@ -59,6 +64,7 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
             temp_y += ScoreItem::linespacing;
             totaldura = 0;
         }
+
     }
 }
 ScoreScene::~ScoreScene(){
@@ -79,10 +85,11 @@ quint32 ScoreScene::load(QString fileName){
         int tmp;
         while(!scorein.eof()){
             scorein>>tmp;
-            note.push_back(uchar(tmp+48));
+            note.push_back(quint8(tmp));
             scorein>>tmp;
             dura.push_back(quint8(tmp));
         }
+        qDebug()<<"load successful!";
         scorein.close();
         return note.size();
     }
@@ -185,7 +192,10 @@ void BarDecorator::construct(quint8 *dura, quint32 num, bool reWrite){
                 }
                 break;
             case 3: break;
-        }
+            }
+        }else{// TODO: finish this
+            scoreX << 2 * temp_x + 1;
+            temp_x += 1;
         }
         duraPtr += dura[i];
         temp_x += dura[i]/tick;

@@ -35,6 +35,8 @@ WavScene::WavScene(QGraphicsView *view, QString fileName)
     if(fileName.isEmpty())
         setName("Untitled.wav");
 
+    WavFile::test();
+
 }
 WavScene::~WavScene(){
     delete []ldata; delete []rdata;
@@ -130,7 +132,7 @@ void WavScene::DFT(QPointF out[], quint32 pos, quint32 halflen){
     for(int k=0; k<88; ++k){
         qreal del_i = halflen/32.0;
         qreal x_temp = 0, y_temp = 0;
-        qreal fr = pianoFreq[k] * 2 * 3.14159 /44100;
+        qreal fr = FreqPiano[k] * 2 * 3.14159 /44100;
         for(int i = -31; i<=32; ++i){
             int j = pos + (int)(i * del_i);
             y_temp += (ldata[j] * ::cos(j * fr));
