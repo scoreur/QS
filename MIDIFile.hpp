@@ -37,9 +37,10 @@ struct Chunk{
     quint8 length[4];
     char *content;
     
-    Chunk():type{0,0,0,0},length{0,0,0,0},
-    content(0){}                //for writing
+    Chunk(): content(0){}       //for writing
     Chunk(char *in){            //for reading
+        *(quint32*)type = (quint32)0;
+        *(quint32*)length = (quint32)0;
         memcpy(type, in, 4);
         memcpy(length, (in+4), 4);
         content = in+8;         //shallow copy

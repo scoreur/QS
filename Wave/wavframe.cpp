@@ -76,7 +76,7 @@ qreal envelope_flute(qreal d){
         return (1-::cos((1-d)/thres2*M_PI))/2;
 }
 qreal envelope_piano(qreal d){
-
+    return 1;
 }
 
 qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.1, 0.1, 0.08, 0.07, 0.06,0.05,
@@ -139,6 +139,7 @@ bool WavFile::addChord(qreal secs, qreal freq, std::vector<qreal> chord,
         qreal fr = *iter * freq;
         addSingleTone(secs, fr, overtone, amp, false, offsecs);
     }
+    return true;
 
 }
 bool WavFile::addArpeggio(qreal secs, qreal freq, std::vector<qreal> chord, quint16 amp,
@@ -290,9 +291,6 @@ void WavFile::test(){
     //wavOut.addFilter(1,0,fil,100);
     //wavOut.save(fileName.arg(QString("testFilter")).toStdString().c_str());
 
-/*read score
-
-    */
     WavFile scoreToWav;
     qDebug()<<scoreToWav.getDuration()<<"s";
     scoreToWav.fromScore(60/80.0,"/Users/user/Documents/QS_tmp/thu_anthem_short.txt");
@@ -308,10 +306,4 @@ void WavFile::test(){
     }
     //scoreToWav.addFilter(40,0,fil,90);
     scoreToWav.save("/Users/user/Documents/QS_tmp/thu_anthem_short.wav");
-
-
-
-
-
-
 }
