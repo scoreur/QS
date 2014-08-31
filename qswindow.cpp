@@ -363,10 +363,13 @@ void QSWindow::keyReleaseEvent(QKeyEvent *event){
 
 void QSWindow::closeEvent(QCloseEvent *event){
     bool checked = false;//to check file state
+
     if(ui->scoreInput->toPlainText().isEmpty())
         checked = true;
     if( checked == true){
-
+        //disconnect to prevent error
+        disconnect(mediaPlayer, SIGNAL(positionChanged(qint64)),
+                this,SLOT(positionChanged(qint64)));
         musicthread->quit();
         delete musicthread;
         //preset->writeSettings();

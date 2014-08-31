@@ -26,8 +26,7 @@ int test_lame(char *in, char *out);
 
 WavScene::WavScene(QGraphicsView *view, QString fileName)
     : QSScene(view, fileName), isMoving(false),
-      len(0), wavFile(0), showSpect(false)
-
+      len(0), wavFile(0), showSpect(false), spect(new SpectrumGraph(this))
 {
     setItemIndexMethod(NoIndex);
     //view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
@@ -84,9 +83,6 @@ quint32 WavScene::load0(WavScene* obj, QString fileName){
 void WavScene::loadReady(){
     if(len != 0){
         qDebug()<<"load successful: "<<len;
-        spect = new SpectrumGraph(this);
-        spect->fresh(wavFile->data+80000, 8000, 1);
-
     }
 }
 
