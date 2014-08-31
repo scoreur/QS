@@ -75,9 +75,11 @@ private:
 private slots:
     void on_verticalScrollBar_valueChanged(int value);
     void addScene(QGraphicsView *view, QString fileName = "");
+    void addScene();
     void switchScene(QAction*);
     void displayKeyBoard();
     void displaySpectrum();
+    void scoreToWav();
 
     void changePreset();
 

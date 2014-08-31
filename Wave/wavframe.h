@@ -118,7 +118,7 @@ public:
     bool addFilter(qreal secs, qreal offsecs, qreal *filter, quint32 l);
 
     bool fromScore(qreal secs, quint8 *score, quint8 *dura, quint32 l);
-    bool fromScore(qreal secs, char* fileName);
+    bool fromScore(qreal secs, const char* fileName);
     qreal getDuration() const{
         return length/nChannels()/(qreal)sampleps();
     }

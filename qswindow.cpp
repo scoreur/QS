@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QDebug>
+#include <QTimer>
 
 
 
@@ -117,8 +118,7 @@ void QSWindow::positionChanged(qint64 position){
     //qDebug()<<"positionChanged"<<position;
     positionSlider->setValue(position);
     QScrollBar * bar = wavView->horizontalScrollBar();
-    qDebug()<<wavView->mapToScene(0,0).x();
-    qDebug()<<wavView->frameRect();
+    //qDebug()<<wavView->mapToScene(0,0).x();
     //scaling
 
     qreal fracPos = position/(qreal)positionSlider->maximum();
@@ -153,12 +153,13 @@ void QSWindow::preloadConnect(){
     ui->actionSave_File_as->setShortcut(QKeySequence::SaveAs);
     connect(ui->actionClose, SIGNAL(triggered()), SLOT(closeFile()));
     ui->actionClose->setShortcut(QKeySequence::Close);
-    connect(ui->actionDisplay_specturm,SIGNAL(triggered()), SLOT(displaySpectrum()));
 
 
     connect(ui->actionPreset, SIGNAL(triggered()), SLOT(changePreset()));
     connect(ui->actionDisplay_Keyboard, SIGNAL(triggered()), SLOT(displayKeyBoard()));
     ui->actionDisplay_Keyboard->setShortcut(QKeySequence("ctrl+K"));
+    connect(ui->actionDisplay_specturm,SIGNAL(triggered()), SLOT(displaySpectrum()));
+    connect(ui->actionScore_to_wav, SIGNAL(triggered()), SLOT(scoreToWav()));
     connect(ui->menuOpened, SIGNAL(triggered(QAction*)), SLOT(switchScene(QAction*)));
 
 
@@ -220,7 +221,7 @@ void QSWindow::openFile(){                                                      
         ui->statusBar->showMessage(QString("open: %1").arg(openFileName));                                                  ////
         if(openFileName.endsWith("wav", Qt::CaseInsensitive)){                                                              ////
             addScene(wavView, openFileName);                                                                                ////
-            mediaPlayer->setMedia(QUrl::fromLocalFile(openFileName));
+            //mediaPlayer->setMedia(QUrl::fromLocalFile(openFileName));
             playButton->setEnabled(true);
             //mediaPlayer->moveToThread(musicThread);
 
@@ -241,9 +242,9 @@ void QSWindow::openFile(){                                                      
 
 void QSWindow::saveFile(){
     if(ui->tabWidget->currentWidget() == ui->wavTab)
-        saveFileName = QFileDialog::getSaveFileName(this, "Save .wav File: ", QDir::homePath(), "*.wav");
+        saveFileName = QFileDialog::getSaveFileName(this, "Save .wav File: ", QDir::homePath(), "*.wav *.txt");
     else if(ui->tabWidget->currentWidget() == ui->scoreTab)
-        saveFileName = QFileDialog::getSaveFileName(this, "Save .txt File: ", QDir::homePath(), "*.txt");
+        saveFileName = QFileDialog::getSaveFileName(this, "Save .txt File: ", QDir::homePath(), "*.txt *.wav");
     else if(ui->tabWidget->currentWidget() == ui->staffTab)
         saveFileName = QFileDialog::getSaveFileName(this, "Save .mid File: ", QDir::homePath(), "*.mid");
 
@@ -274,7 +275,31 @@ void QSWindow::closeFile(){
     qDebug()<<"after delete:"<<view->children().size();//index starts from 4 (3 default children)                           ////
     if(view->findChild<QSScene*>(QString(),Qt::FindDirectChildrenOnly) != 0)//auto switch to another file if possible       ////
         emit ((QSScene*)view->findChild<QSScene*>(QString(),Qt::FindDirectChildrenOnly))->Opened()->triggered();            ////
-}                                                                                                                           ////
+}
+
+void QSWindow::scoreToWav(){
+    ui->tabWidget->setCurrentWidget(ui->scoreTab);
+    QSScene* sc = (QSScene*)scoreView->scene();
+
+    if(sc==0 || ! QFileInfo(sc->Name()).isFile()){
+        ui->statusBar->showMessage(QString("No current score file!"));
+        return;
+    }
+    saveFile();
+    if(saveFileName.isEmpty()){
+        return;
+    }else{
+        WavFile wavOut;
+        if(wavOut.fromScore(60.0/80, sc->Name().toStdString().c_str()));
+        wavOut.save(saveFileName.toStdString().c_str());
+        statusBar()->showMessage(QString("Score to Wave file successful!"));
+        openFileName = saveFileName;
+        QTimer::singleShot(3000, this, SLOT(addScene()));
+        playButton->setEnabled(true);
+    }
+}
+
+////
 /// end of file control module                                                                                              ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -282,7 +307,7 @@ void QSWindow::closeFile(){
 
 
 
-
+//////////////////////////////////////////////////////////////////////////
 /// @brief other Slots:
 
 void QSWindow::on_verticalScrollBar_valueChanged(int value)
@@ -304,6 +329,9 @@ void QSWindow::addScene(QGraphicsView *view, QString fileName){
     ui->menuOpened->addAction(qs->Opened());
     emit qs->Opened()->triggered();
 }
+void QSWindow::addScene(){
+    addScene(wavView, openFileName);
+}
 
 void QSWindow::switchScene(QAction * act){
     QSScene *qs = (QSScene *)act->parent();//triggered one
@@ -317,7 +345,7 @@ void QSWindow::switchScene(QAction * act){
 
     ui->statusBar->showMessage(QString("current file: %1").arg(qs->Name()), 4000);
     if(qs->views()[0]->parent() == ui->wavTab){
-        if(QDir(qs->Name()).exists()) mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
+        if(QFileInfo(qs->Name()).isFile()) mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
         ui->actionDisplay_specturm->setText(((WavScene*)wavView->scene())->showSpect?
                                                 QString("Hide spectrum"): QString("Show spectrum"));
     }

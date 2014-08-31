@@ -239,7 +239,7 @@ bool WavFile::fromScore(qreal secs, quint8 *score, quint8 *dura, quint32 l){
     }
     return true;
 }
-bool WavFile::fromScore(qreal secs, char *fileName){
+bool WavFile::fromScore(qreal secs, const char *fileName){
     std::fstream scoreIn;
     scoreIn.open(fileName, std::ios::in);
     if(!scoreIn) return false;
