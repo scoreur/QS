@@ -77,6 +77,7 @@ private slots:
     void addScene(QGraphicsView *view, QString fileName = "");
     void switchScene(QAction*);
     void displayKeyBoard();
+    void displaySpectrum();
 
     void changePreset();
 

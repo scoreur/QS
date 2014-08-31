@@ -5,12 +5,13 @@
 
 QSPlayer::QSPlayer(QString fileName, QWidget *parent) :
     QThread(parent),
-    player(new QMediaPlayer(this,QMediaPlayer::VideoSurface)),
+    player(new QMediaPlayer(this,QMediaPlayer::StreamPlayback)),
     audioOut(0), file(0)
 
 
 {
     player->setMedia(QUrl::fromLocalFile(fileName));
+    player->setNotifyInterval(200);
 
 
 

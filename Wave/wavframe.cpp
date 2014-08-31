@@ -11,7 +11,7 @@
 double ampExpand(double in){
     int sgn = in>0? 1: -1;
     in /= (1<<15);
-    return sgn * ::pow(in*in, 0.2);
+    //return sgn * ::pow(in*in, 0.2);
     return in;
 }
 
@@ -40,6 +40,16 @@ WavFrame::WavFrame(quint32 _len, short *_data, qreal _intv, qreal _width, qreal 
     pdata.push_back(QPointF(k*interval, -amplitude*ampExpand(_data[step*k]))); ++k;
     }
     qDebug()<<"vector:"<<pdata.size();
+    //save as picture
+    QPainter pt;
+    pt.begin(&pic);
+    QPen pen(QSPreset::wavForegroundColor);
+    pen.setWidth(1);
+    pt.setPen(pen);
+    //pt->drawPolyline((QPointF*)pdata.begin(), pdata.size());
+    pt.drawPolyline(data, datasize);
+
+    pt.end();
 }
 
 // static member
@@ -48,12 +58,8 @@ quint16 WavFrame::framesize = 200;
 void WavFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QPen pen(QSPreset::wavForegroundColor);
-    pen.setWidth(1);
-    painter->setPen(pen);
+    painter->drawPicture(0,0,pic);
 
-    //painter->drawPolyline((QPointF*)pdata.begin(), pdata.size());
-    painter->drawPolyline(data, datasize);
 }
 
 QPainterPath WavFrame::shape() const{
@@ -90,7 +96,7 @@ std::vector<qreal> chordGen(quint8 a, quint8 b, quint8 c=0){
         tmp.push_back(::pow(2.0,c/12.0));
     return tmp;
 }
-std::vector<qreal> chordGen(const char *d){
+std::vector<qreal> WavFile::chordGen(const char *d){
     std::vector<qreal> tmp;
     quint8 i=0; qreal start=1;
     while(d[i]!='\0'){

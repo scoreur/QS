@@ -1,7 +1,8 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 #include <complex>
-typedef std::complex<double> cmplx;//for convenience
+typedef std::complex<double> cmplx;
+//for convenience
 #include <cmath>
 #ifndef M_PI
 #define M_PI 3.141592653589793238462643
@@ -9,7 +10,7 @@ typedef std::complex<double> cmplx;//for convenience
 #include <QVector>
 #include <QMap>
 
-const float FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
+const double FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
                                    34.6478,36.7081,38.8909,41.2034,
                                    43.6535,46.2493,48.9994,51.9131,
                                    55,58.2705,61.7354,65.4064,69.2957,
@@ -27,8 +28,7 @@ const float FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
                                    1567.98,1661.22,1760,1864.66,1975.53,
                                    2093,2217.46,2349.32,2489.02,2637.02,
                                    2793.83,2959.96,3135.96,3322.44,3520,
-                                   3729.31,3951.07,4186.01};//
-//88 frequencies of piano keys
+                                   3729.31,3951.07,4186.01};//88 frequencies of piano keys
 
 /////////////////////////////////////////////
 /// @brief logarithmic spectrum based of piano
@@ -40,24 +40,32 @@ const float FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
 class Spectrum
 {
 public:
-    Spectrum(qint16 *data, quint32 num);
+    Spectrum(qint16 *data, quint32 num, quint8 mode=0);
+    ~Spectrum(){}
+
+    void build(qint16 *data, quint32 num, quint8 mode = 0, quint32 sampleps = 44100);
 
     QMap<double, quint8>peaks;//store the possible peaks;
     void findPeaks(double threshold = 0);//default: clear
 
-    static double PianoFreqGen(int pitch);
-    //mode == false for inverse transform; remember delete after use!
-    static cmplx * DFT(cmplx data[], quint32 num, bool mode = true);
-    static void DFT(Spectrum *spectrum, qint16 *data, quint32 num, quint16 samplesize = 64);//for piano
-    static double * DCT(double data[], quint32 num, bool mode = true);//half length fo DFT
-    static cmplx * FFT(cmplx data[], quint32 num, bool mode = true);
+    static double PianoFreqGen(qreal pitch);//for decimal pitch
     static cmplx exp2iPI(double freq);
     static quint16 order2(quint32 num);
     static quint32 bitrev(quint32 num, quint16 ord);
 
-private:
-    cmplx spect[88];//containing the phase info
-    double power[264];//88*3
+    //mode == false for inverse transform;
+    static cmplx STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow = false);
+    static std::vector<cmplx> DFT(const cmplx data[], quint32 num, bool mode = true);
+    static std::vector<qreal> DCT(const qreal data[], quint32 num, bool mode = true);//half length fo DFT
+    static std::vector<cmplx> FFT(const cmplx data[], quint32 num, bool mode = true);
+    static std::vector<cmplx> CQT(const qreal data[], quint32 num, bool mode = true);
+
+    static void test();//for testing
+
+//private:
+    std::vector<cmplx> val;//containing the phase info
+    quint32 vallen = 88;
+
 };
 
 qreal interpolation3P(qreal delta, qreal y0, qreal y1, qreal y2);

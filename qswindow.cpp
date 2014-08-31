@@ -57,6 +57,7 @@ QSWindow::QSWindow(QWidget *parent) :
     positionSlider->move(wavView->rect().bottomLeft());
     positionSlider->setRange(0, 0);
 
+
     musicthread = new QSPlayer(openFileName);                                                                                                               ////
     mediaPlayer = musicthread->player;
     musicthread->start();
@@ -110,14 +111,19 @@ void QSWindow::musicPlay(){
 void QSWindow::durationChanged(qint64 duration){
     //qDebug()<<"duration changed"<<duration;
     positionSlider->setRange(0, duration);
-    positionSlider->setSingleStep(duration/800.0);
+    positionSlider->setSingleStep(10<duration/800.0? 10: duration/800.0);
 }
 void QSWindow::positionChanged(qint64 position){
     //qDebug()<<"positionChanged"<<position;
     positionSlider->setValue(position);
     QScrollBar * bar = wavView->horizontalScrollBar();
-    bar->setValue(position/(qreal)positionSlider->maximum()*bar->maximum());//
+    qDebug()<<wavView->mapToScene(0,0).x();
+    qDebug()<<wavView->frameRect();
+    //scaling
 
+    qreal fracPos = position/(qreal)positionSlider->maximum();
+    bar->setValue(fracPos * bar->maximum());//
+    ((WavScene*)wavView->scene())->getMoving(fracPos*(1-wavView->rect().width()/wavView->sceneRect().width()));
 
 }
 void QSWindow::setPosition(){
@@ -147,6 +153,7 @@ void QSWindow::preloadConnect(){
     ui->actionSave_File_as->setShortcut(QKeySequence::SaveAs);
     connect(ui->actionClose, SIGNAL(triggered()), SLOT(closeFile()));
     ui->actionClose->setShortcut(QKeySequence::Close);
+    connect(ui->actionDisplay_specturm,SIGNAL(triggered()), SLOT(displaySpectrum()));
 
 
     connect(ui->actionPreset, SIGNAL(triggered()), SLOT(changePreset()));
@@ -309,8 +316,12 @@ void QSWindow::switchScene(QAction * act){
     qs->views()[0]->setToolTip(QDir(qs->Name()).dirName());
 
     ui->statusBar->showMessage(QString("current file: %1").arg(qs->Name()), 4000);
-    if(qs->parent() == ui->wavTab && QDir(qs->Name()).exists())
-        mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
+    if(qs->views()[0]->parent() == ui->wavTab){
+        if(QDir(qs->Name()).exists()) mediaPlayer->setMedia(QUrl::fromLocalFile(qs->Name()));
+        ui->actionDisplay_specturm->setText(((WavScene*)wavView->scene())->showSpect?
+                                                QString("Hide spectrum"): QString("Show spectrum"));
+    }
+
 }
 
 void QSWindow::displayKeyBoard(){
@@ -321,6 +332,18 @@ void QSWindow::displayKeyBoard(){
         keyView->show();
         ui->actionDisplay_Keyboard->setText("Hide Keyboard");
     }
+}
+void QSWindow::displaySpectrum(){
+    WavScene* sc = (WavScene*)wavView->scene();
+    if(!sc) return;
+    if(sc->showSpect){
+        sc->showSpect = false;
+        ui->actionDisplay_specturm->setText(QString("Show spectrum"));
+    }else{
+        sc->showSpect = true;
+        ui->actionDisplay_specturm->setText(QString("Hide spectrum"));
+    }
+    sc->update(sc->spect->sceneBoundingRect());
 }
 
 void QSWindow::keyInput(quint8 id, quint8 dura = 12){

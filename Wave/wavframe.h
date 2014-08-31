@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QDebug>
+#include <QPicture>
 #include <string>
 
 const quint8 default_wavHeader[44] = {
@@ -81,6 +82,7 @@ public:
     };
 
     static quint32 df_chord[12];
+    static std::vector<qreal> chordGen(const char *d);
 
     void save(const char *fileName) const;
     bool load(const char *fileName);
@@ -161,6 +163,7 @@ private:
     QPointF *data;
     QVector<QPointF>pdata;
     QRectF bound;
+    QPicture pic;
 
 };
 

@@ -66,7 +66,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="usesScrollButtons">
      <bool>false</bool>
@@ -160,11 +160,11 @@
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
-   <widget class="QMenu" name="menuConvert">
+   <widget class="QMenu" name="menuFunction">
     <property name="title">
-     <string>Convert</string>
+     <string>Function</string>
     </property>
-    <addaction name="actionShow_specturm"/>
+    <addaction name="actionDisplay_specturm"/>
     <addaction name="separator"/>
     <addaction name="actionWav_to_score"/>
     <addaction name="actionScore_to_wav"/>
@@ -179,7 +179,7 @@
     <addaction name="separator"/>
    </widget>
    <addaction name="menuQS"/>
-   <addaction name="menuConvert"/>
+   <addaction name="menuFunction"/>
    <addaction name="menuOpened"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -237,9 +237,9 @@
     <string>show wave form</string>
    </property>
   </action>
-  <action name="actionShow_specturm">
+  <action name="actionDisplay_specturm">
    <property name="text">
-    <string>show specturm</string>
+    <string>Show specturm</string>
    </property>
   </action>
   <action name="actionClose">
