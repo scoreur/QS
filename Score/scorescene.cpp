@@ -293,6 +293,7 @@ void ScoreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 void ScoreLine::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton)
         isPressed = true;
+    mouseY = mapFromScene(event->scenePos()).y();
         //qDebug()<<event->scenePos();
     scene()->update(sceneBoundingRect());
 }
@@ -300,11 +301,14 @@ void ScoreLine::mousePressEvent(QGraphicsSceneMouseEvent *event){
 void ScoreLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if(event->button() == Qt::LeftButton)
         isPressed = false;
+    mouseY = 0;
     scene()->update(sceneBoundingRect());
 }
 
 void ScoreLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
 
-    setY(event->scenePos().y());
+    setY(event->scenePos().y()-mouseY);
     scene()->update(sceneBoundingRect());
 }
+
+qreal ScoreLine::mouseY = 0;

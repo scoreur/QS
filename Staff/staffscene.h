@@ -53,6 +53,10 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
+private:
+    bool isPressed;
+    static qreal mouseY;
+
 
 };
 

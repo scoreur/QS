@@ -13,7 +13,8 @@ class SpectrumGraph;
 class WavScene : public QSScene
 {
 public:
-    WavScene(QGraphicsView *view, QString fileName = "");
+    WavScene(QGraphicsView *view, const QString &fileName = "");
+    WavScene(QGraphicsView *view, const WavFile &_wavFile, const QString &fileName);
     ~WavScene();
 
     quint32 load(QString fileName){
@@ -67,7 +68,7 @@ public:
     SpectrumGraph(QGraphicsScene *scene);
     ~SpectrumGraph(){}
     void fresh(Spectrum *spectrum);
-    void fresh(qint16 data[], quint32 num, quint8 mode=0);
+    void fresh(qint16 data[], quint32 num, quint8 mode=0, quint8 step=1);
 
     friend class WavScene;
 protected:

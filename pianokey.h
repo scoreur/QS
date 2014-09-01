@@ -7,6 +7,7 @@
 //#include <QString>
 //#include <QThread>
 #include <QSound>
+#define HAVE_NATURAL_KEYSOUND //disable this when have no keysound
 
 class PianoKey: public QGraphicsObject
 {

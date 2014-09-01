@@ -17,16 +17,16 @@ QSPreset::QSPreset(QWidget *parent) :
     //setAttribute(Qt::WA_DeleteOnClose);
 
     widgetConsturct();
+    updateImages();
+    updatePictures();
 
 }
-
+QSPreset * QSPreset::instance = 0;
 QSPreset::~QSPreset(){
     delete ui;
+    if(instance==this) instance = 0;
     qDebug()<<"preset dialog delete!";
 }
-
-QSPreset * QSPreset::instance = 0;
-
 
 void QSPreset::widgetConsturct(){
     QSettings settings(domainName, appName);
@@ -106,7 +106,7 @@ void QSPreset::reject(){
 
 //////////////////////////////////////////////////////////////////////////////
 /// @brief static member
-//general                                                ////
+//general
 QSize QSPreset::winSize = QSize(960,500);
 QSize QSPreset::tabSize = QSize(940,400);                                 ////
 QRect QSPreset::keyViewRect = QRect(0,300, 936,130);                      ////
@@ -128,7 +128,7 @@ QSize QSPreset::staffPageSize = QSize(800, 600);
 QRectF QSPreset::staffPaddingRect = QRect(10, 10,
                                                 QSPreset::staffPageSize.width()-20,
                                                 QSPreset::staffPageSize.height()-20);
-QSize QSPreset::staffLineSize = QSize(780, 50);
+QSize QSPreset::staffLineSize = QSize(750, 50);
 qreal QSPreset::staffLineInterval = 9;
 qreal QSPreset::staffLineSpacing = 50;
 QColor QSPreset::noteColor[2] = {QColor(15,15,15,250), Qt::blue};
@@ -164,17 +164,8 @@ void QSPreset::writeSettings(){
     settings.endGroup();
 }
 
-
-
-StaffImages::StaffImages(){
-
-    updateImages();
-
-    updatePictures();
-}
-
 //loading static images
-void StaffImages::updateImages(){
+void QSPreset::updateImages(){
     int tmp = 70;
     images[tr_clef] = QPixmap(QString(":/image/staff/treble_clef.png"), "PNG").scaled(70, 70);
     images[ba_clef] = QPixmap(QString(":/image/staff/bass_clef"), "PNG").scaled(45, 45);
@@ -186,7 +177,7 @@ void StaffImages::updateImages(){
 
 }
 //loading dynamic pictures
-void StaffImages::updatePictures(){
+void QSPreset::updatePictures(){
     QPainter painter; QPen pen(QSPreset::noteColor[0]); QBrush brush(QSPreset::noteColor[0]);
     qreal shx = 0, shy = -0.35; qreal intv = QSPreset::staffLineInterval;
 
@@ -196,14 +187,14 @@ void StaffImages::updatePictures(){
     painter.shear(shx,shy);
     painter.drawEllipse(QPointF(0,0), intv*0.65,intv*0.45);
     painter.end();
-    picture.save("black_hollow_note.pic");//test
+    picture.save(QDir::homePath().append("/black_hollow_note.pic"));//test
     painter.begin(&picture);//solid_note_head; TODO: allow multi-color
     painter.setPen(pen);
     painter.setBrush(brush);
     painter.shear(shx,shy);
     painter.drawEllipse(QPointF(0,0), intv *0.65, intv*0.45);
     painter.end();
-    picture.save("black_solid_note.pic");
+    picture.save(QDir::homePath().append("/black_solid_note.pic"));
 
 
 }

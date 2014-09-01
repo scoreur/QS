@@ -31,5 +31,6 @@
         <file>image/staff/double_sharp.png</file>
         <file>image/staff/wallpaper.png</file>
         <file>image/lm.jpg</file>
+        <file>sample/thu_anthem_short.txt</file>
     </qresource>
 </RCC>

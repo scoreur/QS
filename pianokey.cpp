@@ -6,9 +6,14 @@
 #include <QTimer>
 #include "qsscene.h"
 
+
+
+#ifdef HAVE_NATURAL_KEYSOUND
 QString PianoKey::soundpath = QDir::currentPath().append("/../../../../QS/sound/keyboard/piano_%1.wav");
         //QString("/Users/user/Documents/compile/Qt5/QS/sound/keyboard/piano_%1.wav");
-
+#else
+QString PianoKey::soundpath = QDir::homePath() + QString("/QS_tmp/keysound/piano_%1.wav");
+#endif
 /// @brief constructor of piano key
 PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
     QGraphicsObject(parent),
@@ -21,7 +26,6 @@ PianoKey::PianoKey(uchar _id, QGraphicsItem *parent):
 {
     setToolTip(QString("I'm No.%1 from the left!").arg(id+1));
 
-    //qDebug()<< id <<"success";
     //keysound->moveToThread(keythread);
 }
 

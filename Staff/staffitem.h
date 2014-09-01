@@ -18,6 +18,8 @@ public:
     QPainterPath shape() const;
     QRectF boundingRect() const;
 
+    static qreal mouseY;
+
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -26,10 +28,12 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 
 
+
 signals:
 
 public slots:
     void showMark(bool f = true);// show sharp/flat/nature sign
+
 
 private:
     quint8 pitch;
@@ -37,6 +41,7 @@ private:
     qint8 mark;
     quint8 colorIndex;
     bool markShowed;
+    bool isPressed;
     QRectF bound;
 
 

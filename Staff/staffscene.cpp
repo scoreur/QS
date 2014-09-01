@@ -48,9 +48,9 @@ StaffMeasure::StaffMeasure(QGraphicsItem *parent):
 /// holding all notes in one track or display title/lyrics/etc.
 ///////////////////////////////////////////////////////////////
 StaffLine::StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent) :
-    QGraphicsRectItem(parent), type((LineType)_type){
+    QGraphicsRectItem(parent), type((LineType)_type), isPressed(false){
     scene->addItem(this);
-    setRect(-20,-20, QSPreset::staffLineSize.width(), QSPreset::staffLineSize.height());
+    setRect(0,0, QSPreset::staffLineSize.width(), QSPreset::staffLineSize.height());
 
 
 
@@ -64,25 +64,36 @@ void StaffLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QPen pen(Qt::black);
     painter->setPen(pen);
     QPointF startPos = QPointF(0,10);
-    qreal endX = QSPreset::staffPaddingRect.right();
+    qreal endX = boundingRect().width()-10;
+
     for(int i=0; i<5; ++i){// draw five lines
         painter->drawLine(startPos.x(),startPos.y()+i*QSPreset::staffLineInterval,
                           endX,startPos.y()+i*QSPreset::staffLineInterval);
     }
+    if(isPressed)
+        painter->drawRect(boundingRect());
 
 
 
 }
 
 void StaffLine::mousePressEvent(QGraphicsSceneMouseEvent *event){// TODO:
-    Q_UNUSED(event)
+
+    isPressed = true;
+    mouseY = mapFromScene(event->scenePos()).y();
+    scene()->update(sceneBoundingRect());
 }
 
 void StaffLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     Q_UNUSED(event)
+    isPressed = false;
+    mouseY = 0;
+    scene()->update(sceneBoundingRect());
 }
 
 void StaffLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
-    Q_UNUSED(event)
+     setY(event->scenePos().y()-mouseY);//
 }
+
+qreal StaffLine::mouseY = 0;
 

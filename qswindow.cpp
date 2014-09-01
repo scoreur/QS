@@ -12,7 +12,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QTimer>
-
+#include <fstream>
 
 
 ////////////////////////////////////////////////
@@ -64,8 +64,33 @@ QSWindow::QSWindow(QWidget *parent) :
     musicthread->start();
 
     preloadConnect();//holding all connections needed
-    addScene(wavView);
-    addScene(scoreView);
+
+    // load sample score from qrc
+    QString sampleScore = QDir::homePath()+QString("/QS_tmp/thu_anthem_short");
+    QDir::home().mkdir(QString("QS_tmp"));
+    QFile fw(sampleScore+QString(".txt")), fd(":/sample/thu_anthem_short.txt");
+    fw.open(QFile::WriteOnly);
+    fd.open(QFile::ReadOnly);
+    QByteArray ba = fd.readAll();
+    fw.write(ba.constData(),ba.size());
+    fd.close();
+    fw.close();
+
+    addScene(scoreView, sampleScore+QString(".txt"));
+    if(! QFileInfo(sampleScore+QString(".wav")).isFile()){
+        WavFile wavOut;
+        qDebug()<<"THERE";
+        if(wavOut.fromScore(60.0/80, (sampleScore+QString(".txt")).toStdString().c_str())){
+            qDebug()<<"HERE";
+            wavOut.save(sampleScore.toStdString().append(".wav").c_str());
+            addScene(wavView, wavOut, sampleScore+QString(".wav"));
+            playButton->setEnabled(true);
+        }
+    }else{
+        addScene(wavView, sampleScore+QString(".wav"));
+        playButton->setEnabled(true);
+
+    }
     addScene(staffView);
     keyScene = new KeyScene(keyView, this);
 
@@ -94,6 +119,8 @@ QSWindow::~QSWindow()
 
 //////////////////////////////////////////////////////////////////
 /// @brief music slot:
+///
+/////////////////////////////////////////////////////////////////
 void QSWindow::musicPlay(){
     qDebug()<<mediaPlayer->state();
    if(mediaPlayer->state() !=QMediaPlayer::PlayingState){
@@ -174,8 +201,10 @@ void QSWindow::preloadConnect(){
     connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()),Qt::QueuedConnection);
 }
 
-
-
+////////////////////////////////////
+/// @brief preset module
+///
+////////////////////////////////////
 void QSWindow::generalPreset(int mode, int arg){
 
     switch(mode){
@@ -214,7 +243,7 @@ void QSWindow::generalPreset(int mode, QSize size){
 /// @brief file control module
 void QSWindow::openFile(){                                                                                                  ////
     openFileName = QFileDialog::getOpenFileName                                                                             ////
-            (this, "Open File: ", QDir::homePath(), "*.wav *.txt *.mid");                                                   ////
+            (this, "Open File: ", QDir::homePath(), "*.wav *.mp3 *.txt *.mid");                                                   ////
     if(openFileName.isEmpty())                                                                                              ////
         ui->statusBar->showMessage("open file unchosen!", 5000);                                                            ////
     else{                                                                                                                   ////
@@ -233,6 +262,10 @@ void QSWindow::openFile(){                                                      
         else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
             addScene(staffView, openFileName);
             MidiParser::test(openFileName.toStdString());
+        }else if(openFileName.endsWith("mp3", Qt::CaseInsensitive)){
+            WavFile wm;
+            qDebug()<<wm.from_lame(openFileName, openFileName+QString("QS.pcm"));
+
         }else{
             ui->statusBar->showMessage("can't process such file format!");
             openFileName = "";
@@ -329,8 +362,13 @@ void QSWindow::addScene(QGraphicsView *view, QString fileName){
     ui->menuOpened->addAction(qs->Opened());
     emit qs->Opened()->triggered();
 }
-void QSWindow::addScene(){
-    addScene(wavView, openFileName);
+void QSWindow::addScene(QGraphicsView *view, const WavFile &_wavFile, const QString &fileName){
+    if(view == wavView){
+        new WavScene(view, _wavFile, fileName);
+    }
+    QSScene* qs = (QSScene*)view->scene();
+    ui->menuOpened->addAction(qs->Opened());
+    emit qs->Opened()->triggered();
 }
 
 void QSWindow::switchScene(QAction * act){

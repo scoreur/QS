@@ -34,7 +34,7 @@ private:
 class QSScene : public QGraphicsScene{
 
 public:
-    QSScene(QGraphicsView *view, QString fileName = "");
+    QSScene(QGraphicsView *view, const QString &fileName = "");
     ~QSScene();
     QString Name() const{
         return name;

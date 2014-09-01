@@ -2,9 +2,11 @@
 #include "pianokey.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include <QDir>
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QDebug>
+#include "Wave/wavframe.h"
 #include "qswindow.h"
 
 
@@ -31,6 +33,12 @@ KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
             temp_x += PianoKey::halfspacing;
         temp_x += PianoKey::halfspacing;
     }
+#ifndef HAVE_NATURAL_KEYSOUND
+    if(QDir::home().mkpath(QString("QS_tmp/keysound"))){
+        qDebug()<<"create:"<<WavFile::keysoundGen(QDir::homePath().append("/QS_tmp/keysound"), 1.2);
+    }else qDebug()<<"keysoundGen error!";
+#endif
+
 
 
 }
@@ -122,7 +130,7 @@ void KeyScene::keyReleaseEvent(QKeyEvent *event){
 
 
 /// @brief constructor of base class QSScene
-QSScene::QSScene(QGraphicsView *view, QString fileName):
+QSScene::QSScene(QGraphicsView *view, const QString &fileName):
         QGraphicsScene(view->geometry(),view), name(fileName),
     act (new QAction(QString("QS~%1").arg(fileName.right(16)), this))
 {

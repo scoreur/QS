@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include "Core/spectrum.h"
+#include "lame.h"
 
 double ampExpand(double in){
     int sgn = in>0? 1: -1;
@@ -85,7 +86,7 @@ qreal envelope_piano(qreal d){
     return 1;
 }
 
-qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.1, 0.1, 0.08, 0.07, 0.06,0.05,
+qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
                            0.04,0.03,0.02,0.01,0};
 
 std::vector<qreal> chordGen(quint8 a, quint8 b, quint8 c=0){
@@ -252,10 +253,27 @@ bool WavFile::fromScore(qreal secs, const char *fileName){
         dura.push_back((quint8)tmp);
         ++i;
     }
-    if(fromScore(secs, (quint8*)&score[0],(quint8*)&dura[0],(quint32)i))
-        qDebug()<<"score load success!";
+    qDebug()<<"score load success!";
     scoreIn.close();
+    return fromScore(secs, (quint8*)&score[0],(quint8*)&dura[0],(quint32)i);
 }
+
+bool WavFile::fromPcm(quint32 channellen, qint16 *pcm_l, qint16 *pcm_r, bool append){
+    quint8 step = (pcm_r==0)? 1:2;
+    setChannels((quint16)step);
+    if(length>0) delete[]data;
+    if(setLength(channellen*step))
+        data = new qint16[length];
+    if(step==1)
+        memcpy(data, pcm_l, channellen*2);
+    else
+        for(quint32 i=0;i<channellen;++i){
+            data[i*2] = pcm_l[i];
+            data[i*2+1] = pcm_r[i];
+    }
+    return true;
+}
+
 bool WavFile::load(const char *fileName){
     std::ifstream in(fileName);
     if(!in) return false;
@@ -274,14 +292,36 @@ bool WavFile::load(const char *fileName){
     return true;
 
 }
-void WavFile::save(const char *fileName) const{
+bool WavFile::save(const char *fileName) const{
     std::ofstream out(fileName);
     out.write((char*)header, 44);
     out.write((char*)data, length*2);
     out.close();
+    return true;
 }
 
 quint32 WavFile::df_chord[12] = {chordM,0,chordm,0,chordm,chordM,0,chordM,0,chordm,0,chorddim};
+
+quint16 biquad(quint8 frnum){
+    if(frnum<10) return 10000;
+    else if(frnum<20) return 6000;
+    else if(frnum<65) return 4000;
+    else if(frnum<80) return 3000;
+    else return 2000;
+
+}
+
+bool WavFile::keysoundGen(const QString &filePath, qreal secs){
+    if(! QDir(filePath).exists()) return false;
+    WavFile wavOut(secs*44100);
+    quint8 o[4]={2,3,5,7};
+    std::vector<quint8>overtone(o,o+4);
+    for(quint16 i=0;i<88;++i){
+        wavOut.addSingleTone(secs, FreqPiano[i], overtone, biquad((quint8)i));
+        wavOut.save((filePath+QString("/piano_%1.wav")).arg(QString::number(i,10)).toStdString().c_str());
+    }
+    return true;
+}
 
 void WavFile::test(){
     qDebug() << "mkdir: "<<QDir(QDir::homePath().append("/Documents")).mkdir(QString("QS_tmp"));
@@ -313,3 +353,52 @@ void WavFile::test(){
     //scoreToWav.addFilter(40,0,fil,90);
     scoreToWav.save("/Users/user/Documents/QS_tmp/thu_anthem_short.wav");
 }
+
+void lame_display(mp3data_struct *md){//display header info
+    qDebug()<<"nchannels:" << md->stereo;
+    qDebug()<<"samplerate:" << md->samplerate;
+    qDebug()<<"bitrate:" << md->bitrate;
+    qDebug()<<"framesize:" << md->framesize;
+}
+const int buffersize = 4000;
+int WavFile::from_lame(const QString &in, const QString &out){
+       std::ifstream wavIn(in.toStdString().c_str());
+       if(!wavIn){
+           qDebug()<<"open file %s error!"<<in;
+           return 1;
+       }
+       std::ofstream wavOut(out.toStdString().c_str());
+
+       mp3data_struct md;
+       hip_t mfile = hip_decode_init();
+
+       unsigned char mbuffer[buffersize];
+       short pcm_l[40000]; short pcm_r[40000];
+       wavIn.read((char*)mbuffer, buffersize);
+
+       int nout = hip_decode_headers( mfile, mbuffer, buffersize, pcm_l, pcm_r, &md);
+       lame_display(&md);
+       int i=0;
+       for(i=0; i<nout; ++i){
+           wavOut.write((char*)(pcm_l+i),2);
+           wavOut.write((char*)(pcm_r+i), 2);
+       }
+
+       int totallen = nout;
+       while( wavIn.read((char*)mbuffer, buffersize)){
+           nout = hip_decode(mfile, mbuffer, buffersize, pcm_l, pcm_r);
+           qDebug()<<"out:"<<nout;
+           if(nout == -1) { qDebug()<<"ERROR!"; hip_decode_exit(mfile); return 3;}
+           totallen += nout;
+           for(i=0; i<nout; ++i){
+               wavOut.write((char*)(pcm_l+i),2);
+               wavOut.write((char*)(pcm_r+i), 2);
+           }
+       }
+       qDebug()<<"Exit: /total lenth sec:"<<hip_decode_exit(mfile)<<totallen/44100.0;
+       wavIn.close();
+       wavOut.close();
+       return 0;
+
+}
+

@@ -61,11 +61,11 @@ void ScoreItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
         if(semi == 1){// #
             painter->drawPixmap(-bound.width()/2-6,-bound.height()/2+5, 20,12,
-                                QSPreset::getInstance()->imgs[StaffImages::sharp]);
+                                QSPreset::getInstance()->images[QSPreset::sharp]);
         }
         else if(semi == -1){// b
             painter->drawPixmap(-bound.width()/2-6,-bound.height()/2+5, 20,12,
-                                            QSPreset::getInstance()->imgs[StaffImages::flat]);
+                                            QSPreset::getInstance()->images[QSPreset::flat]);
         }
         else//nature sign
             ;

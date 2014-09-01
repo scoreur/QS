@@ -16,7 +16,7 @@
 
 const QString domainName = "www.scoreur.cn";
 const QString appName = "QtScoreur";
-
+class WavFile;
 
 namespace Ui {
 class QSWindow;
@@ -75,11 +75,12 @@ private:
 private slots:
     void on_verticalScrollBar_valueChanged(int value);
     void addScene(QGraphicsView *view, QString fileName = "");
-    void addScene();
+    void addScene(QGraphicsView *view, const WavFile &_wavFile, const QString &fileName);
     void switchScene(QAction*);
     void displayKeyBoard();
     void displaySpectrum();
     void scoreToWav();
+
 
     void changePreset();
 

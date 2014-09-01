@@ -40,10 +40,10 @@ const double FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
 class Spectrum
 {
 public:
-    Spectrum(qint16 *data, quint32 num, quint8 mode=0);
+    Spectrum(qint16 *data, quint32 num, quint8 mode=0, quint8 step=1);
     ~Spectrum(){}
 
-    void build(qint16 *data, quint32 num, quint8 mode = 0, quint32 sampleps = 44100);
+    void build(qint16 *data, quint32 num, quint8 mode = 0, quint8 step = 1, quint32 sampleps = 44100);
 
     QMap<double, quint8>peaks;//store the possible peaks;
     void findPeaks(double threshold = 0);//default: clear
@@ -54,7 +54,7 @@ public:
     static quint32 bitrev(quint32 num, quint16 ord);
 
     //mode == false for inverse transform;
-    static cmplx STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow = false);
+    static cmplx STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow = false, quint8 step=1);
     static std::vector<cmplx> DFT(const cmplx data[], quint32 num, bool mode = true);
     static std::vector<qreal> DCT(const qreal data[], quint32 num, bool mode = true);//half length fo DFT
     static std::vector<cmplx> FFT(const cmplx data[], quint32 num, bool mode = true);

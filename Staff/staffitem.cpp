@@ -2,6 +2,7 @@
 #include "qspreset.h"
 #include "qsscene.h"
 #include <QDir>
+#include <QDebug>
 ////////////////////
 /// \brief Constructor of StaffItem
 /// \param parent
@@ -9,7 +10,7 @@
 ///
 StaffItem::StaffItem(QGraphicsItem *parent, quint8 _dura) :
     QGraphicsObject(parent), dura(_dura), colorIndex(0),
-    markShowed(false), bound(-10,-10,20,20)
+    markShowed(false), isPressed(false), bound(-30,-30,20,20)
 {
 
 }
@@ -17,24 +18,35 @@ StaffItem::StaffItem(QGraphicsItem *parent, quint8 _dura) :
 void StaffItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option)
     Q_UNUSED(widget)
+
     QPicture picture;
     if(dura >= 24){
 
-        picture.load("black_solid_note.pic");
-        painter->drawPicture(0,0,picture);
+        picture.load(QDir::homePath().append("/black_solid_note.pic"));
+        painter->drawPicture(-20,-20,picture);
 
     }
     else{
 
-        picture.load("black_hollow_note.pic");
-        painter->drawPicture(0,0, picture);
+        picture.load(QDir::homePath().append("/black_hollow_note.pic"));
+        painter->drawPicture(-20,-20, picture);
     }
+    if(isPressed){
+        QBrush brush(QColor(0,200,50,50));
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(brush);
+        painter->drawRect(bound);
+        //qDebug()<<"drawRect!";
+
+    }
+
 
 
 }
 
 void StaffItem::showMark(bool f){
     markShowed = f;
+    scene()->update(sceneBoundingRect());
 }
 
 
@@ -52,21 +64,32 @@ QRectF StaffItem::boundingRect() const{
 
 void StaffItem::mousePressEvent(QGraphicsSceneMouseEvent *event){
     Q_UNUSED(event)
+    isPressed = true;
+    //qDebug()<<"pressed!";
+    mouseY = mapToParent(event->pos()).y();
+    scene()->update(sceneBoundingRect());
+
 }
 
 void StaffItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     Q_UNUSED(event)
+    isPressed = false;
+    mouseY = 0;
+    scene()->update(sceneBoundingRect());
 }
 
 void StaffItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
-
-
-    scene()->update(sceneBoundingRect());
+    //if(mapToParent(pos()).y()<mouseY+30 && mapToParent(pos()).y()>mouseY-30){
+        setY(mapToParent(event->pos()).y()-boundingRect().top()-10);
+        scene()->update(sceneBoundingRect());
+    //}
 }
 
 void StaffItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     Q_UNUSED(event)
 }
+
+qreal StaffItem::mouseY = 0;//for mouse event
 
 //////////////////////////////////////////
 /// \brief constructor of KeySignature
@@ -77,10 +100,10 @@ void StaffItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 ///
 KeySignature::KeySignature(QGraphicsItem *parent, qint8 _clef, qint8 _id) :
     QGraphicsObject(parent), clef(_clef), id(_id), bound(QRectF(0,0, 100,100)),
-    clefImg(_clef==0? QSPreset::getInstance()->imgs[StaffImages::tr_clef]:
-                      QSPreset::getInstance()->imgs[StaffImages::ba_clef]),
-    markImg(_id>=0? QSPreset::getInstance()->imgs[StaffImages::sharp]:
-                    QSPreset::getInstance()->imgs[StaffImages::flat]),
+    clefImg(_clef==0? QSPreset::getInstance()->images[QSPreset::tr_clef]:
+                      QSPreset::getInstance()->images[QSPreset::ba_clef]),
+    markImg(_id>=0? QSPreset::getInstance()->images[QSPreset::sharp]:
+                    QSPreset::getInstance()->images[QSPreset::flat]),
     clefPos(_clef==0? QPointF(-20,-8) : QPointF(-12,4))
 {
     constructPlaces();

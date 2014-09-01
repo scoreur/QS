@@ -37,15 +37,17 @@ const char chords[][4] = { "43" // major
 
 class WavFile{
 public:
-    WavFile(quint32 _len=0):data(0), length(_len){
-        quint32 dataSize = length*2;
+    WavFile(quint32 _len=0):data(0), length(0){
         memcpy(header, default_wavHeader, 44);
-        memcpy(header+40, &dataSize, 4);
-        dataSize += 36;
-        memcpy(header+4, &dataSize, 4);
-        if(length>0)
+        if(setLength(_len))
             data = new qint16[length];
     }
+    WavFile(const WavFile &wavFile):length(wavFile.length),
+        data(new qint16[wavFile.length]){
+        memcpy(header, wavFile.header, 44);
+        memcpy((char*)data, (char*)wavFile.data, wavFile.length*2);
+    }
+
     WavFile(const char* fileName):WavFile(){
         if(load(fileName))
             qDebug()<<"wavFile load successful!";
@@ -84,7 +86,7 @@ public:
     static quint32 df_chord[12];
     static std::vector<qreal> chordGen(const char *d);
 
-    void save(const char *fileName) const;
+    bool save(const char *fileName) const;
     bool load(const char *fileName);
 
     quint16 nChannels() const{
@@ -108,6 +110,16 @@ public:
         }else
             return false;//not supported
     }
+    bool setLength(quint32 _len){
+        bool tmp = (length < _len);
+        length = _len;
+        quint32 dataSize = length*2;
+        memcpy(header+40, &dataSize, 4);
+        dataSize += 36;
+        memcpy(header+4, &dataSize, 4);
+        return tmp;// need to expand data[] or not
+    }
+
     bool addSingleTone(qreal secs, qreal freq, std::vector<quint8>overtone,
                        quint16 amp=4000, bool overwrite=true, qreal offsecs=0);
     bool addChord(qreal secs, qreal freq, std::vector<qreal>chord, quint16 amp=4000,
@@ -119,6 +131,7 @@ public:
 
     bool fromScore(qreal secs, quint8 *score, quint8 *dura, quint32 l);
     bool fromScore(qreal secs, const char* fileName);
+    bool fromPcm(quint32 channellen, qint16 *pcm_l, qint16 *pcm_r=0, bool append=false);
     qreal getDuration() const{
         return length/nChannels()/(qreal)sampleps();
     }
@@ -126,9 +139,9 @@ public:
     qint16 *data;
     quint32 length;
 
-
+    static bool keysoundGen(const QString &filePath, qreal secs);
     static void test();
-
+    int from_lame(const QString &in, const QString &out);
 };
 
 

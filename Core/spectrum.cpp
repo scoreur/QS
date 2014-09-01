@@ -3,10 +3,10 @@
 #include "Wave/wavframe.h"
 
 
-Spectrum::Spectrum(qint16 *data, quint32 num, quint8 mode)
+Spectrum::Spectrum(qint16 *data, quint32 num, quint8 mode, quint8 step)
 {
     //construct spectrum
-    build(data, num, mode);
+    build(data, num, mode, step);
 
 }
 
@@ -53,7 +53,7 @@ void cmplx_info(const cmplx &c){
 
 
 
-void Spectrum::build(qint16 *data, quint32 num, quint8 mode, quint32 sampleps){
+void Spectrum::build(qint16 *data, quint32 num, quint8 mode, quint8 step, quint32 sampleps){
     quint32 samplesize = 128;
     qreal sampledata = 0;
     cmplx w0;
@@ -76,9 +76,9 @@ void Spectrum::build(qint16 *data, quint32 num, quint8 mode, quint32 sampleps){
             for(qint32 k=samplesize-1;k>=0;--k){
                 abs_i = delta_i*k;
                 quint32 i=(quint32)(abs_i);
-                sampledata = *(data+i);
+                sampledata = *(data+i*step);
 #ifdef ENABLE_INTERPOLATION
-                sampledata = *(data+i+1)*(abs_i-i) + sampledata *(1+i-abs_i);//linear interpolation
+                sampledata = *(data+(i+1)*step)*(abs_i-i) + sampledata *(1+i-abs_i);//linear interpolation
 #endif
                 val[j] = val[j]*w0 +sampledata;
             }
@@ -95,7 +95,7 @@ void Spectrum::build(qint16 *data, quint32 num, quint8 mode, quint32 sampleps){
         val.assign(vallen, cmplx(0));
         qreal start = PianoFreqGen(-mode/qreal(2*mode+1)), mult = ::pow(2.0, 1.0/12/(2*mode+1));
         for(quint32 i=0;i<vallen;++i){
-            val[i] = STFT1P(data, num, start, false);
+            val[i] = STFT1P(data, num, start, false, step);
             start*=mult;
         }
 
@@ -112,7 +112,7 @@ double Spectrum::PianoFreqGen(qreal pitch){
     return 440.0 * ::pow(2.0, (pitch-48.0)/12.0);
 }
 
-cmplx Spectrum::STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow){
+cmplx Spectrum::STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow, quint8 step){
     cmplx tmp = cmplx(0); qreal sampleps = 44100;
     cmplx w = exp2iPI(freq/sampleps);
     num = sampleps/freq*(quint32)(num*freq/sampleps);//shrink to integral periods
@@ -120,10 +120,10 @@ cmplx Spectrum::STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWin
 
     if(addWindow){
         for(quint32 i=num-1;i>=0;--i)
-            tmp = w*tmp+data[i]*0.5;//TODO: define window function;
+            tmp = w*tmp+data[i*step]*0.5;//TODO: define window function;
     }else{
         for(qint32 i=num-1;i>=0;--i)
-            tmp = w*tmp+data[i]*1.0;
+            tmp = w*tmp+data[i*step]*1.0;
     }
     tmp *= 2.0/num;
     return tmp;
