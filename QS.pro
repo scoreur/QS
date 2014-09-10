@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     qsplayer.cpp \
     Staff/staffitem.cpp \
     Core/spectrum.cpp \
-    midiparser.cpp
+    midiparser.cpp \
+    Wave/wavfile.cpp
 
 HEADERS  += qswindow.h \
     pianokey.h \
@@ -48,7 +49,8 @@ HEADERS  += qswindow.h \
     midiparser.h \
     decorator.h \
     MIDIFile.hpp \
-    Wave/lame.h
+    Wave/lame.h \
+    Wave/wavfile.h
 
 INCLUDEPATH += $$PWD
 

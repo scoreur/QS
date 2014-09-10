@@ -11,6 +11,7 @@
 #include <QThread>
 #include <QEvent>
 #include <QTextEdit>
+#include <QLabel>
 
 #include "qsplayer.h"
 
@@ -44,6 +45,7 @@ public slots:
 
 
     //music play
+    void musicInit();
     void musicPlay();
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
@@ -66,6 +68,7 @@ private:
 
     QMediaPlayer *mediaPlayer;
     QAbstractButton *playButton;
+    QLabel *playTime;
     QSlider *positionSlider;
     QSPlayer *musicthread;
     QSPreset *preset;

@@ -53,7 +53,7 @@ ScoreScene::ScoreScene(QGraphicsView *view, QString fileName)
 
             bar->construct((quint8*)dura.begin()+start_i, i-start_i+1);
             scoreX = &bar->scoreX;
-            qDebug()<<"start: "<<start_i;
+            //qDebug()<<"start: "<<start_i;
 
 
             for(i = 0; i<scoreX->size(); ++i){
@@ -89,7 +89,7 @@ quint32 ScoreScene::load(QString fileName){
             scorein>>tmp;
             dura.push_back(quint8(tmp));
         }
-        qDebug()<<"load successful!";
+        //qDebug()<<"load successful!";
         scorein.close();
         return note.size();
     }

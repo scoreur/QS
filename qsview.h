@@ -3,7 +3,8 @@
 
 #include <QGraphicsView>
 #include <QWheelEvent>
-
+#include <QMouseEvent>
+#include <QLabel>
 
 class QSView : public QGraphicsView
 {
@@ -22,10 +23,12 @@ public:
     WavView(QWidget *parent, int w, int h);
     ~WavView(){}
 
+    QLabel *mouseTime;
 signals:
     void KeyInput(quint8);
 protected:
     void wheelEvent(QWheelEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 };
 
 class ScoreView : public QSView{

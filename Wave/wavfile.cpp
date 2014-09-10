@@ -1,74 +1,32 @@
-
-#include "qspreset.h"
-#include "wavframe.h"
-#include <fstream>
-#include <QDebug>
-#include <QDir>
-#include <QGraphicsScene>
-#include <QGraphicsView>
+#include "wavfile.h"
 #include "Core/spectrum.h"
 #include "lame.h"
+#include <fstream>
+#include <QDir>
+#include <exception>
 
-double ampExpand(double in){
-    int sgn = in>0? 1: -1;
-    in /= (1<<15);
-    //return sgn * ::pow(in*in, 0.2);
-    return in;
+qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
+                           0.04,0.03,0.02,0.01,0};
+
+std::vector<qreal> chordGen(quint8 a, quint8 b, quint8 c=0){
+    std::vector<qreal> tmp;
+    tmp.push_back(::pow(2.0,a/12.0));
+    tmp.push_back(::pow(2.0,b/12.0));
+    if(!c)
+        tmp.push_back(::pow(2.0,c/12.0));
+    return tmp;
 }
 
-WavFrame::WavFrame(quint32 _len, short *_data, qreal _intv, qreal _width, qreal _amp, quint8 step):
-    datasize((quint32)(_width/_intv)),
-    interval(_intv), amplitude(_amp),
-    bound(QRectF(0,-_amp, _width,_amp*2.0)){
-
-    data = new QPointF[datasize];
-    qreal d = _len/(qreal)datasize;
-    data[0]=QPointF(0, -amplitude * ampExpand(_data[0]));
-    data[1*step]=QPointF(d, -amplitude * ampExpand(_data[0]));
-    data[datasize-2]=QPointF(_len*interval, -amplitude * ampExpand(_data[step*(datasize-1)]));
-    data[datasize-2]=QPointF(_len*interval-d, -amplitude * ampExpand(_data[step*(datasize-1)]));
-    for(quint32 i=2;i<datasize-2;++i){
-        quint32 j = (quint32)(i*d+0.5);
-        qreal delta = i*d-j;
-        data[i] = QPointF(i*d*interval, -amplitude * ampExpand(interpolation3P(delta, _data[step*(j-1)],_data[step*j],_data[step*(j+1)])));
-        //2 to the 15th power as maximum
+std::vector<qreal> WavFile::chordGen(const char *d){
+    std::vector<qreal> tmp;
+    quint8 i=0; qreal start=1;
+    while(d[i]!='\0'){
+        start *= ::pow(2.0,(d[i]-'0')/12.0);
+        tmp.push_back(start);
+        ++i;
     }
-    qDebug()<<"array "<<datasize;
-    quint32 k = 1;
-    while(k<_len-100){
-    while(k<_len-1 && (_data[step*k]-_data[step*(k-1)]<=5 || _data[step*(k+1)]-_data[step*k]>=-5)
-          &&(_data[step*k]-_data[step*(k-1)]>=-5 || _data[step*(k+1)]-_data[step*k]<=5))++k;
-    pdata.push_back(QPointF(k*interval, -amplitude*ampExpand(_data[step*k]))); ++k;
-    }
-    qDebug()<<"vector:"<<pdata.size();
-    //save as picture
-    QPainter pt;
-    pt.begin(&pic);
-    QPen pen(QSPreset::wavForegroundColor);
-    pen.setWidth(1);
-    pt.setPen(pen);
-    //pt->drawPolyline((QPointF*)pdata.begin(), pdata.size());
-    pt.drawPolyline(data, datasize);
-
-    pt.end();
+    return tmp;
 }
-
-// static member
-quint16 WavFrame::framesize = 200;
-
-void WavFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-    painter->drawPicture(0,0,pic);
-
-}
-
-QPainterPath WavFrame::shape() const{
-    QPainterPath path;
-    path.addRect(bound);
-    return path;
-}
-
 const qreal thres1 = 0.1, thres2=0.2, qk = 0.5/(1-thres2-thres1), qdis=(1.5+qk*thres1);
 qreal envelope_flute(qreal d){
     d = d-(qint16)d;
@@ -86,27 +44,6 @@ qreal envelope_piano(qreal d){
     return 1;
 }
 
-qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
-                           0.04,0.03,0.02,0.01,0};
-
-std::vector<qreal> chordGen(quint8 a, quint8 b, quint8 c=0){
-    std::vector<qreal> tmp;
-    tmp.push_back(::pow(2.0,a/12.0));
-    tmp.push_back(::pow(2.0,b/12.0));
-    if(!c)
-        tmp.push_back(::pow(2.0,c/12.0));
-    return tmp;
-}
-std::vector<qreal> WavFile::chordGen(const char *d){
-    std::vector<qreal> tmp;
-    quint8 i=0; qreal start=1;
-    while(d[i]!='\0'){
-        start *= ::pow(2.0,(d[i]-'0')/12.0);
-        tmp.push_back(start);
-        ++i;
-    }
-    return tmp;
-}
 bool WavFile::addSingleTone(qreal secs, qreal freq, std::vector<quint8> overtone, quint16 amp, bool overwrite, qreal offsecs){
     quint32 samplesize = (quint32)(secs*sampleps());
     quint8 step = nChannels();
@@ -275,8 +212,12 @@ bool WavFile::fromPcm(quint32 channellen, qint16 *pcm_l, qint16 *pcm_r, bool app
 }
 
 bool WavFile::load(const char *fileName){
-    std::ifstream in(fileName);
-    if(!in) return false;
+    std::fstream in; in.clear();
+    in.open(fileName, std::ios::in|std::ios::binary);
+    if(!in){
+        qDebug()<<"file open error";
+        return false;
+    }
     in.read((char*)header, 36);
     quint32 wavSize = *(quint32*)(header+16);
     if(wavSize != 16)// ==18, skip addpack (2bytes)
@@ -284,11 +225,38 @@ bool WavFile::load(const char *fileName){
     header[16] = (quint8)16;
     in.read((char*)(header+36), 8);
     quint32 datasize = *(quint32*)(header+40);
+
     if(length>0) delete[]data;
+
     length = datasize/2;
+
     data = new qint16[length];
-    in.read((char*)data, datasize);//deep copy
+
+    qDebug()<<length;
+    try{
+        if(length<100000000000)
+            in.read((char*)data, length*2);
+        else{
+            in.read((char *)data, length/4);
+            for(int i=1;i<7;++i){
+                in.seekg(length/4*i+44, std::ios::beg);
+                in.read((char *)(data+length/8*i), length/4);
+            }
+        }
+        qDebug()<<"first";
+        //in.read((char *)(data+length/2), length/2);
+
+        in.seekg(0, std::ios::end);
+        qDebug()<<"eof: "<<(int)in.tellg()-44;
+
+    }catch(std::exception &ex){
+        qDebug()<<ex.what();
+        in.close();
+        return false;
+    }
+    qDebug()<<"close input wav";
     in.close();
+
     return true;
 
 }
@@ -377,8 +345,14 @@ int WavFile::from_lame(const QString &in, const QString &out){
        wavIn.read((char*)mbuffer, buffersize);
 
        int nout = hip_decode_headers( mfile, mbuffer, buffersize, pcm_l, pcm_r, &md);
+
        lame_display(&md);
+       if(md.samplerate != 44100) return 2;
+       if(md.bitrate != 128 && md.bitrate != 192) return 3;
+       setChannels(md.stereo);
+       setSampleps(md.samplerate);
        int i=0;
+       wavOut.seekp(44, std::ios::beg);
        for(i=0; i<nout; ++i){
            wavOut.write((char*)(pcm_l+i),2);
            wavOut.write((char*)(pcm_r+i), 2);
@@ -396,6 +370,9 @@ int WavFile::from_lame(const QString &in, const QString &out){
            }
        }
        qDebug()<<"Exit: /total lenth sec:"<<hip_decode_exit(mfile)<<totallen/44100.0;
+       setLength(totallen * nChannels());
+       wavOut.seekp(0, std::ios::beg);
+       wavOut.write((char*)header, 44);
        wavIn.close();
        wavOut.close();
        return 0;

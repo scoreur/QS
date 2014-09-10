@@ -11,8 +11,6 @@
 #include <QDialog>
 #include <QPicture>
 
-class StaffImages;
-
 
 
 namespace Ui{

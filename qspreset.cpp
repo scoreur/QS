@@ -115,14 +115,15 @@ QRect QSPreset::scoreViewRect = QRect(0,0, 770,300);                      ////
 QRect QSPreset::staffViewRect = QRect(0,0, 800,300);
 
 //wave
+QColor QSPreset::wavForegroundColor = QColor(20, 200, 50, 220);
+QColor QSPreset::wavBackgroundColor = QColor(15, 15, 15, 240);
 
 //score
 QSize QSPreset::scorePageSize = QSize(800,600);
 QRect QSPreset::scorePaddingRect = QRect(20,20,
                                          QSPreset::scorePageSize.width()-40,
                                          QSPreset::scorePageSize.height()-40);
-QColor QSPreset::wavForegroundColor = QColor(20, 175, 50, 220);
-QColor QSPreset::wavBackgroundColor = QColor(15, 15, 15, 100);
+
 //staff
 QSize QSPreset::staffPageSize = QSize(800, 600);
 QRectF QSPreset::staffPaddingRect = QRect(10, 10,
@@ -154,6 +155,7 @@ void QSPreset::readSettings(){
     win->scoreView->move(0,0);
     win->staffView->move(0,0);
     win->keyView->move(keyViewRect.x(),keyViewRect.y());
+
 }
 void QSPreset::writeSettings(){
     QSettings settings(domainName, appName);

@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QTimer>
+#include <QTime>
 #include <fstream>
 
 
@@ -42,23 +43,10 @@ QSWindow::QSWindow(QWidget *parent) :
     setWindowIcon(iconQS);
     //initialize
 
-
-
-
     ui->statusBar->showMessage(QString("Welcome to QtScoreur! ")+QDir::currentPath());
 
     //music play
-    playButton = new QPushButton(ui->wavTab);
-    playButton->setEnabled(false);
-    playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-    playButton->setText("play");
-    playButton->move(0, wavView->height()+25);
-    positionSlider = new QSlider(Qt::Horizontal,ui->wavTab);
-    positionSlider->resize(wavView->width(),20);
-    positionSlider->move(wavView->rect().bottomLeft());
-    positionSlider->setRange(0, 0);
-
-
+    musicInit();
     musicthread = new QSPlayer(openFileName);                                                                                                               ////
     mediaPlayer = musicthread->player;
     musicthread->start();
@@ -99,8 +87,7 @@ QSWindow::QSWindow(QWidget *parent) :
     webView->setOrientation(Html5ApplicationViewer::ScreenOrientationAuto);
     webView->resize(900, 400);
     webView->showExpanded();
-    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
-
+    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net/js/example.html")));
 
 
 }
@@ -121,6 +108,33 @@ QSWindow::~QSWindow()
 /// @brief music slot:
 ///
 /////////////////////////////////////////////////////////////////
+void QSWindow::musicInit(){
+    playButton = new QPushButton(ui->wavTab);
+    playButton->setEnabled(false);
+    playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    playButton->setText("play");
+    playButton->move(0, wavView->height()+25);
+    playTime = new QLabel(ui->wavTab);
+    playTime->move(wavView->width()-160, wavView->height()+25);
+    playTime->resize(160,20);
+    playTime->setText("00:00.00/00:00.00");
+
+    positionSlider = new QSlider(Qt::Horizontal,ui->wavTab);
+    positionSlider->resize(wavView->width(),20);
+    positionSlider->move(wavView->rect().bottomLeft());
+    positionSlider->setRange(0, 0);
+
+    wavView->horizontalScrollBar()->setSingleStep(5);
+
+    QLabel *mouseTime = new QLabel(ui->wavTab);
+    ((WavView*)wavView)->mouseTime = mouseTime;
+    mouseTime->move(wavView->width()-360, wavView->height()+25);
+    mouseTime->resize(100, 20);
+    mouseTime->setText("00:00.000");
+
+
+}
+
 void QSWindow::musicPlay(){
     qDebug()<<mediaPlayer->state();
    if(mediaPlayer->state() !=QMediaPlayer::PlayingState){
@@ -137,14 +151,17 @@ void QSWindow::musicPlay(){
    }
 }
 void QSWindow::durationChanged(qint64 duration){
-    //qDebug()<<"duration changed"<<duration;
+    playTime->setText("00:00.00/"+QTime(0,0).addMSecs(duration).toString("mm:ss.z"));
     positionSlider->setRange(0, duration);
-    positionSlider->setSingleStep(10<duration/800.0? 10: duration/800.0);
+    positionSlider->setSingleStep(5<duration/4000.0? 5: duration/4000.0);
 }
 void QSWindow::positionChanged(qint64 position){
     //qDebug()<<"positionChanged"<<position;
     positionSlider->setValue(position);
+    playTime->setText(QTime(0,0).addMSecs(position).toString(QString("mm:ss.z"))+"/"
+                      +QTime(0,0).addMSecs(mediaPlayer->duration()).toString(QString("mm:ss.z")));
     QScrollBar * bar = wavView->horizontalScrollBar();
+
     //qDebug()<<wavView->mapToScene(0,0).x();
     //scaling
 
@@ -264,7 +281,8 @@ void QSWindow::openFile(){                                                      
             MidiParser::test(openFileName.toStdString());
         }else if(openFileName.endsWith("mp3", Qt::CaseInsensitive)){
             WavFile wm;
-            qDebug()<<wm.from_lame(openFileName, openFileName+QString("QS.pcm"));
+            if( wm.from_lame(openFileName, openFileName+QString("QS.wav")) == 0)
+                addScene(wavView, openFileName+QString("QS.wav"));
 
         }else{
             ui->statusBar->showMessage("can't process such file format!");
@@ -453,3 +471,4 @@ void QSWindow::changePreset(){
 
 }
 
+//other tools//TODO: add to QSWindow class
