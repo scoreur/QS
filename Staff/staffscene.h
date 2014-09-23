@@ -1,7 +1,7 @@
 #ifndef STAFFSCENE_H
 #define STAFFSCENE_H
 
-#include "qsscene.h"
+#include "General/qsscene.h"
 #include "qspreset.h"
 #include "decorator.h"
 #include "staffitem.h"

@@ -19,8 +19,20 @@ void StaffItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+    if(isPressed){
+        QBrush brush(QColor(0,200,50,50));
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(brush);
+        painter->drawRect(bound);
+        //qDebug()<<"drawRect!";
+
+    }
     QPicture picture;
-    if(dura >= 24){
+    if(dura == 48){
+        painter->setBrush(Qt::NoBrush);
+        painter->setPen(Qt::black);
+        drawFullNote(painter, QPointF(-20,-10));
+    }else if(dura >= 24){
 
         picture.load(QDir::homePath().append("/black_solid_note.pic"));
         painter->drawPicture(-20,-20,picture);
@@ -31,14 +43,7 @@ void StaffItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         picture.load(QDir::homePath().append("/black_hollow_note.pic"));
         painter->drawPicture(-20,-20, picture);
     }
-    if(isPressed){
-        QBrush brush(QColor(0,200,50,50));
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(brush);
-        painter->drawRect(bound);
-        //qDebug()<<"drawRect!";
 
-    }
 
 
 
@@ -125,26 +130,26 @@ QPainterPath KeySignature::shape() const{
 void KeySignature::constructPlaces(){
     if(! places.empty())
         places.clear();
-    qreal startX = 20;
-    if(clef == 0){
+    qreal startX = 20, intv = QSPreset::staffLineInterval/2;
+    if(clef == 0){//tremble clef
         if(id > 0){//sharp key
             for(qint8 i=0; i<id; ++i){
-                places << QPointF(i*7+startX,(i*3)%5 * QSPreset::staffLineInterval/2-3);
+                places << QPointF(i*7+startX,(i*3)%5 * intv - 3);
             }
         }
         else if(id < 0)//flat key
             for(quint8 i=0; i<-id; ++i){
-                places<< QPointF(i*7+startX,(2 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
+                places<< QPointF(i*7+startX,(2 - (i*3)%5) * intv+2);
             }
-    }else if(clef == 1){
+    }else if(clef == 1){//bass clef
         if(id > 0){//sharp key
             for(qint8 i=0; i<id; ++i){
-                places << QPointF(i*7+startX,(2 + (i*3)%5) * QSPreset::staffLineInterval/2-3);
+                places << QPointF(i*7+startX,(2 + (i*3)%5) * intv-3);
             }
         }
         else if(id < 0)//flat key
             for(quint8 i=0; i<-id; ++i){
-                places<< QPointF(i*7+startX,(4 - (i*3)%5) * QSPreset::staffLineInterval/2+2);
+                places<< QPointF(i*7+startX,(4 - (i*3)%5) * intv+2);
             }
 
     }else{
@@ -152,3 +157,25 @@ void KeySignature::constructPlaces(){
     }
 
 }
+
+////////////////////
+//present painter commands which would be in QSPreset.cpp, for testing
+void drawNoteHead(QPainter *painter, QPointF center){
+    //QPen pen(QSPreset::noteColor[0]); QBrush brush(QSPreset::noteColor[0]);
+    qreal shx = 0, shy = -0.35; qreal intv = QSPreset::staffLineInterval;
+    //painter->setPen(pen);
+    //painter->setBrush(brush);
+    painter->shear(shx,shy);
+    painter->drawEllipse(center, intv *0.65, intv*0.45);
+    painter->shear(-shx, -shy);
+    painter->setTransform(QTransform());
+}
+void drawFullNote(QPainter *painter, QPointF center){
+    qreal shx = 0, shy = 0.25; qreal intv = QSPreset::staffLineInterval;
+    painter->shear(shx,shy);
+    painter->drawEllipse(center, intv *0.65, intv*0.6);
+    //painter->shear(shy, shx);
+    painter->setTransform(QTransform());
+}
+
+

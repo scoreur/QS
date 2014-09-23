@@ -1,6 +1,6 @@
 #include "qspreset.h"
 #include "ui_qspreset.h"
-#include "qswindow.h"
+#include "General/qswindow.h"
 #include "ui_qswindow.h"
 #include "Score/scoreitem.h"
 #include "Score/scorescene.h"

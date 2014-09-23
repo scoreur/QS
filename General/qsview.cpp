@@ -5,12 +5,15 @@
 #include "Wave/wavscene.h"
 #include <QPointF>
 #include <QTime>
+#include <QMimeData>
+#include "qswindow.h"
 
 QSView::QSView(QWidget *parent, int w, int h):
     QGraphicsView(parent)
 {
     resize(w,h);
     setEnabled(true);
+    setAcceptDrops(true);
     show();
     setDragMode(NoDrag);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -23,6 +26,13 @@ QSView::QSView(QWidget *parent, int w, int h):
 void QSView::wheelEvent(QWheelEvent *event){
     Q_UNUSED(event)
 
+}
+void QSView::dragEnterEvent(QDragEnterEvent *event){
+    qDebug()<<"QSView::"<<event->mimeData()->text();
+    event->acceptProposedAction();
+}
+void QSView::dropEvent(QDropEvent *event){
+    qDebug()<<"DROP"<<event->mimeData()->text();
 }
 
 WavView::WavView(QWidget *parent, int w, int h):

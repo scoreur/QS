@@ -11,7 +11,7 @@
 #include <QDebug>
 #include "wavframe.h"
 #include "wavscene.h"
-#include "qsview.h"
+#include "General/qsview.h"
 #include "Core/spectrum.h"
 #include "qspreset.h"
 

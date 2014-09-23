@@ -1,4 +1,4 @@
-#include "qswindow.h"
+#include "General/qswindow.h"
 #include <QApplication>
 #include <QLabel>
 #include <QTimer>

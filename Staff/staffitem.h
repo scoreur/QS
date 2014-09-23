@@ -7,7 +7,6 @@
 
 
 
-
 class StaffItem : public QGraphicsObject
 {
     Q_OBJECT
@@ -71,5 +70,9 @@ private:
     QPixmap markImg;
     QPointF clefPos;
 };
+
+
+void drawNoteHead(QPainter *painter, QPointF center = QPointF(0,0));
+void drawFullNote(QPainter *painter, QPointF center = QPointF(0,0));
 
 #endif // STAFFITEM_H

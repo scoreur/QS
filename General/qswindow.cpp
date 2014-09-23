@@ -13,7 +13,10 @@
 #include <QDebug>
 #include <QTimer>
 #include <QTime>
+#include <QDragEnterEvent>
+#include <QMimeData>
 #include <fstream>
+#include <thread>
 
 
 ////////////////////////////////////////////////
@@ -44,6 +47,12 @@ QSWindow::QSWindow(QWidget *parent) :
     //initialize
 
     ui->statusBar->showMessage(QString("Welcome to QtScoreur! ")+QDir::currentPath());
+    //setAutoFillBackground(false);
+
+
+    QPalette winPalette;
+    winPalette.setBrush(QPalette::Window, QBrush(QPixmap(QString(":/image/glry.jpg"), "JPG").scaled(900,600)));
+    //setPalette(winPalette);
 
     //music play
     musicInit();
@@ -51,7 +60,7 @@ QSWindow::QSWindow(QWidget *parent) :
     mediaPlayer = musicthread->player;
     musicthread->start();
 
-    preloadConnect();//holding all connections needed
+    preload();//holding all connections needed
 
     // load sample score from qrc
     QString sampleScore = QDir::homePath()+QString("/QS_tmp/thu_anthem_short");
@@ -87,7 +96,7 @@ QSWindow::QSWindow(QWidget *parent) :
     webView->setOrientation(Html5ApplicationViewer::ScreenOrientationAuto);
     webView->resize(900, 400);
     webView->showExpanded();
-    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net/js/example.html")));
+    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
 }
@@ -187,8 +196,10 @@ void QSWindow::mediaStateChanged(QMediaPlayer::State state){
 /// end of music slot
 /////////////////////////////////////////////////////////////
 
-void QSWindow::preloadConnect(){
+void QSWindow::preload(){
     //file control buttons and shortcuts
+    setAcceptDrops(true);
+    ui->tabWidget->setAcceptDrops(true);
     connect(ui->actionOpen_File, SIGNAL(triggered()), SLOT(openFile()));
     ui->actionOpen_File->setShortcut(QKeySequence::Open);
     connect(ui->actionSave_File, SIGNAL(triggered()), SLOT(saveFile()));
@@ -206,7 +217,7 @@ void QSWindow::preloadConnect(){
     connect(ui->actionScore_to_wav, SIGNAL(triggered()), SLOT(scoreToWav()));
     connect(ui->menuOpened, SIGNAL(triggered(QAction*)), SLOT(switchScene(QAction*)));
 
-
+    connect(this,SIGNAL(addFromLameSignal(QString)),this, SLOT(addFromLame(QString)), Qt::QueuedConnection);
    //music state management
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)),
             this,SLOT(positionChanged(qint64)),Qt::QueuedConnection);
@@ -216,6 +227,11 @@ void QSWindow::preloadConnect(){
             SLOT(mediaStateChanged(QMediaPlayer::State)),Qt::QueuedConnection);
     connect(positionSlider, SIGNAL(sliderReleased()), this, SLOT(setPosition()),Qt::QueuedConnection);
     connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()),Qt::QueuedConnection);
+}
+void QSWindow::paintEvent(QPaintEvent *event){
+    QPainter p(this);
+
+
 }
 
 ////////////////////////////////////
@@ -265,29 +281,7 @@ void QSWindow::openFile(){                                                      
         ui->statusBar->showMessage("open file unchosen!", 5000);                                                            ////
     else{                                                                                                                   ////
         ui->statusBar->showMessage(QString("open: %1").arg(openFileName));                                                  ////
-        if(openFileName.endsWith("wav", Qt::CaseInsensitive)){                                                              ////
-            addScene(wavView, openFileName);                                                                                ////
-            //mediaPlayer->setMedia(QUrl::fromLocalFile(openFileName));
-            playButton->setEnabled(true);
-            //mediaPlayer->moveToThread(musicThread);
-
-        }
-        else if(openFileName.endsWith("txt", Qt::CaseInsensitive))
-        {
-            addScene(scoreView, openFileName);
-        }
-        else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
-            addScene(staffView, openFileName);
-            MidiParser::test(openFileName.toStdString());
-        }else if(openFileName.endsWith("mp3", Qt::CaseInsensitive)){
-            WavFile wm;
-            if( wm.from_lame(openFileName, openFileName+QString("QS.wav")) == 0)
-                addScene(wavView, openFileName+QString("QS.wav"));
-
-        }else{
-            ui->statusBar->showMessage("can't process such file format!");
-            openFileName = "";
-        }
+        addScene();
     }
 }
 
@@ -295,7 +289,7 @@ void QSWindow::saveFile(){
     if(ui->tabWidget->currentWidget() == ui->wavTab)
         saveFileName = QFileDialog::getSaveFileName(this, "Save .wav File: ", QDir::homePath(), "*.wav *.txt");
     else if(ui->tabWidget->currentWidget() == ui->scoreTab)
-        saveFileName = QFileDialog::getSaveFileName(this, "Save .txt File: ", QDir::homePath(), "*.txt *.wav");
+        saveFileName = QFileDialog::getSaveFileName(this, "Save File: ", QDir::homePath(), "*.txt *.wav");
     else if(ui->tabWidget->currentWidget() == ui->staffTab)
         saveFileName = QFileDialog::getSaveFileName(this, "Save .mid File: ", QDir::homePath(), "*.mid");
 
@@ -350,6 +344,18 @@ void QSWindow::scoreToWav(){
     }
 }
 
+void QSWindow::dragEnterEvent(QDragEnterEvent *event){
+    openFileName = event->mimeData()->text();
+    openFileName = QUrl(openFileName).toLocalFile();
+    event->acceptProposedAction();
+
+}
+void QSWindow::dropEvent(QDropEvent *event){
+    qDebug()<<event->mimeData()->data(QString("text/plain"));
+    addScene();
+
+}
+
 ////
 /// end of file control module                                                                                              ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,7 +372,31 @@ void QSWindow::on_verticalScrollBar_valueChanged(int value)
     qDebug()<<value;
 }
 
-void QSWindow::addScene(QGraphicsView *view, QString fileName){
+void QSWindow::addScene(){
+    if(openFileName.endsWith("wav", Qt::CaseInsensitive)){                                                              ////
+        addScene(wavView, openFileName);                                                                                ////
+        //mediaPlayer->setMedia(QUrl::fromLocalFile(openFileName));
+        playButton->setEnabled(true);
+        //mediaPlayer->moveToThread(musicThread);
+
+    }
+    else if(openFileName.endsWith("txt", Qt::CaseInsensitive))
+    {
+        addScene(scoreView, openFileName);
+    }
+    else if(openFileName.endsWith("mid", Qt::CaseInsensitive)){
+        addScene(staffView, openFileName);
+        MidiParser::test(openFileName.toStdString());
+    }else if(openFileName.endsWith("mp3", Qt::CaseInsensitive)){
+        std::thread th(WavFile::from_lame0, this, openFileName , openFileName+QString("QS.wav"));
+        th.detach();
+    }else{
+        ui->statusBar->showMessage("can't process such file format!");
+        openFileName = "";
+    }
+}
+
+void QSWindow::addScene(QGraphicsView *view, const QString fileName){
     if(view->scene() != 0)
         ((QSScene *)view->scene())->Opened()->setChecked(false);
     if(view == wavView){
@@ -436,6 +466,9 @@ void QSWindow::keyInput(quint8 id, quint8 dura = 12){
         ui->scoreInput->insertPlainText(QString::number(id)+":"+QString::number(dura)+"; ");
 }
 void QSWindow::keyPressEvent(QKeyEvent *event){
+    if(ui->tabWidget->currentWidget()==ui->wavTab && event->key()==Qt::Key_Space){
+        emit playButton->clicked();
+    }
     if(keyView->isVisible())
         keyScene->keyPressEvent(event);
 
@@ -448,7 +481,7 @@ void QSWindow::keyReleaseEvent(QKeyEvent *event){
 void QSWindow::closeEvent(QCloseEvent *event){
     bool checked = false;//to check file state
 
-    if(ui->scoreInput->toPlainText().isEmpty())
+    //if(ui->scoreInput->toPlainText().isEmpty())
         checked = true;
     if( checked == true){
         //disconnect to prevent error

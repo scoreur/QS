@@ -1,7 +1,7 @@
 #ifndef SCORESCENE_H
 #define SCORESCENE_H
 
-#include "qsscene.h"
+#include "General/qsscene.h"
 #include "qspreset.h"
 #include "decorator.h"
 #include <QVector>

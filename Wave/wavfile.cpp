@@ -4,6 +4,8 @@
 #include <fstream>
 #include <QDir>
 #include <exception>
+#include "General/qswindow.h"
+#include "ui_qswindow.h"
 
 qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
                            0.04,0.03,0.02,0.01,0};
@@ -376,6 +378,14 @@ int WavFile::from_lame(const QString &in, const QString &out){
        wavIn.close();
        wavOut.close();
        return 0;
+
+}
+void WavFile::from_lame0(QSWindow *win, const QString &in, const QString &out){
+    WavFile wm;
+    if( wm.from_lame(in, out) == 0)
+        emit win->addFromLameSignal(out);
+    else
+        qDebug()<<"failed to convert mp3";
 
 }
 

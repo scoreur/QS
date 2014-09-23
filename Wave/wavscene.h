@@ -1,7 +1,7 @@
 #ifndef WAVSCENE_H
 #define WAVSCENE_H
 
-#include "qsscene.h"
+#include "General/qsscene.h"
 #include "wavframe.h"
 #include <QGraphicsRectItem>
 #include <QPicture>

@@ -1,4 +1,4 @@
-#-------------------------------------------------
+-------------------------------------------------
 #
 # Project created by QtCreator 2014-08-02T20:43:25
 #
@@ -17,40 +17,40 @@ CONFIG += c++11 \
         ordered
 
 SOURCES += main.cpp\
-        qswindow.cpp \
+    General/qswindow.cpp \
+    General/qsview.cpp \
+    General/qsscene.cpp \
     pianokey.cpp \
-    Score/scoreitem.cpp \
-    Score/scorescene.cpp \
-    qsscene.cpp \
     qspreset.cpp \
+    qsplayer.cpp \
     Wave/wavscene.cpp \
     Wave/wavframe.cpp \
+    Score/scoreitem.cpp \
+    Score/scorescene.cpp \
     Staff/staffscene.cpp \
-    qsview.cpp \
-    qsplayer.cpp \
     Staff/staffitem.cpp \
     Core/spectrum.cpp \
     midiparser.cpp \
     Wave/wavfile.cpp
 
-HEADERS  += qswindow.h \
-    pianokey.h \
-    Score/scoreitem.h \
-    Score/scorescene.h \
-    qsscene.h \
+HEADERS  += General/qswindow.h \
+    General/qsview.h \
+    General/qsscene.h \
     qspreset.h \
+    pianokey.h \
+    qsplayer.h \
     Wave/wavscene.h \
     Wave/wavframe.h \
-    Staff/staffscene.h \
-    qsview.h \
-    qsplayer.h \
+    Wave/lame.h \
+    Wave/wavfile.h\
+    Score/scoreitem.h \
+    Score/scorescene.h \
+    Staff/staffscene.h \ 
     Staff/staffitem.h \
     Core/spectrum.h \
     midiparser.h \
     decorator.h \
-    MIDIFile.hpp \
-    Wave/lame.h \
-    Wave/wavfile.h
+    MIDIFile.hpp
 
 INCLUDEPATH += $$PWD
 

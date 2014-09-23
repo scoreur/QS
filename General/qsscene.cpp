@@ -6,9 +6,10 @@
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QDebug>
+#include <QMimeData>
 #include "Wave/wavframe.h"
 #include "qswindow.h"
-
+#include <QGraphicsSceneDragDropEvent>
 
 /// @brief constructor of the keyboard
 KeyScene::KeyScene(QGraphicsView *view, QWidget *parent)
@@ -138,13 +139,22 @@ QSScene::QSScene(QGraphicsView *view, const QString &fileName):
         view->setRenderHint(QPainter::Antialiasing);
         act->setCheckable(true);
 
+
 }
+
 QSScene::~QSScene(){
     delete act;
 }
 void QSScene::setName(QString fileName){
     name = fileName;
     act->setText(QString("QS~%1").arg(fileName.right(16)));
+}
+void QSScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event){
+    qDebug()<<"QSScene:: "<<event->mimeData()->text();
+    event->acceptProposedAction();
+}
+void QSScene::dropEvent(QGraphicsSceneDragDropEvent *event){
+    event->ignore();
 }
 
 

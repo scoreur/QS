@@ -17,7 +17,7 @@ StaffScene::StaffScene(QGraphicsView *view, QString fileName)
     new KeySignature(staffLine, 1, -5);
     qreal startX = 100, startY = 10, intv = QSPreset::staffLineInterval;
     for(quint16 i=0;i<10;++i)
-        (new StaffItem(staffLine, 24-(i*12)%24))->setPos(startX+intv*2*i, startY + i*intv/2.0);
+        (new StaffItem(staffLine, 48-(i*12)%48))->setPos(startX+intv*2*i, startY + i*intv/2.0);
     //quint8 test_notes[8] = {39,41,43,44,46,48,50,51};
 
 

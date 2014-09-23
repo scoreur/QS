@@ -12,10 +12,11 @@
 #include <QEvent>
 #include <QTextEdit>
 #include <QLabel>
+#include <QPaintEvent>
 
 #include "qsplayer.h"
 
-const QString domainName = "www.scoreur.cn";
+const QString domainName = "scoreur.net";
 const QString appName = "QtScoreur";
 class WavFile;
 
@@ -32,7 +33,9 @@ public:
     ~QSWindow();
     
     friend class QSPreset;
-
+    friend class WavFile;
+signals:
+    Q_INVOKABLE void addFromLameSignal(const QString &fileName);
 public slots:
     void openFile();
     void saveFile();
@@ -51,11 +54,20 @@ public slots:
     void durationChanged(qint64 duration);
     void mediaStateChanged(QMediaPlayer::State state);
     void setPosition();
+    void addFromLame(const QString &fileName){
+        addScene(wavView, fileName);
+    }
 
 protected slots:
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
+
+
+protected:
+    void paintEvent(QPaintEvent *event);
 
 
 private:
@@ -72,12 +84,13 @@ private:
     QSlider *positionSlider;
     QSPlayer *musicthread;
     QSPreset *preset;
-    void preloadConnect();
+    void preload();
 
 
 private slots:
     void on_verticalScrollBar_valueChanged(int value);
-    void addScene(QGraphicsView *view, QString fileName = "");
+    void addScene();
+    void addScene(QGraphicsView *view, const QString fileName = "");
     void addScene(QGraphicsView *view, const WavFile &_wavFile, const QString &fileName);
     void switchScene(QAction*);
     void displayKeyBoard();

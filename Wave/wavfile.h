@@ -3,6 +3,7 @@
 #include <string>
 #include <QDebug>;
 
+class QSWindow;
 const quint8 default_wavHeader[44] = {
     82, 73, 70, 70,      // 'RIFF'
     255, 255, 255, 255,  // dataSize+36
@@ -136,6 +137,7 @@ public:
     static bool keysoundGen(const QString &filePath, qreal secs);
     static void test();
     int from_lame(const QString &in, const QString &out);
+    static void from_lame0(QSWindow *win, const QString &in, const QString &out);
 };
 
 #endif // WAVFILE_H

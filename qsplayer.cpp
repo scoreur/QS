@@ -6,12 +6,13 @@
 QSPlayer::QSPlayer(QString fileName, QWidget *parent) :
     QThread(parent),
     player(new QMediaPlayer(this,QMediaPlayer::StreamPlayback)),
-    audioOut(0), file(0)
+    audioOut(0), file(0), lrc(new QSLrcLine)
 
 
 {
     player->setMedia(QUrl::fromLocalFile(fileName));
     player->setNotifyInterval(200);
+    //lrc->show();
 
 
 
@@ -19,7 +20,7 @@ QSPlayer::QSPlayer(QString fileName, QWidget *parent) :
 QSPlayer::~QSPlayer(){
         player->setMedia(QUrl());//discard the media
         qDebug()<<"discard media to prevent error";
-        delete file;
+        delete file; delete lrc;
 }
 
 void QSPlayer::run(){
@@ -47,3 +48,16 @@ void QSPlayer::playerConnect(QSWindow *win){
 
 
 }*/
+
+QPoint QSLrcLine::mousePos = QPoint();
+QColor QSLrcLine::activeColor = QColor(200,200,200,100);
+QColor QSLrcLine::defaultColor = QColor(250,250,250,110);
+void QSLrcLine::enterEvent(QEvent *event){
+    lrcPalette.setColor(QPalette::Background,activeColor);
+    setPalette(lrcPalette);
+
+}
+void QSLrcLine::leaveEvent(QEvent *event){
+    lrcPalette.setColor(QPalette::Background,defaultColor);
+    setPalette(lrcPalette);
+}

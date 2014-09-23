@@ -25,6 +25,7 @@ protected:
     void drawForeground(QPainter *painter, const QRectF &rect);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
 private:
     QGraphicsItem *board;
     QTime keyTime;
@@ -45,6 +46,8 @@ public:
     void setName(QString fileName);
     virtual quint32 load(QString fileName) = 0;
     virtual quint32 store(QString fileName) = 0;
+    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+    void dropEvent(QGraphicsSceneDragDropEvent *event);
 
 
 

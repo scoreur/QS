@@ -14,6 +14,8 @@ public:
 
 protected:
     virtual void wheelEvent(QWheelEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 };
 
 
@@ -29,6 +31,7 @@ signals:
 protected:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+
 };
 
 class ScoreView : public QSView{
