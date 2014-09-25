@@ -4,7 +4,7 @@
 #include <QGraphicsScene>
 #include <QDir>
 #include <QTimer>
-#include "qsscene.h"
+#include "General/qsscene.h"
 
 
 

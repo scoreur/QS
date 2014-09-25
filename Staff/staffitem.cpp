@@ -1,6 +1,6 @@
 #include "staffitem.h"
 #include "qspreset.h"
-#include "qsscene.h"
+#include "General/qsscene.h"
 #include <QDir>
 #include <QDebug>
 ////////////////////

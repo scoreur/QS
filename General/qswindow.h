@@ -13,7 +13,7 @@
 #include <QTextEdit>
 #include <QLabel>
 #include <QPaintEvent>
-
+#include "qsrecorder.h"
 #include "qsplayer.h"
 
 const QString domainName = "scoreur.net";
@@ -83,6 +83,7 @@ private:
     QLabel *playTime;
     QSlider *positionSlider;
     QSPlayer *musicthread;
+    QSRecorder *recorder;
     QSPreset *preset;
     void preload();
 
@@ -96,6 +97,7 @@ private slots:
     void displayKeyBoard();
     void displaySpectrum();
     void scoreToWav();
+    void record();
 
 
     void changePreset();

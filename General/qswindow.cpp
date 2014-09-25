@@ -19,6 +19,7 @@
 #include <thread>
 
 
+
 ////////////////////////////////////////////////
 /// @brief constructor of QS mainwindow
 ///
@@ -34,6 +35,7 @@ QSWindow::QSWindow(QWidget *parent) :
     tempFileName(""),
     mediaPlayer(0),
     musicthread(0),
+    recorder(new QSRecorder(this)),
     preset(QSPreset::getInstance(this))
 {
     //qDebug()<<QSettings(domainName, appName).scope();
@@ -99,6 +101,8 @@ QSWindow::QSWindow(QWidget *parent) :
     //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
+
+
 }
 QSWindow::~QSWindow()
 {
@@ -140,6 +144,10 @@ void QSWindow::musicInit(){
     mouseTime->move(wavView->width()-360, wavView->height()+25);
     mouseTime->resize(100, 20);
     mouseTime->setText("00:00.000");
+
+    recorder->recordButton->setParent(ui->wavTab);
+    recorder->recordButton->move(100, wavView->height()+100);
+    recorder->recordButton->setEnabled(true);
 
 
 }
@@ -193,6 +201,19 @@ void QSWindow::mediaStateChanged(QMediaPlayer::State state){
         ((WavScene*)wavView->scene())->isMoving = true;
     }
 }
+
+void QSWindow::record(){
+    if(recorder->recordButton->text() == "Record"){
+        saveFile();
+        qDebug()<<"start record";
+        recorder->recordButton->setText("Pause");
+        recorder->record(saveFileName, 5000);
+
+    }else{
+        recorder->recordButton->setText("Record");
+    }
+}
+
 /// end of music slot
 /////////////////////////////////////////////////////////////
 
@@ -227,6 +248,8 @@ void QSWindow::preload(){
             SLOT(mediaStateChanged(QMediaPlayer::State)),Qt::QueuedConnection);
     connect(positionSlider, SIGNAL(sliderReleased()), this, SLOT(setPosition()),Qt::QueuedConnection);
     connect(playButton, SIGNAL(clicked()), this, SLOT(musicPlay()),Qt::QueuedConnection);
+
+    connect(recorder->recordButton, SIGNAL(clicked()), this, SLOT(record()));
 }
 void QSWindow::paintEvent(QPaintEvent *event){
     QPainter p(this);
