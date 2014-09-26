@@ -32,7 +32,11 @@ SOURCES += main.cpp\
     Core/spectrum.cpp \
     midiparser.cpp \
     Wave/wavfile.cpp \
-    qsrecorder.cpp
+    qsrecorder.cpp \
+    Wave/spectrumgraph.cpp \
+    Core/pywrap.cpp \
+    Core/svm.cpp \
+    Core/detector.cpp
 
 HEADERS  += General/qswindow.h \
     General/qsview.h \
@@ -52,9 +56,17 @@ HEADERS  += General/qswindow.h \
     midiparser.h \
     decorator.h \
     MIDIFile.hpp \
-    qsrecorder.h
+    qsrecorder.h \
+    Wave/spectrumgraph.h \
+    Core/pywrap.h \
+    Core/Python.h \
+    Core/svm.h \
+    Core/detector.h
 
 INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD/Core/python2.7
+
+LIBS += -L$$PWD/Core/mac/ -lpython
 
 DEFINES += TOUCH_OPTIMIZED_NAVIGATION
 # Please do not modify the following two lines. Required for deployment.

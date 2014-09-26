@@ -90,21 +90,23 @@ void Spectrum::build(qint16 *data, quint32 num, quint8 mode, quint8 step, quint3
 
         break;
     default:
-    {
+        try{
         vallen *= (2*mode+1);
         val.assign(vallen, cmplx(0));
         qreal start = PianoFreqGen(-mode/qreal(2*mode+1)), mult = ::pow(2.0, 1.0/12/(2*mode+1));
+        qDebug()<<"build spectrum";
         for(quint32 i=0;i<vallen;++i){
             val[i] = STFT1P(data, num, start, false, step);
             start*=mult;
         }
 
+    }catch(...){
+            qDebug()<<"exception caught";
+        }
+        qDebug()<<"build finish";
+
+        break;
     }
-         break;
-
-    }
-
-
 }
 
 

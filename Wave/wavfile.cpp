@@ -7,9 +7,40 @@
 #include "General/qswindow.h"
 #include "ui_qswindow.h"
 
-qreal overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
+//static members
+qint16 WavFile::maxAmp = 1<<15;
+
+qreal WavFile::overtone_decr[16] = {0,1, 0.5, 0.3, 0.2, 0.2, 0.1, 0.1, 0.08, 0.06,0.05,
                            0.04,0.03,0.02,0.01,0};
 
+char WavFile::chords[][4] = { "43" // major
+                          ,"34" // minor
+                          ,"33" // dim
+                          ,"44" // aug
+                          ,"434"// major7
+                          ,"433"// (dom)7
+                          ,"343"// minor7
+                           //inversion
+                          ,"35","54"
+                          ,"45","53"
+                          ,"341","414","143"
+                          ,"332","324","243"
+                          ,"432","323","234"
+};
+
+quint8 WavFile::default_wavHeader[44] = {
+    82, 73, 70, 70,      // 'RIFF'
+    255, 255, 255, 255,  // dataSize+36
+    87, 65, 86, 69,      // 'WAVE'
+    102, 109, 116, 32,   // 'fmt '
+    16, 0, 0, 0,         // wavSize:16||18
+    1, 0, 1, 0,          // pcm:1, nchannels
+    68, 172, 0, 0,       // sampleps:44100=68+172*256
+    16, 177, 2, 0,       // Bps(BytesPerSecond)=sampleps*blockAlign
+    2, 0, 16, 0,         // BlockAlign, bpsample
+    100, 97, 116, 97,    // Bpsample
+    255, 255, 255, 255   // dataSize
+};
 std::vector<qreal> chordGen(quint8 a, quint8 b, quint8 c=0){
     std::vector<qreal> tmp;
     tmp.push_back(::pow(2.0,a/12.0));
@@ -30,7 +61,7 @@ std::vector<qreal> WavFile::chordGen(const char *d){
     return tmp;
 }
 const qreal thres1 = 0.1, thres2=0.2, qk = 0.5/(1-thres2-thres1), qdis=(1.5+qk*thres1);
-qreal envelope_flute(qreal d){
+qreal WavFile::envelope_flute(qreal d){
     d = d-(qint16)d;
     if(d<thres1){
         qreal t= d/thres1;

@@ -42,7 +42,7 @@ void QSRecorder::init(){
 void QSRecorder::record(QString fileName, quint32 milisecs){
     recFile = new QFile(fileName);   // Class member
     recFile->open( QIODevice::WriteOnly | QIODevice::Truncate );
-    recFile->write((char*)default_wavHeader, 44);
+    recFile->write((char*)WavFile::default_wavHeader, 44);
 
         if (!audioInputDevice.isFormatSupported(format)) {
             qDebug() << "Default format not supported, trying to use the nearest.";

@@ -2,6 +2,7 @@
 #include "ui_qswindow.h"
 #include "qsview.h"
 #include "Wave/wavscene.h"
+#include "Wave/spectrumgraph.h"
 #include "Score/scorescene.h"
 #include "Staff/staffscene.h"
 #include "midiparser.h"
@@ -17,6 +18,8 @@
 #include <QMimeData>
 #include <fstream>
 #include <thread>
+#include "Core/pywrap.h"
+#include "Core/detector.h"
 
 
 
@@ -101,8 +104,15 @@ QSWindow::QSWindow(QWidget *parent) :
     //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
-
-
+    Pywrap pr;
+    char **params = new char*[4];
+    params[0] = "fCQT";
+    params[1] = "piano.wav";
+    params[2] = "model.dat";
+    params[3] = "pyQt.txt";
+    //pr.load(params);
+    qDebug()<<"test detector";
+    Detector::test();
 }
 QSWindow::~QSWindow()
 {

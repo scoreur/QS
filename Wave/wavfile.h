@@ -4,33 +4,8 @@
 #include <QDebug>;
 
 class QSWindow;
-const quint8 default_wavHeader[44] = {
-    82, 73, 70, 70,      // 'RIFF'
-    255, 255, 255, 255,  // dataSize+36
-    87, 65, 86, 69,      // 'WAVE'
-    102, 109, 116, 32,   // 'fmt '
-    16, 0, 0, 0,         // wavSize:16||18
-    1, 0, 1, 0,          // pcm:1, nchannels
-    68, 172, 0, 0,       // sampleps:44100=68+172*256
-    16, 177, 2, 0,       // Bps(BytesPerSecond)=sampleps*blockAlign
-    2, 0, 16, 0,         // BlockAlign, bpsample
-    100, 97, 116, 97,    // Bpsample
-    255, 255, 255, 255   // dataSize
-};
-const char chords[][4] = { "43" // major
-                          ,"34" // minor
-                          ,"33" // dim
-                          ,"44" // aug
-                          ,"434"// major7
-                          ,"433"// (dom)7
-                          ,"343"// minor7
-                           //inversion
-                          ,"35","54"
-                          ,"45","53"
-                          ,"341","414","143"
-                          ,"332","324","243"
-                          ,"432","323","234"
-};
+
+
 
 class WavFile{
 public:
@@ -138,6 +113,12 @@ public:
     static void test();
     int from_lame(const QString &in, const QString &out);
     static void from_lame0(QSWindow *win, const QString &in, const QString &out);
+
+    static qint16 maxAmp;
+    static qreal overtone_decr[16];
+    static qreal envelope_flute(qreal d);
+    static quint8 default_wavHeader[44];
+    static char chords[][4];
 };
 
 #endif // WAVFILE_H

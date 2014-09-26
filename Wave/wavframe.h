@@ -33,6 +33,8 @@ public:
     void constructPic();
     void fresh(qint16 _data[], quint32 num, quint8 step=1);
     static quint16 framesize;
+    static bool useInterpolation3P;
+
 signals:
 
 public slots:

@@ -8,5 +8,6 @@
 *.mp3
 *.mid
 
+Core/python2.7/*.h
 
 
