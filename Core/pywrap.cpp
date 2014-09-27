@@ -10,7 +10,7 @@ Pywrap::Pywrap()
         qDebug()<<"init python failed";
         return;
     }
-    PyRun_SimpleString("import sys");
+
 
 
 
@@ -19,10 +19,23 @@ Pywrap::Pywrap()
 
 
 }
-void Pywrap::load(char **&argv){
-    PyRun_SimpleString("sys.path.append('/Users/user/Documents/compile/Eigen/wrap/')");
+
+void printDict(PyObject* obj) {
+    if (!PyDict_Check(obj))
+        return;
+    PyObject *k, *keys;
+    keys = PyDict_Keys(obj);
+    for (int i = 0; i < PyList_GET_SIZE(keys); i++) {
+        k = PyList_GET_ITEM(keys, i);
+        char* c_name = PyString_AsString(k);
+        printf("%s/n", c_name);
+    }
+}
+void Pywrap::load(char **&argv){//under testing, do not use
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append('/Users/user/Documents/compile/Qt5/QS/Core/py/')");
         PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;
-        pName = PyString_FromString("api");
+        pName = PyString_FromString("onset");
         pModule = PyImport_Import(pName);
         if ( !pModule )
         {
@@ -35,18 +48,20 @@ void Pywrap::load(char **&argv){
         {
             return;
         }
-        pFunc = PyDict_GetItemString(pDict, "fCQT");
+        printDict(pDict);
+        pFunc = PyDict_GetItemString(pDict, "onset_svm");
         if ( !pFunc || !PyCallable_Check(pFunc) )
         {
             qDebug()<<"can't find function";
             return;
         }
-        pArgs = PyTuple_New(5);
-        PyTuple_SetItem(pArgs, 0, Py_BuildValue("s",argv[1]));
-        PyTuple_SetItem(pArgs, 1, Py_BuildValue("s",argv[2]));
-        PyTuple_SetItem(pArgs, 2, Py_BuildValue("s",argv[3]));
-        PyTuple_SetItem(pArgs, 3, Py_BuildValue("i", 0));
-        PyTuple_SetItem(pArgs, 4, Py_BuildValue("i", 1));
+        pArgs = PyTuple_New(4);
+        PyTuple_SetItem(pArgs, 0, Py_BuildValue("s","/Users/user/Documents/compile/Qt5/QS/Core/py/piano.wav"));
+        PyTuple_SetItem(pArgs, 1, Py_BuildValue("s","/Users/user/Documents/compile/Qt5/QS/Core/py/testpy2.txt"));
+        PyTuple_SetItem(pArgs, 2, Py_BuildValue("i",0));
+        PyTuple_SetItem(pArgs, 3, Py_BuildValue("i", 1));
+        qDebug()<<"pass params success";
+
 
 
         PyObject_CallObject(pFunc, pArgs);

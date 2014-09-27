@@ -192,6 +192,26 @@ std::vector<cmplx> Spectrum::FFT(const cmplx data[], quint32 num, bool mode){//t
             out[k] /= (qreal)num;//normalize
     return out;
 }
+double Hanning(int i,int num)
+{
+    return 0.5*(1-::cos(2*M_PI*i/(num-1)));
+}
+std::vector<qreal> Spectrum::realFFT(qreal data[], quint32 num, quint8 step, bool useHanning){
+    std::vector<cmplx> mdata;
+    mdata.reserve(num);
+    for(quint32 i=0;i<num;++i){
+        mdata.push_back(cmplx(data[i*step]*Hanning(i, num)));
+    }
+    std::vector<cmplx> tmp1 = FFT(mdata.data(), num, true);
+    num = tmp1.size();
+    std::vector<qreal> tmp2;
+    tmp2.reserve(num);
+    for(std::vector<cmplx>::iterator iter = tmp1.begin();iter != tmp1.end();++iter){
+        tmp2.push_back(std::abs(*iter));
+    }
+
+    return tmp2;
+}
 
 std::vector<cmplx> Spectrum::CQT(const qreal data[], quint32 num, bool mode){
     qreal fmin= FreqPiano[0], fmax= FreqPiano[87];

@@ -58,6 +58,11 @@ public slots:
         addScene(wavView, fileName);
     }
 
+    quint32 onsetDetect(const WavFile &wavFile, const QString &fileName);
+    quint32 onsetDetect(const WavFile &wavFile, QVector<quint8>&pitch, QVector<qreal>&onset);
+
+
+
 protected slots:
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);
@@ -97,6 +102,7 @@ private slots:
     void displayKeyBoard();
     void displaySpectrum();
     void scoreToWav();
+    void wavToScore();
     void record();
 
 

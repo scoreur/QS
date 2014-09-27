@@ -9,5 +9,8 @@
 *.mid
 
 Core/python2.7/*.h
+Core/py/*.txt
+*.pyc
+
 
 

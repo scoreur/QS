@@ -46,10 +46,11 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-private:
 
+public:
     quint32 len;
     WavFile *wavFile;
+private:
     QGraphicsItem *channel[2];
     qreal selectPos0;
     QGraphicsRectItem *grabber;

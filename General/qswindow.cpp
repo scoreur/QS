@@ -104,23 +104,68 @@ QSWindow::QSWindow(QWidget *parent) :
     //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
-    Pywrap pr;
-    char **params = new char*[4];
-    params[0] = "fCQT";
-    params[1] = "piano.wav";
-    params[2] = "model.dat";
-    params[3] = "pyQt.txt";
-    //pr.load(params);
-    qDebug()<<"test detector";
-    Detector::test();
+
+
 }
 QSWindow::~QSWindow()
 {
     //delete mediaPlayer;
     delete ui;
 }
-////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////
+/// wavToScore Module --> IMPORTANT
+///
+///
+void QSWindow::wavToScore(){
+
+    qDebug()<<"wavToScore";
+
+    std::string inf("/Users/user/Documents/piano1.wav"), outf("/Users/user/Documents/piano1.txt");
+    //Detector::compute_f(inf.c_str(), outf.c_str(), 0);
+    qDebug()<<"onset detect";
+
+    if(wavView->scene() == 0)  return;
+
+    std::vector<quint8> pitch;//test
+    std::vector<quint16> dura;
+    Detector::compute_onset(*((WavScene*)wavView->scene())->wavFile, pitch, dura);
+    //std::thread th(&Detector::compute_onset, *((WavScene*)wavView->scene())->wavFile, pitchs, duras);
+    //th.detach();
+    //onsetDetect(*((WavScene*)wavView->scene())->wavFile, QString("./output.txt"));
+    //Detector::test();
+}
+quint32 QSWindow::onsetDetect(const WavFile &wavFile, const QString &fileName){
+    QFile od (fileName);
+    od.open(QFile::WriteOnly);
+    QVector<quint8>pitch;
+    QVector<qreal>onset;
+    quint32 len = onsetDetect(wavFile, pitch, onset);
+    quint8 step = wavFile.nChannels();
+    quint32 winsize = 6000;
+    quint32 winnum = wavFile.length/step/winsize;
+
+    for(quint32 i=0;i<winnum;++i){
+        //Spectrum spect(wavFile.data+i*winsize, winsize, 3, step);
+
+    }
+
+
+    QDataStream dt(&od);
+
+    //TODO: write file:
+    for(quint32 i=0;i<len;++i){
+        dt<<pitch.at(i)<<onset.at(i)<<'\n';
+    }
+    od.close();
+    return len;
+
+}
+quint32 QSWindow::onsetDetect(const WavFile &wavFile, QVector<quint8>&pitch, QVector<qreal>&onset){
+
+    return 0;
+}
 
 
 
@@ -246,6 +291,7 @@ void QSWindow::preload(){
     ui->actionDisplay_Keyboard->setShortcut(QKeySequence("ctrl+K"));
     connect(ui->actionDisplay_specturm,SIGNAL(triggered()), SLOT(displaySpectrum()));
     connect(ui->actionScore_to_wav, SIGNAL(triggered()), SLOT(scoreToWav()));
+    connect(ui->actionWav_to_score, SIGNAL(triggered()), SLOT(wavToScore()));
     connect(ui->menuOpened, SIGNAL(triggered(QAction*)), SLOT(switchScene(QAction*)));
 
     connect(this,SIGNAL(addFromLameSignal(QString)),this, SLOT(addFromLame(QString)), Qt::QueuedConnection);

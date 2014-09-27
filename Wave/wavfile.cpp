@@ -270,17 +270,19 @@ bool WavFile::load(const char *fileName){
         if(length<100000000000)
             in.read((char*)data, length*2);
         else{
+            qDebug()<<"devide and read";
             in.read((char *)data, length/4);
             for(int i=1;i<7;++i){
                 in.seekg(length/4*i+44, std::ios::beg);
                 in.read((char *)(data+length/8*i), length/4);
             }
+            in.seekg(0, std::ios::end);
+            qDebug()<<"eof: "<<(int)in.tellg()-44;
         }
-        qDebug()<<"first";
+
         //in.read((char *)(data+length/2), length/2);
 
-        in.seekg(0, std::ios::end);
-        qDebug()<<"eof: "<<(int)in.tellg()-44;
+
 
     }catch(std::exception &ex){
         qDebug()<<ex.what();
