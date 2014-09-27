@@ -196,6 +196,9 @@ double Hanning(int i,int num)
 {
     return 0.5*(1-::cos(2*M_PI*i/(num-1)));
 }
+double hamming(int i, int num) {
+    return 0.46 - 0.54 * ::cos(2 * M_PI * i / num);
+}
 std::vector<qreal> Spectrum::realFFT(qreal data[], quint32 num, quint8 step, bool useHanning){
     std::vector<cmplx> mdata;
     mdata.reserve(num);
@@ -213,14 +216,43 @@ std::vector<qreal> Spectrum::realFFT(qreal data[], quint32 num, quint8 step, boo
     return tmp2;
 }
 
-std::vector<cmplx> Spectrum::CQT(const qreal data[], quint32 num, bool mode){
-    qreal fmin= FreqPiano[0], fmax= FreqPiano[87];
+std::vector<cmplx> Spectrum::CQT(qreal data[], quint32 num, quint8 step){
+    qreal fmin= FreqPiano[3], fmax= FreqPiano[86];
 
-    const quint32 nbins = 88*15;
-    const quint8 q = 4;
-    std::vector<cmplx> out(nbins,cmplx(0));
+    const quint16 b_hop = 7;
+    const quint32 nbins = b_hop*12;
+    const quint16 sampleps = 44100;
 
-    return out;
+    if(step == 2){
+        qreal *mdata = new qreal[num];
+        for(int i=0;i<num;++i)
+            mdata[i] = data[i*2];
+        return CQT(fmin, fmax, nbins, sampleps, mdata, num);
+    }else
+        return CQT(fmin, fmax, nbins, sampleps, data, num);
+
+
+}
+
+std::vector<cmplx> Spectrum::CQT(qreal fmin, qreal fmax, quint32 nbins, quint16 sampleps, qreal data[], quint32 num){
+
+    std::vector<cmplx> cq;
+    quint32 len = ceil(nbins * log2(fmax / fmin));
+    cq.reserve(len);
+    qreal Q = 1.0 / (::pow(2.0, 1.0/ nbins) - 1);
+
+    for (int k = 0; k < len; ++k) {
+        quint32 n = ceil(Q * sampleps / (fmin * ::pow(2.0, k / (qreal)nbins)));
+        cmplx cur(0.0);
+        cmplx w = exp2iPI(-Q / n);
+        qint32 nbound = n<num? n: num;
+
+        for (qint32 i = nbound-1; i >=0 ; --i)//&&
+            cur = cur*w+data[i] * hamming(i, n);
+        cq.push_back(cur / (1.0 * n));
+    }
+    return cq;
+
 }
 
 const quint32 testsize = 64;

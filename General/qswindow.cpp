@@ -130,10 +130,10 @@ void QSWindow::wavToScore(){
 
     std::vector<quint8> pitch;//test
     std::vector<quint16> dura;
-    Detector::compute_onset(*((WavScene*)wavView->scene())->wavFile, pitch, dura);
-    //std::thread th(&Detector::compute_onset, *((WavScene*)wavView->scene())->wavFile, pitchs, duras);
-    //th.detach();
-    //onsetDetect(*((WavScene*)wavView->scene())->wavFile, QString("./output.txt"));
+    //Detector::compute_onset(*((WavScene*)wavView->scene())->wavFile, pitch, dura);
+    std::thread th(&Detector::computeOnset, *(((WavScene*)wavView->scene())->wavFile));
+    th.detach();
+
     //Detector::test();
 }
 quint32 QSWindow::onsetDetect(const WavFile &wavFile, const QString &fileName){

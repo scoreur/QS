@@ -21,6 +21,7 @@ public:
 
 
     static void predict(FILE *input, FILE *output);
+    static void loadNodeFromFile(FILE *input);
     static char * readline(FILE *input);
     static void exit_input_error(int line_num);
     static void test();
@@ -29,12 +30,15 @@ public:
     //onset part
     static void maxNormalize(std::vector<double> &data);
     static void preprocess(std::vector<double> &data);
+    static std::vector<qreal> preprocess(const WavFile &wavin, quint32 len);
     static double Hanning(int i,int N);
     static double winsecs;
-    static std::vector<double> compute_f(const char *inputFileName, int len);
-    static std::vector<double> compute_f(const WavFile &wavin, int len);
+    static std::vector<qreal> compute_f(const char *inputFileName, int len);
+    static std::vector<qreal> compute_f(const WavFile &wavin, int len);
+    static std::vector<qreal> compute_f(std::vector<qreal>&signal, int h);
     static void compute_f(const char *inputFileName, const char *outputFileName, int len);
     static void compute_onset(const WavFile &wavin, std::vector<quint8>&pitch, std::vector<quint16>&dura);
+    static void computeOnset(const WavFile &wavin);
     static qreal quantize(std::vector<quint32>data);
 
 

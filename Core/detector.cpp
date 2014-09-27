@@ -43,13 +43,7 @@ void Detector::preprocess(vector<qreal> &data){
     }
     maxNormalize(data);
 }
-
-double Detector::Hanning(int i,int num)
-{
-    return 0.5*(1-::cos(2*M_PI*i/(num-1)));
-}
-std::vector<qreal> Detector::compute_f(const WavFile &wavin, int len){
-
+vector<qreal> Detector::preprocess(const WavFile& wavin, quint32 len){
     quint16 step = wavin.nChannels();
     if(len<100) len = wavin.length/step;
     vector<qreal> signal;
@@ -60,35 +54,41 @@ std::vector<qreal> Detector::compute_f(const WavFile &wavin, int len){
     //only process left channel
     preprocess(signal);
 
+    return signal;
+}
 
-    int h = ::pow(2,::ceil(::log(wavin.sampleps()*winsecs)/::log(2))); //hopsize
+double Detector::Hanning(int i,int num)
+{
+    return 0.5*(1-::cos(2*M_PI*i/(num-1)));
+}
+std::vector<qreal> Detector::compute_f(vector<qreal>&signal, int h){
     int N = 2*h; //window size
-
+    int len = signal.size();
     int M = int(len/h+0.5) -1;// window number, rounded by 0.5  WYJ
 
+    std::vector<qreal> f;
+    f.assign(M, 0.0);
+    for (int m=0;m<M;m++)
+    {
 
-/*
-        vector<qreal> wnd;
-        wnd.reserve(N);
-        for (int i=0;i<N;i++)
-            wnd.push_back(Hanning(i,N));
-*/
+        vector<qreal> out = Spectrum::realFFT(signal.data()+m*h, N);
+        qreal *iter = f.data()+m;
+        for (int i=int(f.size()/2);i>=0;i--)//size N -> f.size()
+            (*iter) += out.at(i);
+        //TODO: add more advanced discrimination
+        //qDebug()<<m<<'\t'<<*iter<<'\n';
+    }
+    maxNormalize(f);
+    return f;
+}
 
-        qDebug()<<"Processing f...";
-        std::vector<qreal> f;
-        f.assign(M, 0.0);
-        for (int m=0;m<M;m++)
-        {
+std::vector<qreal> Detector::compute_f(const WavFile &wavin, int len){ 
 
-            vector<qreal> out = Spectrum::realFFT(signal.data()+m*h, N);
-            qreal *iter = f.data()+m;
-            for (int i=int(f.size()/2);i>=0;i--)//size N -> f.size()
-                (*iter) += out.at(i);
-            //TODO: add more advanced discrimination
-            //qDebug()<<m<<'\t'<<*iter<<'\n';
-        }
-        maxNormalize(f);
-        return f;
+    vector<qreal> signal = preprocess(wavin, len);
+    int h = ::pow(2,::ceil(::log(wavin.sampleps()*winsecs)/::log(2))); //hopsize
+    return compute_f(signal, h);
+
+
 }
 
 vector<double> Detector::compute_f(const char *inputFileName, int len){
@@ -108,6 +108,10 @@ void Detector::compute_f(const char *inputFileName, const char *outputFileName, 
     }
 
 
+}
+
+qreal abs(const cmplx &c){
+    return ::sqrt(c.real()*c.real()+c.imag()*c.imag());
 }
 
 qreal quantizeQuality(vector<qreal> data, qreal beat){
@@ -150,7 +154,9 @@ qreal Detector::quantize(std::vector<quint32> data){//order reversed
 
 void Detector::compute_onset(const WavFile &wavin, std::vector<quint8> &pitch, std::vector<quint16> &dura){
     vector<quint32> onset;
-    vector<qreal> f = compute_f(wavin,0);
+    vector<qreal>signal = preprocess(wavin, 0);
+    int h = ::pow(2,::ceil(::log(wavin.sampleps()*winsecs)/::log(2))); //hopsize
+    vector<qreal> f = compute_f(signal,h);
     qreal *iter = f.data()+f.size()-1;
     for(quint32 m = f.size()-1;m>0;--m, --iter){
         if(*iter >-1e-6 && *iter<1e-6)
@@ -160,7 +166,8 @@ void Detector::compute_onset(const WavFile &wavin, std::vector<quint8> &pitch, s
         }
     }
     *iter = 0;//f[0] == 0;
-    //int h = ::pow(2,::ceil(::log(wavin.sampleps()*winsecs)/::log(2))); //hopsize
+    int b_hop = 7;
+    model = svm_load_model("/Users/user/model.dat");
     qreal threshhold1 = 0.5; //standard
     qreal threshhold2 = 0.4; //the lowest requirement for f_onset
     qreal threshhold3 = 0.6; //to compensate for the decline of the requirement for f_onset, the local maximium must be greater than threshhold3
@@ -170,10 +177,43 @@ void Detector::compute_onset(const WavFile &wavin, std::vector<quint8> &pitch, s
         if(f.at(max)<f.at(m+1)) max = m+1;
         if ((max == m && f.at(m)>threshhold1) || (f.at(m)>threshhold2 && f.at(max)>threshhold3)){
             onset.push_back(m);
-            qDebug()<<m*winsecs;
+            qDebug()<<"compute "<< m;
+
+            vector<qreal>feature;
+            if(m+4<=f.size()){
+                //qDebug()<<"cqt";
+                vector<cmplx> cq = Spectrum::CQT(signal.data()+(m+2)*h, 2*h, 1);
+
+                //qDebug()<<"cqt "<<cq.size();
+                for(int k=1;k<83;++k){
+                    qreal tmpsum = 0;
+                    for(int j=k*b_hop-int(b_hop/2); j<=k*b_hop+int(b_hop/2);++j)
+                        tmpsum += abs(cq.at(j));
+                    feature.push_back(tmpsum/b_hop);
+                }
+                maxNormalize(feature);
+
+            }else{
+                feature.assign(82, 0.0);
+            }
+            //qDebug()<<m*winsecs;
+            //qDebug()<<feature.front()<<","<<feature.back();
+
+            max_nr_attr = 128;
+            x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
+            for(int i=0;i<feature.size();++i){
+                x[i].index = i;
+                x[i].value = feature.at(i);
+            }
+            x[feature.size()].index = -1;
+            double predict_label = svm_predict(model,x);
+            qDebug()<<"predict pitch"<<predict_label;//modify here
         }
     }
     //doing cqt and svm to compute pitch
+
+
+
 
 
 
@@ -185,13 +225,19 @@ void Detector::compute_onset(const WavFile &wavin, std::vector<quint8> &pitch, s
      for(quint32 i=onset.size()-1;i>0;--i){
          qreal tmp = onset[i-1]-onset[i];
          dura.push_back(3*(quint16)(tmp/bestbeat+0.5));
-         qDebug()<<dura.back();
+         //qDebug()<<dura.back();
      }
 
 
 
 
 
+}
+
+void Detector::computeOnset(const WavFile &wavin){
+    vector<quint8> pitch;
+    vector<quint16> dura;
+    compute_onset(wavin, pitch, dura);
 }
 
 void Detector::analysis(std::string insrc, std::string modelsrc, std::string outsrc){
@@ -233,6 +279,10 @@ double Detector::winsecs = 0.03;
 void Detector::exit_input_error(int line_num)
 {
     fprintf(stderr,"Wrong input format at line %d\n", line_num);
+}
+
+void Detector::loadNodeFromFile(FILE *input){
+
 }
 
 //important part!!

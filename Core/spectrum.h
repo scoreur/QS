@@ -59,7 +59,8 @@ public:
     static std::vector<qreal> DCT(const qreal data[], quint32 num, bool mode = true);//half length fo DFT
     static std::vector<cmplx> FFT(const cmplx data[], quint32 num, bool mode = true);
     static std::vector<qreal> realFFT(qreal data[], quint32 num, quint8 step=1, bool useHanning = true);
-    static std::vector<cmplx> CQT(const qreal data[], quint32 num, bool mode = true);
+    static std::vector<cmplx> CQT(qreal data[], quint32 num, quint8 step = 1);
+    static std::vector<cmplx> CQT(qreal fmin, qreal fmax, quint32 bins, quint16 sampleps, qreal data[], quint32 num);
 
     static void test();//for testing
 
