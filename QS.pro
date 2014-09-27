@@ -20,9 +20,9 @@ SOURCES += main.cpp\
     General/qswindow.cpp \
     General/qsview.cpp \
     General/qsscene.cpp \
-    pianokey.cpp \
+    General/pianokey.cpp \
     qspreset.cpp \
-    qsplayer.cpp \
+    General/qsplayer.cpp \
     Wave/wavscene.cpp \
     Wave/wavframe.cpp \
     Score/scoreitem.cpp \
@@ -32,7 +32,7 @@ SOURCES += main.cpp\
     Core/spectrum.cpp \
     midiparser.cpp \
     Wave/wavfile.cpp \
-    qsrecorder.cpp \
+    General/qsrecorder.cpp \
     Wave/spectrumgraph.cpp \
     Core/pywrap.cpp \
     Core/svm.cpp \
@@ -42,8 +42,8 @@ HEADERS  += General/qswindow.h \
     General/qsview.h \
     General/qsscene.h \
     qspreset.h \
-    pianokey.h \
-    qsplayer.h \
+    General/pianokey.h \
+    General/qsplayer.h \
     Wave/wavscene.h \
     Wave/wavframe.h \
     Wave/lame.h \
@@ -56,7 +56,7 @@ HEADERS  += General/qswindow.h \
     midiparser.h \
     decorator.h \
     MIDIFile.hpp \
-    qsrecorder.h \
+    General/qsrecorder.h \
     Wave/spectrumgraph.h \
     Core/pywrap.h \
     Core/Python.h \
