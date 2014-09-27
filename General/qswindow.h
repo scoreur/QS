@@ -16,7 +16,13 @@
 #include "qsrecorder.h"
 #include "qsplayer.h"
 
+/**
+ * @brief domainName, the domain of Scoreur Project
+ */
 const QString domainName = "scoreur.net";
+/**
+ * @brief appName, the app name of current Qt GUI
+ */
 const QString appName = "QtScoreur";
 class WavFile;
 
@@ -24,6 +30,9 @@ namespace Ui {
 class QSWindow;
 }
 
+/**
+ * @brief The QSWindow class, main window of the Qt project
+ */
 class QSWindow : public QMainWindow
 {
     Q_OBJECT
@@ -44,11 +53,20 @@ public slots:
 
     void generalPreset(int mode, int arg);
     void generalPreset(int mode, QSize size);
+    /**
+     * @brief keyInput, read the keyboard input into score scene
+     * @param dura
+     */
     void keyInput(quint8, quint8 dura);
 
 
-    //music play
+    /**
+     * @brief musicInit, initiate the music thread
+     */
     void musicInit();
+    /**
+     * @brief musicPlay, play the audio file
+     */
     void musicPlay();
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
@@ -58,6 +76,12 @@ public slots:
         addScene(wavView, fileName);
     }
 
+    /**
+     * @brief onsetDetect
+     * @param wavFile
+     * @param fileName
+     * @return
+     */
     quint32 onsetDetect(const WavFile &wavFile, const QString &fileName);
     quint32 onsetDetect(const WavFile &wavFile, QVector<quint8>&pitch, QVector<qreal>&onset);
 
@@ -106,6 +130,9 @@ private slots:
     void record();
 
 
+    /**
+     * @brief changePreset, change the preset parameters
+     */
     void changePreset();
 
 };

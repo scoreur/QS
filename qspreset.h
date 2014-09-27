@@ -17,16 +17,27 @@ namespace Ui{
 class QSPreset;
 }
 
+/**
+ * @brief The QSPreset class
+ *
+ *
+ */
+
 class QSPreset : public QDialog
 {
     Q_OBJECT
 public:
     ~QSPreset();
-    //singleton pattern
+    /**
+     * @brief getInstance
+     * @param parent
+     * @return the singleton instance of QSPreset
+     */
     static QSPreset* getInstance(QWidget *parent = 0){
         if(instance == 0) instance = new QSPreset(parent);
         return instance;
     }
+
     //general(in QSWindow)
     static QSize winSize;
     static QSize tabSize;
@@ -49,6 +60,12 @@ public:
     static qreal staffLineInterval;
     static qreal staffLineSpacing;
     static QColor noteColor[2];
+
+    /**
+     * @brief The StaffType enum
+     *
+     * Define the type of staff notes
+     */
     enum StaffType{
         tr_clef = 0,
         ba_clef,
@@ -59,15 +76,34 @@ public:
         nature,
 
     };
+    /**
+     * @brief store the staff images
+     */
     QPixmap images[20];//TODO: add more
+    /**
+     * @brief operator []
+     * @param i
+     * @return the image of staff item with defined enum index
+     */
     QPixmap &operator[](quint32 i){
             return images[i%20];
     }
+    /**
+     * @brief update staff images
+     */
     void updateImages();
+    /**
+     * @brief update QPicture with painter commands
+     */
     void updatePictures();
 
-    //QSettings
+    /**
+     * @brief read Settings of last storage
+     */
     void readSettings();
+    /**
+     * @brief save Settings when exit the program
+     */
     void writeSettings();
 
 public slots:
@@ -78,6 +114,9 @@ private:
     explicit QSPreset(QWidget *parent = 0);
     Ui::QSPreset *ui;
     static QSPreset *instance;
+    /**
+     * @brief Consturct the stack widget of preset dialog
+     */
     void widgetConsturct();
     //void switchStack(QWidget *widget);
 
@@ -86,6 +125,11 @@ private slots:
 };
 
 // types of ScoreLine & StaffLine
+/**
+ * @brief The LineType enum
+ *
+ * Define supported line type in scoreView and staffView
+ */
 enum LineType{
     NOTES = 0,
     TITLE,

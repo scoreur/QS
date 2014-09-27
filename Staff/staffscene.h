@@ -14,7 +14,9 @@ class StaffImages;
 class StaffLine;
 
 
-
+/**
+ * @brief The StaffScene class, for staves typesetting and editing
+ */
 class StaffScene : public QSScene{
 public:
     StaffScene(QGraphicsView *view, QString fileName);
@@ -27,6 +29,9 @@ private:
 
 };
 
+/**
+ * @brief The StaffMeasure class, hold staff item of one measure
+ */
 class StaffMeasure : QGraphicsRectItem{
 
 public:
@@ -38,7 +43,9 @@ private:
 };
 
 
-
+/**
+ * @brief The StaffLine class, hold staff measures/notations in one line
+ */
 class StaffLine : public QGraphicsRectItem{
 public:
     StaffLine(QGraphicsScene *scene, quint32 _type, QGraphicsItem *parent = 0);

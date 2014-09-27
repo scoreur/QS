@@ -10,18 +10,37 @@
 
 class ScoreLine;
 
+/**
+ * @brief The ScoreScene class, for score typesetting and editing
+ */
 class ScoreScene : public QSScene
 {
 
 public:
     ScoreScene(QGraphicsView *view, QString fileName = "");
     ~ScoreScene();
-    //load score.txt
+    /**
+     * @brief load score file
+     * @param fileName
+     * @return number of notes
+     */
     quint32 load(QString fileName);
-    //save score.txt
+    /**
+     * @brief save store file to local file
+     * @param fileName
+     * @return number of stored notes
+     */
     quint32 store(QString fileName);
-    //append new notes; when num<0, remove abs(num) notes from the back
+    /**
+     * @brief append new notes; when num<0, remove abs(num) notes from the back
+     * @param num
+     * @param notes
+     * @param duras
+     */
     void append(qint16 num, uchar * notes = 0, quint8 * duras = 0);
+    /**
+     * @brief Update all score lines
+     */
     void lineUpdate();
 protected:
     void drawBackground(QPainter *painter, const QRectF *rect);
@@ -34,6 +53,9 @@ private:
     quint32 len;
 };
 
+/**
+ * @brief The ScoreLine class, holding simple score notes of one line
+ */
 class ScoreLine : public QGraphicsRectItem
 {
 public:
@@ -43,8 +65,11 @@ public:
     LineType type;
 
 
-    QString text;//
-    Decorator *decorator;
+    QString text;//displaying line number or else
+    /**
+     * @brief decorator, provide extension to draw extra painting
+     */
+    Decorator *decorator;//
     static quint8 nTicksPerBeat, nBeatsPerMeasure, nMeasuresPerLine;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -57,7 +82,9 @@ private:
 
 };
 
-
+/**
+ * @brief The BarDecorator class, provide extra painting of barlines, bottom lines, dots, etc.
+ */
 class BarDecorator : public Decorator{
 public:
     BarDecorator(): ticks(12), duraPtr(0), temp_x(0), path(0){}

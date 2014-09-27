@@ -11,6 +11,9 @@
 #include <QAudioOutput>
 #include <QPushButton>
 
+/**
+ * @brief The QSRecorder class, for recording microphone inputs
+ */
 class QSRecorder : public QObject
 {
 

@@ -10,6 +10,7 @@ typedef std::complex<double> cmplx;
 #include <QVector>
 #include <QMap>
 
+/// @brief frequency table for fast lookup
 const double FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
                                    34.6478,36.7081,38.8909,41.2034,
                                    43.6535,46.2493,48.9994,51.9131,
@@ -31,35 +32,121 @@ const double FreqPiano[88] = {      27.5,29.1352,30.8677,32.7032,
                                    3729.31,3951.07,4186.01};//88 frequencies of piano keys
 
 /////////////////////////////////////////////
-/// @brief logarithmic spectrum based of piano
+/// @brief logarithmic based spectrum
 ///
-/// provide basic analysis function
+/// provide basic spectrum analysis function like FFT, STFT, DCT, CQT, etc.
 ///
-/// @author wyj
+///
 //////////////////////////////////////////////
 class Spectrum
 {
 public:
+    /**
+     * @brief Constructor of Spectrum Class
+     * @param data
+     * @param num
+     * @param mode
+     * @param step, single channel or double channel
+     */
     Spectrum(qint16 *data, quint32 num, quint8 mode=0, quint8 step=1);
     ~Spectrum(){}
 
+    /**
+     * @brief build the spectrum with data
+     * @param data
+     * @param num
+     * @param mode
+     * @param step
+     * @param sampleps
+     */
     void build(qint16 *data, quint32 num, quint8 mode = 0, quint8 step = 1, quint32 sampleps = 44100);
 
     QMap<double, quint8>peaks;//store the possible peaks;
     void findPeaks(double threshold = 0);//default: clear
 
     static double PianoFreqGen(qreal pitch);//for decimal pitch
+    /**
+     * @brief exp2iPI
+     * @param freq
+     * @return the complex unit root with required circular frequency
+     */
     static cmplx exp2iPI(double freq);
+    /**
+     * @brief order2
+     * @param num
+     * @return the smallest order of 2 no less than num
+     */
     static quint16 order2(quint32 num);
+    /**
+     * @brief bitrev
+     * @param num
+     * @param ord
+     * @return the number with bit order reversed
+     */
     static quint32 bitrev(quint32 num, quint16 ord);
 
     //mode == false for inverse transform;
+    /**
+     * @brief one point shortime FT with window function
+     * @param data
+     * @param num
+     * @param freq
+     * @param addWindow
+     * @param step
+     * @return
+     */
     static cmplx STFT1P(const qint16 data[], quint32 num, qreal freq, bool addWindow = false, quint8 step=1);
+    /**
+     * @brief Discrete FT
+     * @param data
+     * @param num
+     * @param mode
+     * @return
+     */
     static std::vector<cmplx> DFT(const cmplx data[], quint32 num, bool mode = true);
+    /**
+     * @brief Discrete Cosine Transform of type II
+     * @param data
+     * @param num
+     * @param mode
+     * @return
+     */
     static std::vector<qreal> DCT(const qreal data[], quint32 num, bool mode = true);//half length fo DFT
+    /**
+     * @brief efficent implementation of FFT in iterative way
+     * @param data
+     * @param num
+     * @param mode
+     * @return
+     */
     static std::vector<cmplx> FFT(const cmplx data[], quint32 num, bool mode = true);
+    /**
+     * @brief FFT with real input and output
+     * @param data
+     * @param num
+     * @param step
+     * @param useHanning, add Hanning window or not
+     * @return
+     */
     static std::vector<qreal> realFFT(qreal data[], quint32 num, quint8 step=1, bool useHanning = true);
+    /**
+     * @brief Constant Q Transform with predefined min/max frequencies and number of bins
+     * @param data
+     * @param num
+     * @param step
+     * @return
+     */
     static std::vector<cmplx> CQT(qreal data[], quint32 num, quint8 step = 1);
+    /**
+     * @brief CQT of basic form
+     * @param fmin
+     * @param fmax
+     * @param bins
+     * @param sampleps
+     * @param data
+     * @param num
+     * @return
+     */
     static std::vector<cmplx> CQT(qreal fmin, qreal fmax, quint32 bins, quint16 sampleps, qreal data[], quint32 num);
 
     static void test();//for testing
@@ -69,7 +156,14 @@ public:
     quint32 vallen = 88;
 
 };
-
+/**
+ * @brief interpolation3P, cubic interpolation
+ * @param delta
+ * @param y0
+ * @param y1
+ * @param y2
+ * @return
+ */
 qreal interpolation3P(qreal delta, qreal y0, qreal y1, qreal y2);
 
 #endif // SPECTRUM_H

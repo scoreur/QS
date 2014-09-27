@@ -6,7 +6,9 @@
 #include <QGraphicsSceneMouseEvent>
 
 
-
+/**
+ * @brief The StaffItem class, for drawing/editing single staff notation
+ */
 class StaffItem : public QGraphicsObject
 {
     Q_OBJECT
@@ -46,6 +48,9 @@ private:
 
 };
 
+/**
+ * @brief The KeySignature class, draw key signature accoring to chose keys
+ */
 class KeySignature : public QGraphicsObject
 {
     Q_OBJECT

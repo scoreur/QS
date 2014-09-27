@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+/**
+ * @brief show welcome effect, enabled when released
+ */
 void welcomeEffect(){
     QLabel *welc = new QLabel(0,Qt::FramelessWindowHint);
     QPixmap pixmap(QString(":/image/lm.jpg"),"JPG");

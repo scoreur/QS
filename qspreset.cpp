@@ -116,7 +116,7 @@ QRect QSPreset::staffViewRect = QRect(0,0, 800,300);
 
 //wave
 QColor QSPreset::wavForegroundColor = QColor(20, 200, 50, 220);
-QColor QSPreset::wavBackgroundColor = QColor(15, 15, 15, 240);
+QColor QSPreset::wavBackgroundColor = QColor(30, 30, 30, 240);
 
 //score
 QSize QSPreset::scorePageSize = QSize(800,600);

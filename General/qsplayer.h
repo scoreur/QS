@@ -15,6 +15,9 @@
 class QSWindow;
 class QSLrcLine;
 
+/**
+ * @brief The QSPlayer class, playing audio file in other thread
+ */
 class QSPlayer : public QThread
 {
     Q_OBJECT
@@ -35,6 +38,9 @@ public slots:
     
 };
 
+/**
+ * @brief The QSLrcLine class, displaying lyrics
+ */
 class QSLrcLine : public QLabel{
     Q_OBJECT
 public:

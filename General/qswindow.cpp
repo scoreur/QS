@@ -78,6 +78,7 @@ QSWindow::QSWindow(QWidget *parent) :
     fd.close();
     fw.close();
 
+    addScene(staffView);
     addScene(scoreView, sampleScore+QString(".txt"));
     if(! QFileInfo(sampleScore+QString(".wav")).isFile()){
         WavFile wavOut;
@@ -93,7 +94,7 @@ QSWindow::QSWindow(QWidget *parent) :
         playButton->setEnabled(true);
 
     }
-    addScene(staffView);
+
     keyScene = new KeyScene(keyView, this);
 
     //add webView
@@ -101,7 +102,7 @@ QSWindow::QSWindow(QWidget *parent) :
     webView->setOrientation(Html5ApplicationViewer::ScreenOrientationAuto);
     webView->resize(900, 400);
     webView->showExpanded();
-    //webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
+    webView->loadUrl(QUrl(QLatin1String("http://www.scoreur.net")));
 
 
 

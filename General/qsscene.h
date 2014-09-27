@@ -9,7 +9,9 @@
 class QGraphicsItem;
 class QGraphicsView;
 
-
+/**
+ * @brief The KeyScene class, for displaying piano keyboard
+ */
 class KeyScene : public QGraphicsScene
 {
 public:
@@ -32,6 +34,9 @@ private:
     static qint8 keyhold;
 };
 
+/**
+ * @brief The QSScene class, base class of important graphics scenes in the project
+ */
 class QSScene : public QGraphicsScene{
 
 public:
@@ -40,6 +45,10 @@ public:
     QString Name() const{
         return name;
     }
+    /**
+     * @brief Opened
+     * @return the menu action associated with the scene
+     */
     QAction *Opened() const{
         return act;
     }
@@ -48,9 +57,6 @@ public:
     virtual quint32 store(QString fileName) = 0;
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     void dropEvent(QGraphicsSceneDragDropEvent *event);
-
-
-
 
 
 private:

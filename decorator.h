@@ -1,6 +1,9 @@
 #ifndef DECORATOR_H
 #define DECORATOR_H
 
+/**
+ * @brief The Decorator class, using decorator design pattern for drawing
+ */
 class Decorator{
 
 public:

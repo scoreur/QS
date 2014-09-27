@@ -6,6 +6,9 @@
 #include <QMouseEvent>
 #include <QLabel>
 
+/**
+ * @brief The QSView class, base class of other important graphics views in the project
+ */
 class QSView : public QGraphicsView
 {
 public:
@@ -18,7 +21,9 @@ protected:
     void dropEvent(QDropEvent *event);
 };
 
-
+/**
+ * @brief The WavView class, for holding wave scene
+ */
 class WavView : public QSView{
 
 public:
@@ -33,7 +38,9 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
 };
-
+/**
+ * @brief The ScoreView class, for holding score scene
+ */
 class ScoreView : public QSView{
 
 public:

@@ -15,7 +15,12 @@
 using std::vector;
 using std::string;
 
-
+/**
+ * @brief convert byte arrays into bigEndian integer
+ * @param length
+ * @param size
+ * @return
+ */
 quint32 B2bigEndian(const quint8 *length, quint16 size = 4){
     quint32 tmp = (quint32)length[0];
     for(int i=1;i<size;++i){
@@ -23,7 +28,11 @@ quint32 B2bigEndian(const quint8 *length, quint16 size = 4){
     }
     return tmp;
 }
-
+/**
+ * @brief convert byte sequence into vary-length Number
+ * @param length
+ * @return
+ */
 quint32 B2varyNum(char* &length){
     quint32 tmp = 0x7F & (quint32)*(length);
     while(0x80 & (quint32)*length)
@@ -32,26 +41,43 @@ quint32 B2varyNum(char* &length){
     return tmp;
 }
 
+/**
+ * @brief The Chunk struct, basic component of midi file
+ */
 struct Chunk{
     char type[4];
     quint8 length[4];
     char *content;
     
+    /**
+     * @brief prepare an empty Chunk for writing
+     */
     Chunk(): content(0){    //for writing
         *(quint32*)type = (quint32)0;
         *(quint32*)length = (quint32)0;
     }
+    /**
+     * @brief read Chunk from byte array
+     * @param in
+     */
     Chunk(char *in){        //for reading
         memcpy(type, in, 4);
         memcpy(length, (in+4), 4);
         content = in+8;         //shallow copy
     }
+    /**
+     * @brief get the length of chunk in bytes
+     * @return
+     */
     quint32 len() const{            //big endian
         return B2bigEndian(length);
     }
     
 };
 
+/**
+ * @brief The ControlChunk struct, chunks contain control commands
+ */
 struct ControlChunk{
     quint32 deltaTime;
     char type;// <=0x7F, or 0xF0/0xF7
@@ -75,6 +101,9 @@ struct ControlChunk{
 
 };
 
+/**
+ * @brief The MidiEvent struct
+ */
 struct MidiEvent{
     quint32 deltaTime;
     char type;
@@ -94,7 +123,9 @@ struct MidiEvent{
     }
     ~MidiEvent(){}
     };
-/// @brief Midi Header chunck
+/**
+ * @brief The MidiHeader class, header chunks containing info of midi file
+ */
 class MidiHeader:public Chunk{
 public:
     MidiHeader(){
@@ -122,7 +153,9 @@ private:
     
 };
 
-/// @brief Midi Track Chunk
+/**
+ * @brief The MidiTrack class, track chunk containing info of tracks
+ */
 class MidiTrack:public Chunk{
 public:
     MidiTrack(){
@@ -167,7 +200,10 @@ private:
     
 };
 
-/// @brief Raw Midi data
+
+/**
+ * @brief The RawFile class, for reading raw file
+ */
 class RawFile{
 public:
     RawFile() : buffer(0), length(0){
@@ -188,6 +224,10 @@ public:
         in.seekg(0, std::ios::beg);
         in.read(buffer, length);
     }
+    /**
+     * @brief RawFile, copy constructor
+     * @param _raw
+     */
     RawFile(const RawFile& _raw):length(_raw.length){
         buffer = new char[length];
         memcpy(buffer, _raw.buffer, length);
@@ -215,7 +255,11 @@ private:
     
 };
 
-/// @brief Input Midi File
+
+
+/**
+ * @brief The MidiFileIn class, for reading midi file
+ */
 class MidiFileIn{
 public:
 
@@ -257,12 +301,15 @@ private:
 
 };
 
-class MIDIFileOut{
+/**
+ * @brief The MIDIFileOut class for writing midi file
+ */
+class MidiFileOut{
 public:
-    MIDIFileOut(quint32 _nTracks){
+    MidiFileOut(quint32 _nTracks){
 
     }
-    ~MIDIFileOut(){}
+    ~MidiFileOut(){}
 
     RawFile toRawFile(){
 

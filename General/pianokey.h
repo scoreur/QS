@@ -7,8 +7,12 @@
 //#include <QString>
 //#include <QThread>
 #include <QSound>
-#define HAVE_NATURAL_KEYSOUND //disable this when have no keysound
 
+#define HAVE_NATURAL_KEYSOUND //disable this when have no keysound in the "sound" folder
+
+/**
+ * @brief The PianoKey class, draw single pianokey with pressed effects
+ */
 class PianoKey: public QGraphicsObject
 {
 //no need to
@@ -45,6 +49,9 @@ public:
     bool isWhite() const{
         return is_white;
     }
+    /**
+     * @brief The enum of four types of keys
+     */
     enum TYPE{
         BLACK = 0,
         WHITE_LEFT,

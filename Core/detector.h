@@ -6,6 +6,9 @@
 #include "svm.h"
 #include "Wave/wavfile.h"
 
+/**
+ * @brief The Detector class, porting main algorithms of onset_detect, including svm
+ */
 class Detector{
 public:
     Detector();

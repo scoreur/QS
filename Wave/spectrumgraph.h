@@ -5,7 +5,9 @@
 #include <QPicture>
 
 class Spectrum;
-
+/**
+ * @brief The SpectrumGraph class, for drawing spectrum
+ */
 class SpectrumGraph: public QGraphicsRectItem{
 public:
     SpectrumGraph(Spectrum *spectrum, QGraphicsScene *scene, QGraphicsItem *parent = 0);

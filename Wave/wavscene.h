@@ -11,6 +11,9 @@
 class Spectrum;
 class SpectrumGraph;
 
+/**
+ * @brief The WavScene class, displaying waveforms and specturm graphs
+ */
 class WavScene : public QSScene
 {
 public:
@@ -36,6 +39,10 @@ public:
 
 
 public slots:
+    /**
+     * @brief getMoving, update waveform and spectrumgraph when receive moving signal
+     * @param fracPos
+     */
     void getMoving(qreal fracPos);
 
 protected:
@@ -58,7 +65,9 @@ private:
 
 };
 
-
+/**
+ * @brief The WavChannel class, support single/double channel(s)
+ */
 class WavChannel : QGraphicsRectItem{
 
 public:

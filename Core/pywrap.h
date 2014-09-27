@@ -1,6 +1,9 @@
 #ifndef PYWRAP_H
 #define PYWRAP_H
 
+/**
+ * @brief The Pywrap class, for wrapping python module
+ */
 class Pywrap
 {
 public:

@@ -3,6 +3,9 @@
 #include <string>
 #include <fstream>
 using namespace std;
+/**
+ * @brief The MidiParser class, for parsing midi into json array
+ */
 class MidiParser
 {
 public:

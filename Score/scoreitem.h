@@ -6,7 +6,9 @@
 #include <QGraphicsSceneMouseEvent>
 
 
-
+/**
+ * @brief The ScoreItem class, simple score notation
+ */
 class ScoreItem: public QGraphicsObject
 {
     Q_OBJECT
