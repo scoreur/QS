@@ -29,7 +29,7 @@ QSPreset::~QSPreset(){
 }
 
 void QSPreset::widgetConsturct(){
-    QSettings settings(domainName, appName);
+    QSettings settings(QSAbout::domainName, QSAbout::appName);
 
     ui->listWidget->addItem("general");
     ui->listWidget->addItem("wave");
@@ -139,7 +139,7 @@ QColor QSPreset::noteColor[2] = {QColor(15,15,15,250), Qt::blue};
 //////////////////////////////////////////////////////////////////////////////
 
 void QSPreset::readSettings(){
-    QSettings settings(domainName, appName);
+    QSettings settings(QSAbout::domainName, QSAbout::appName);
     QSWindow * win = (QSWindow*)parent();
     settings.beginGroup("general");
     win->resize(settings.value("winSize", winSize).toSize());
@@ -158,7 +158,7 @@ void QSPreset::readSettings(){
 
 }
 void QSPreset::writeSettings(){
-    QSettings settings(domainName, appName);
+    QSettings settings(QSAbout::domainName, QSAbout::appName);
     QSWindow * win = (QSWindow*)parent();
     settings.beginGroup("general");
     settings.setValue("winSize", win->size());

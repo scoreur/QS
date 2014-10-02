@@ -5,6 +5,7 @@
 
 void welcomeEffect();
 
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -29,3 +30,29 @@ void welcomeEffect(){
     QTimer::singleShot(3000, welc, SLOT(close()));
     QTimer::singleShot(3500, welc, SLOT(deleteLater()));
 }
+
+// about info
+QString QSAbout::version = "0.9";
+QString QSAbout::date = "Oct. 1, 2014";
+QString QSAbout::copyright = "© QtScoreur";
+QString QSAbout::domainName = "scoreur.net";
+QString QSAbout::appName = "QtScoreur";
+
+
+QString getAbout(int attr){
+    switch(attr){
+    case 0:
+        return QSAbout::version;
+    case 1:
+        return QSAbout::date;
+    case 2:
+        return QSAbout::domainName;
+    case 3:
+        return QSAbout::appName;
+    case 4:
+        return QSAbout::copyright;
+    }
+    return QString();
+}
+
+

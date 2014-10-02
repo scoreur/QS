@@ -41,8 +41,8 @@ QSWindow::QSWindow(QWidget *parent) :
     recorder(new QSRecorder(this)),
     preset(QSPreset::getInstance(this))
 {
-    //qDebug()<<QSettings(domainName, appName).scope();
-    //QSettings(domainName, appName).clear();//remove this line in release version
+    //qDebug()<<QSettings(QSAbout::domainName, QSAbout::appName).scope();
+    //QSettings(QSAbout::domainName, QSAbout::appName).clear();//remove this line in release version
     ui->setupUi(this);
     preset->readSettings();//ALSO construct ALL Views!!
 

@@ -16,14 +16,18 @@
 #include "qsrecorder.h"
 #include "qsplayer.h"
 
-/**
- * @brief domainName, the domain of Scoreur Project
- */
-const QString domainName = "scoreur.net";
-/**
- * @brief appName, the app name of current Qt GUI
- */
-const QString appName = "QtScoreur";
+class QSAbout{
+public:
+    QSAbout(){}
+
+    static QString version, date;
+    static QString domainName, appName;
+    static QString copyright;
+
+};
+QString getAbout(int attr);
+
+
 class WavFile;
 
 namespace Ui {
