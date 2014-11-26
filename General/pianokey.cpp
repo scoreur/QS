@@ -9,8 +9,7 @@
 
 
 #ifdef HAVE_NATURAL_KEYSOUND
-QString PianoKey::soundpath = QDir::currentPath().append("/../../../../QS/sound/keyboard/piano_%1.wav");
-        //QString("/Users/user/Documents/compile/Qt5/QS/sound/keyboard/piano_%1.wav");
+QString PianoKey::soundpath = QString("/Coding/Qt/QS/sound/keyboard/piano_%1.wav");
 #else
 QString PianoKey::soundpath = QDir::homePath() + QString("/QS_tmp/keysound/piano_%1.wav");
 #endif
